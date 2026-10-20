@@ -85,6 +85,13 @@ button:focus-visible,#say:focus-visible{outline:3px solid var(--gold);outline-of
 @keyframes draw{to{stroke-dashoffset:0}}
 @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes walk{from{transform:rotate(14deg)}to{transform:rotate(-14deg)}}
+/* montage look: word-by-word captions, wipe between scenes, lower-third tag */
+.kin span{display:inline-block;animation:kin .55s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes kin{from{opacity:0;transform:translateY(.45em) scale(.85);filter:blur(7px)}to{opacity:1;transform:none;filter:none}}
+.wipe{position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(100deg,var(--maroon) 0 60%,var(--gold) 60% 63%,transparent 63%);transform:translateX(-100%);animation:wipe .85s ease-in-out forwards}
+@keyframes wipe{0%{transform:translateX(-100%)}50%{transform:translateX(0)}100%{transform:translateX(100%)}}
+.tag.in{animation:tagin .7s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes tagin{from{transform:translateX(-130%)}to{transform:none}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
 </style>
 <div class="app" dir="rtl" id="app">
@@ -204,11 +211,11 @@ const colorWords={'أحمر':'#c0243f','احمر':'#c0243f','أزرق':'#2a7bd0'
 /* ---------- drawing ---------- */
 let currentKey=null;
 function show(key,custom){
-  run++;
+  run++; wipe();
   if(lessons[key]){ currentKey=key; runLesson(lessons[key]()); return; }
   const s=scenes[key]; if(!s) return;
   currentKey=key;
-  tag.textContent=s.t;
+  punchTag(s.t);
   art.innerHTML=`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${s.t}">${s.svg()}</svg>`;
   fact.textContent=s.f||'';
   qcard.hidden=true;
@@ -220,9 +227,28 @@ function showQuestion(q){
   art.innerHTML='';
   fact.textContent='';
 }
+let shownWords=0;
 function setLive(text,hint){
-  live.textContent=text||'';
   live.classList.toggle('hint',!!hint);
+  if(hint){ live.textContent=text||''; shownWords=0; return; }
+  const words=String(text||'').split(/\s+/).filter(Boolean);
+  /* keep words already on screen; only the new ones pop in */
+  if(words.length<shownWords){ live.textContent=''; shownWords=0; }
+  for(let i=shownWords;i<words.length;i++){
+    const sp=document.createElement('span'); sp.className='kin'; sp.textContent=words[i]+' ';
+    sp.style.animationDelay=((i-shownWords)*0.07)+'s';
+    live.appendChild(sp);
+  }
+  shownWords=words.length;
+}
+/* transition: a colour wipe crosses the stage when a new scene arrives */
+function wipe(){
+  const st=document.getElementById('stage'); if(!st) return;
+  const w=document.createElement('div'); w.className='wipe'; st.appendChild(w);
+  setTimeout(()=>w.remove(),900);
+}
+function punchTag(txt){
+  tag.textContent=txt; tag.classList.remove('in'); void tag.offsetWidth; tag.classList.add('in');
 }
 
 /* ---------- hand-drawn effect: pencil outlines draw one by one, then colour fills in ---------- */
@@ -404,10 +430,10 @@ function handle(raw,interim){
 }
 /* any other spoken topic: big animated word card */
 function showGeneric(topic){
-  currentKey=null; color=null;
+  currentKey=null; color=null; wipe();
   const word=esc(topic.replace(/[.،؟!?]+$/,'').trim().slice(0,40));
   const size=word.length>14?30:word.length>7?44:60;
-  tag.innerHTML=word;
+  punchTag(word);
   fact.textContent='';
   qcard.hidden=true;
   art.innerHTML=`<svg viewBox="0 0 400 300" role="img" aria-label="${word}">
@@ -509,7 +535,7 @@ async function aiDraw(topic){
     const svg=cleanSvg(res.svg);
     if(!svg) throw new Error('وصل رسم غير صالح من ChatGPT. قل الأمر مرة ثانية.');
     GPT.cache[k]=res;
-    tag.textContent=res.title||topic; fact.textContent=res.caption||'';
+    punchTag(res.title||topic); fact.textContent=res.caption||'';
     art.innerHTML=''; art.appendChild(svg); note.textContent='';
     sketch(svg);
   }catch(e){ if(my===run) note.textContent=e.message; }
