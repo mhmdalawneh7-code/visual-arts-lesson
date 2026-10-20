@@ -392,6 +392,8 @@ function handle(raw,interim){
   }
   if(/نظف|امسح|مسح/.test(t)){ clearAll(); return; }
   if(/مره ثانيه|اعد|كرر|مثال جديد|من جديد/.test(t) && currentKey){ show(currentKey); return; }
+  const cmdAI=raw.trim().match(/^(?:تخيل|تخيّل|اعرض|أعرض|اظهر|أظهر|وريني|ورني|ارسم)\s*(.+)$/);
+  if(cmdAI && GPT.key && !interim && !cw){ showGeneric(cmdAI[1]); aiDraw(cmdAI[1]); return; }
   const hit=keys.find(([re])=>re.test(t));
   if(hit){ color=cw?colorWords[cw]:null; show(hit[1]); note.textContent=cw?'اللون: '+cw:''; return; }
   if(cw && currentKey){ color=colorWords[cw]; show(currentKey,true); note.textContent='اللون: '+cw; return; }
