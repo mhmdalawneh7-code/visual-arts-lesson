@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>شاشة الدرس التفاعلي</title>
+<title>شاشة الدرس التفاعلي</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap">
 <style>
@@ -59,8 +59,12 @@ button:focus-visible,#say:focus-visible{outline:3px solid var(--gold);outline-of
 .gptchip{border-color:var(--sea);color:var(--sea)}
 .gptchip.linked{background:var(--sea);color:var(--ink)}
 .note{font-size:.8rem;color:rgba(244,234,215,.65);min-height:1.1em}
-.show .dock,.show .strip{display:none}
-.show .app{grid-template-rows:1fr}
+.show .strip,.show .chips,.show .note{display:none}
+.show .app{grid-template-rows:minmax(0,1fr) auto;padding-top:max(8px,env(safe-area-inset-top,0px))}
+.show .talk{padding-top:0}
+.show .main{grid-template-rows:minmax(0,1fr) auto}
+.show .main>.talk{max-height:30vh}
+#exit{display:none!important}
 #exit{display:none;position:fixed;inset-inline-end:max(12px,env(safe-area-inset-right,0px));top:max(10px,env(safe-area-inset-top,0px));min-height:36px;font-size:.8rem;opacity:.5;z-index:5}
 .show #exit{display:block}
 /* scene motion */
@@ -104,6 +108,7 @@ button:focus-visible,#say:focus-visible{outline:3px solid var(--gold);outline-of
       <input id="say" type="text" autocomplete="off" enterkeyhint="done" placeholder="اكتب هنا، أو اضغط مايك الكيبورد في الآيفون">
       <button id="show" type="button">نفّذ</button>
       <button id="clr" type="button">مسح</button>
+      <button id="full" type="button" aria-label="عرض بشاشة كاملة">ملء الشاشة</button>
     </div>
     <div class="note" id="note"></div>
     <div class="gptbox" id="gptbox" hidden>
@@ -543,7 +548,13 @@ say.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sub
 /* iPhone keyboard dictation types words into the box: show them live, run built-in commands at once, finish after a 2 s pause */
 say.addEventListener('input',()=>{ if(!say.value.trim()) return; handle(say.value,true); clearTimeout(sayTimer); sayTimer=setTimeout(submitSay,2000); });
 $('clr').addEventListener('click',clearAll);
-$('exit').addEventListener('click',()=>{ document.body.classList.remove('show'); });
+/* full-screen presentation: big stage, mic and input stay reachable; works fully on desktop, on iPhone add to Home Screen */
+function leaveFull(){ document.body.classList.remove('show'); try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(_){} }
+$('full').addEventListener('click',()=>{
+  if(document.body.classList.contains('show')){ leaveFull(); $('full').textContent='ملء الشاشة'; return; }
+  document.body.classList.add('show'); $('full').textContent='خروج';
+  try{ const el=document.documentElement; const rq=el.requestFullscreen||el.webkitRequestFullscreen; if(rq) rq.call(el).catch(()=>{}); }catch(_){}
+});
 
 /* quick chips: tap to show a topic */
 const chipList=[['نقطة التلاشي','vp1'],['منظور بنقطتين','vp2'],['طريق','road'],['الظل والنور','shade'],['نخلة','palm'],['سدو','sadu'],['محمل','mahmal'],['سفينة','dhow'],['خيمة','tent'],['جمل','camel'],['عمارة','mosque'],['زخرفة هندسية','geo'],['زخرفة نباتية','plant'],['خط عربي','calli']];
@@ -555,4 +566,3 @@ chipList.forEach(([label,key])=>{
 });
 })();
 </script>
-</body></html>
