@@ -1,0 +1,558 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>شاشة الدرس التفاعلي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+/* Layout: dark stage. Big animated scene on top, giant live words below, command dock at the bottom; widescreen splits into two columns. */
+:root{
+  --ink:#16090e; --ink2:#241017; --maroon:#8a1538; --pearl:#f4ead7; --sea:#2a9d9a; --gold:#e0a93f;
+  --c1:#e0a93f; --c2:#8a1538; --tsize:1;
+  --f-display:'Reem Kufi','Tajawal',system-ui,sans-serif; --f-body:'Tajawal',system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--pearl);font-family:var(--f-body);overflow:hidden}
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:10px;
+  padding-block:8px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+.strip{height:14px;border-radius:3px;background:
+  linear-gradient(135deg,var(--gold) 25%,transparent 25%) -7px 0/14px 14px,
+  linear-gradient(225deg,var(--gold) 25%,transparent 25%) -7px 0/14px 14px,var(--maroon)}
+.main{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.15fr) minmax(0,1fr);gap:12px;min-height:0;min-width:0}
+@media (min-aspect-ratio:5/4){.main{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
+.stage{position:relative;min-height:0;min-width:0;border-radius:18px;background:radial-gradient(120% 90% at 50% 100%,#3a1a24 0%,var(--ink2) 55%,var(--ink) 100%);
+  border:1px solid rgba(224,169,63,.35);overflow:hidden;display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:8px}
+#art{flex:1;min-height:0}
+.stage svg{width:100%;height:100%;max-height:100%}
+.tag{position:absolute;inset-inline-start:12px;top:10px;font-family:var(--f-display);font-size:clamp(1rem,2.6vw,1.6rem);
+  color:var(--c1);background:rgba(22,9,14,.7);padding:4px 14px;border-radius:999px;border:1px solid rgba(224,169,63,.4)}
+.fact{flex:none;font-size:clamp(.85rem,2.2vw,1.25rem);line-height:1.5;
+  background:rgba(22,9,14,.78);padding:8px 14px;border-radius:12px;border:1px solid rgba(244,234,215,.15)}
+.fact:empty{display:none}
+.talk{min-height:0;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:6px 8px;overflow:hidden}
+.label{font-size:.85rem;letter-spacing:.04em;color:var(--sea);display:flex;gap:8px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;background:#665;transition:.2s}
+.on .dot{background:#ff4d5e;box-shadow:0 0 0 6px rgba(255,77,94,.25);animation:pulse 1.2s infinite}
+#live{font-family:var(--f-display);font-weight:500;line-height:1.45;font-size:calc(clamp(2.3rem,9vw,5rem)*var(--tsize));
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;text-wrap:balance;transition:font-size .25s}
+#live.hint{opacity:.45;font-family:var(--f-body);font-size:calc(clamp(1.2rem,3.4vw,2.2rem)*var(--tsize))}
+.qcard{border:2px solid var(--gold);border-radius:16px;padding:12px 16px;background:rgba(224,169,63,.1)}
+.qcard b{display:block;font-size:.8rem;color:var(--gold);margin-bottom:4px;letter-spacing:.06em}
+.qcard span{font-family:var(--f-display);font-size:calc(clamp(1.5rem,5vw,3.4rem)*var(--tsize));line-height:1.4}
+.qcard[hidden]{display:none}
+.dock{display:flex;flex-direction:column;gap:8px;min-width:0}
+.row{display:flex;gap:8px;align-items:stretch}
+#say{flex:1;min-width:0;font:inherit;font-size:1.15rem;padding:12px 14px;border-radius:14px;border:1px solid rgba(244,234,215,.25);
+  background:rgba(244,234,215,.08);color:var(--pearl)}
+#say::placeholder{color:rgba(244,234,215,.5)}
+button{font:inherit;color:var(--pearl);background:rgba(244,234,215,.1);border:1px solid rgba(244,234,215,.25);border-radius:14px;
+  padding:0 16px;min-height:48px;cursor:pointer;transition:.15s}
+button:hover{background:rgba(244,234,215,.2)}
+button:focus-visible,#say:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#mic{background:var(--maroon);border-color:var(--gold);min-width:64px;font-weight:700}
+.on #mic{background:#c0243f}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:38px;padding:0 14px;font-size:.95rem;border-radius:999px}
+.gptbox{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--sea);border-radius:14px;background:rgba(42,157,154,.08)}
+.gptbox[hidden]{display:none}
+.gptbox label{font-size:.9rem;color:var(--sea)}
+#key{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid rgba(244,234,215,.25);background:rgba(244,234,215,.08);color:var(--pearl)}
+.gptchip{border-color:var(--sea);color:var(--sea)}
+.gptchip.linked{background:var(--sea);color:var(--ink)}
+.note{font-size:.8rem;color:rgba(244,234,215,.65);min-height:1.1em}
+.show .dock,.show .strip{display:none}
+.show .app{grid-template-rows:1fr}
+#exit{display:none;position:fixed;inset-inline-end:max(12px,env(safe-area-inset-right,0px));top:max(10px,env(safe-area-inset-top,0px));min-height:36px;font-size:.8rem;opacity:.5;z-index:5}
+.show #exit{display:block}
+/* scene motion */
+.sway{transform-origin:200px 150px;animation:sway 4s ease-in-out infinite alternate}
+.bob{animation:bob 3.6s ease-in-out infinite}
+.wave{animation:wave 3s linear infinite}
+.spin{transform-origin:200px 150px;animation:spin 40s linear infinite}
+.pop{animation:pop .7s cubic-bezier(.2,1.4,.4,1) both}
+.draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 2.6s ease forwards}
+.fade{animation:fade .9s ease both}
+.walk{transform-origin:50% 0;animation:walk 1.2s ease-in-out infinite alternate}
+@keyframes pulse{50%{transform:scale(1.25)}}
+@keyframes sway{to{transform:rotate(3deg)}}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-1deg)}}
+@keyframes wave{to{transform:translateX(-60px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes walk{from{transform:rotate(14deg)}to{transform:rotate(-14deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
+</style>
+<div class="app" dir="rtl" id="app">
+  <div class="strip" aria-hidden="true"></div>
+  <div class="main">
+    <section class="stage" id="stage" aria-live="polite">
+      <div class="tag" id="tag">الفنون البصرية</div>
+      <div id="art"></div>
+      <div class="fact" id="fact"></div>
+    </section>
+    <section class="talk">
+      <div class="label" id="lab"><i class="dot"></i><span id="status">جاهز</span></div>
+      <p id="live" class="hint">قل: تخيل نخلة، تخيل سدو، تخيل المحمل...</p>
+      <div class="qcard" id="qcard" hidden><b>سؤال للطلاب</b><span id="qtext"></span></div>
+    </section>
+  </div>
+  <div class="dock">
+    <div class="chips" id="chips"></div>
+    <div class="row">
+      <button id="mic" type="button" aria-label="تشغيل المايك">مايك</button>
+      <input id="say" type="text" autocomplete="off" enterkeyhint="done" placeholder="اكتب هنا، أو اضغط مايك الكيبورد في الآيفون">
+      <button id="show" type="button">نفّذ</button>
+      <button id="clr" type="button">مسح</button>
+    </div>
+    <div class="note" id="note"></div>
+    <div class="gptbox" id="gptbox" hidden>
+      <label for="key">مفتاح OpenAI API</label>
+      <div class="row"><input id="key" type="password" autocomplete="off" placeholder="sk-..."><button id="keysave" type="button">حفظ</button><button id="keydel" type="button">حذف</button></div>
+      <p class="note" id="keymsg"></p>
+      <p class="note">يُحفظ المفتاح في هذا الجهاز فقط، ولا يُكتب داخل الملف. لا تعطِ أحداً مفتاحك.</p>
+    </div>
+  </div>
+</div>
+<button id="exit" type="button">خروج</button>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const art=$('art'), live=$('live'), status=$('status'), fact=$('fact'), tag=$('tag'),
+      qcard=$('qcard'), qtext=$('qtext'), say=$('say'), note=$('note'), mic=$('mic'), chips=$('chips');
+let color=null; // user-chosen accent for the current scene
+
+/* ---------- scenes (inline SVG, simple shapes, animated) ---------- */
+const P='#f4ead7', G='#e0a93f', M='#8a1538', S='#2a9d9a', D='#16090e';
+const acc=(d)=>color||d||G;
+const scenes={
+ palm:{t:'النخلة',f:'النخلة رمز الخير والصبر في قطر، وتُذكر في الشعر والأمثال الشعبية.',svg:()=>`
+  <g class="sway"><path d="M200 300 Q196 200 206 120" stroke="#8b5a2b" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M206 120 Q140 80 90 120 Q140 100 206 130Z" fill="${acc()}" class="bob"/>
+  <path d="M206 120 Q270 70 320 118 Q270 100 206 130Z" fill="${acc()}" class="bob"/>
+  <path d="M206 120 Q180 50 210 30 Q212 80 206 130Z" fill="${acc()}"/>
+  <path d="M206 120 Q120 150 110 210 Q150 160 206 130Z" fill="${acc()}" opacity=".85"/>
+  <path d="M206 120 Q300 150 300 210 Q260 160 206 130Z" fill="${acc()}" opacity=".85"/></g>
+  <g fill="${M}">${[0,1,2,3,4,5].map(i=>`<circle cx="${190+i%2*10}" cy="${138+i*4}" r="6"/>`).join('')}</g>
+  <rect x="60" y="300" width="290" height="10" fill="${S}" class="fade"/>`},
+ sadu:{t:'السدو',f:'السدو فن نسيج بدوي تقليدي، تنسج النساء فيه الخطوط والمعينات بالألوان.',svg:()=>`
+  <rect x="70" y="60" width="260" height="200" rx="6" fill="${D}" stroke="${acc()}" stroke-width="6"/>
+  ${[0,1,2,3,4,5,6].map(i=>`<rect x="${90+i*35}" y="80" width="22" height="160" fill="${i%2?acc():M}" class="pop" style="animation-delay:${i*.08}s"/>`).join('')}
+  ${[0,1,2,3].map(i=>`<path d="M${120+i*60} 130 l22 22 l-22 22 l-22 -22z" fill="${P}" class="pop" style="animation-delay:${.5+i*.1}s"/>`).join('')}`},
+ mahmal:{t:'المحمل',f:'المحمل هودج يُزيّن الجمل، وكان يرافق موكب الحج ويحمل الزخرفة والكرامة.',svg:()=>`
+  <g class="bob"><path d="M90 230 L310 230 L290 150 L110 150Z" fill="${M}" stroke="${acc()}" stroke-width="6"/>
+  <path d="M130 150 Q200 60 270 150" fill="${acc()}" class="pop"/>
+  <circle cx="200" cy="120" r="18" fill="${P}" class="pop"/></g>
+  <rect x="80" y="240" width="240" height="10" fill="${S}"/>`},
+ dhow:{t:'السفينة الخشبية',f:'السفن الخشبية القطرية كانت تُبنى يدوياً، وتعتمد على الغوص واللؤلؤ والتجارة البحرية.',svg:()=>`
+  <rect x="0" y="230" width="400" height="70" fill="${S}" opacity=".7"/>
+  <g class="bob"><path d="M90 200 L320 200 L290 240 L120 240Z" fill="#6b3a1e"/>
+  <path d="M200 200 L200 70 L280 190Z" fill="${P}" class="pop"/>
+  <path d="M200 200 L200 110 L140 190Z" fill="${acc()}" class="pop"/></g>
+  <path d="M0 250 Q40 240 80 250 T160 250 T240 250 T320 250 T400 250" stroke="${P}" fill="none" stroke-width="3" class="wave"/>`},
+ tent:{t:'الخيمة',f:'بيت الشعر أو الخيمة من وبر الإبل والماعز، تقي من الحر والبرد.',svg:()=>`
+  <ellipse cx="200" cy="268" rx="190" ry="22" fill="#b98a4a" opacity=".5"/>
+  <path d="M50 262 L200 80 L350 262Z" fill="#6b4a33" class="pop"/>
+  <path d="M200 80 L350 262 L200 262Z" fill="#4a3123"/>
+  <path d="M92 262 L108 244 L292 244 L308 262Z" fill="${acc()}"/>
+  <path d="M170 262 L200 186 L230 262Z" fill="#16090e"/>
+  <path d="M200 80 L200 62" stroke="${P}" stroke-width="4"/>`},
+ camel:{t:'الجمل',f:'الإبل كانت رفيقة البدو، تحمل الأثقال وتعطي الحليب واللحم.',svg:()=>`
+  <ellipse cx="200" cy="286" rx="170" ry="10" fill="#b98a4a" opacity=".5"/>
+  <g class="bob" fill="${acc('#c08a4e')}" stroke="${acc('#c08a4e')}">
+   <path d="M105 170 Q105 140 140 140 Q165 98 195 140 L255 140 Q285 140 285 172 Q285 205 255 205 L140 205 Q105 205 105 170Z"/>
+   <path d="M270 150 Q312 112 304 74" fill="none" stroke-width="26" stroke-linecap="round"/>
+   <ellipse cx="318" cy="68" rx="26" ry="14" transform="rotate(-12 318 68)"/>
+   <path d="M108 160 Q88 180 94 215" fill="none" stroke-width="6" stroke-linecap="round"/>
+   <g stroke-width="13" stroke-linecap="round"><path d="M135 205 V278"/><path d="M165 205 V278"/><path d="M230 205 V278"/><path d="M258 205 V278"/></g>
+  </g>
+  <circle cx="324" cy="62" r="3" fill="${D}"/>`},
+ colors:{t:'الألوان الأساسية',f:'الألوان الأساسية: الأحمر والأصفر والأزرق، ومنها نصنع كل الألوان الأخرى.',svg:()=>`
+  <g style="mix-blend-mode:screen">
+   <circle cx="160" cy="125" r="68" fill="#e03a3e" class="pop"/>
+   <circle cx="240" cy="125" r="68" fill="#f2c230" class="pop" style="animation-delay:.2s"/>
+   <circle cx="200" cy="190" r="68" fill="#2a6fd0" class="pop" style="animation-delay:.4s"/></g>`},
+ mosque:{t:'العمارة الإسلامية',f:'القباب والمآذن والأقواس من أبرز عناصر العمارة الإسلامية، والقباب تعني السماء والمأذنة تعني الدعوة.',svg:()=>`
+  <rect x="110" y="150" width="180" height="140" fill="${P}" class="pop"/>
+  <path d="M120 150 Q200 60 280 150Z" fill="${acc()}" class="pop" style="animation-delay:.2s"/>
+  <rect x="290" y="90" width="22" height="200" fill="${P}" class="pop" style="animation-delay:.3s"/>
+  <path d="M289 90 L301 50 L313 90Z" fill="${acc()}"/>
+  <path d="M160 290 V220 Q175 190 190 220 V290 M210 290 V220 Q225 190 240 220 V290" stroke="${M}" stroke-width="8" fill="none"/>`},
+ geo:{t:'الزخرفة الهندسية',f:'الزخرفة الهندسية تقوم على تكرار الأشكال والنجوم والمضلعات، وتبدو بلا بداية ولا نهاية.',svg:()=>`
+  <g class="spin">${[0,1,2,3,4,5,6,7].map(i=>`<rect x="150" y="70" width="100" height="100" fill="none" stroke="${acc()}" stroke-width="4" transform="rotate(${i*22.5} 200 150)"/>`).join('')}</g>
+  <circle cx="200" cy="150" r="22" fill="${M}"/>`},
+ plant:{t:'الزخرفة النباتية',f:'الزخرفة النباتية تستلهم الأوراق والأغصان والزهور، وتتكرر في المساجد والمخطوطات.',svg:()=>`
+  <g class="spin">${[0,1,2,3,4,5].map(i=>`<ellipse cx="200" cy="100" rx="22" ry="60" fill="${acc()}" opacity=".85" transform="rotate(${i*60} 200 150)"/>`).join('')}</g>
+  <circle cx="200" cy="150" r="18" fill="${P}"/>`},
+ calli:{t:'الخط العربي',f:'الخط العربي فن قائم بذاته، من أشهر أنواعه الثلث والنسخ والكوفي.',svg:()=>`
+  <text x="200" y="185" text-anchor="middle" font-family="Reem Kufi,serif" font-size="110" fill="${acc()}" class="pop">بسم</text>`},
+ wall:{t:'الحرف',f:'',svg:()=>''}
+};
+const keys=[
+ [/نقطتين|بنقطتين|منظور ثنائي/,'vp2'],[/تلاشي|منظور|الافق/,'vp1'],[/طريق|سكه|شارع/,'road'],[/ظل|نور|ضوء|تظليل|كره/,'shade'],
+ [/الوان اساسي|الالوان الاساسي/,'colors'],[/نخل/,'palm'],[/سدو/,'sadu'],[/محمل|المحامل/,'mahmal'],[/سفين|قارب|مركب|سفن|دهو/,'dhow'],
+ [/خيم|بيت الشعر/,'tent'],[/جمل|ابل/,'camel'],[/عماره|قبه|مئذن|ماذن|منار|مسجد/,'mosque'],
+ [/هندس/,'geo'],[/نبات/,'plant'],[/خط|كتاب|كتابي/,'calli']
+];
+const colorWords={'أحمر':'#c0243f','احمر':'#c0243f','أزرق':'#2a7bd0','ازرق':'#2a7bd0','أخضر':'#2e9e5b','اخضر':'#2e9e5b','أصفر':'#f2c230','اصفر':'#f2c230','ذهبي':'#e0a93f','أبيض':'#f4ead7','ابيض':'#f4ead7','بني':'#8b5a2b','برتقالي':'#e8772e','أسود':'#222','اسود':'#222'};
+
+/* ---------- drawing ---------- */
+let currentKey=null;
+function show(key,custom){
+  run++;
+  if(lessons[key]){ currentKey=key; runLesson(lessons[key]()); return; }
+  const s=scenes[key]; if(!s) return;
+  currentKey=key;
+  tag.textContent=s.t;
+  art.innerHTML=`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${s.t}">${s.svg()}</svg>`;
+  fact.textContent=s.f||'';
+  qcard.hidden=true;
+  if(!custom) sketch(art.querySelector('svg'));
+}
+function showQuestion(q){
+  qcard.hidden=false; qtext.textContent=q; qcard.querySelector('b').textContent='سؤال للطلاب';
+  tag.textContent='سؤال';
+  art.innerHTML='';
+  fact.textContent='';
+}
+function setLive(text,hint){
+  live.textContent=text||'';
+  live.classList.toggle('hint',!!hint);
+}
+
+/* ---------- hand-drawn effect: pencil outlines draw one by one, then colour fills in ---------- */
+let sketchTimer=null;
+function sketch(svg){
+  if(!svg||!svg.animate||matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  svg.querySelectorAll('.pop,.draw,.fade').forEach(e=>e.classList.remove('pop','draw','fade'));
+  const els=[...svg.querySelectorAll('path,circle,ellipse,rect,line,polygon,polyline,text')]
+    .filter(e=>!e.closest('defs'));
+  const n=els.length; if(!n) return;
+  const PEN='#f4ead7', gap=Math.min(260,4200/n), dur=650, T=n*gap+dur;
+  note.textContent='جاري الرسم...';
+  clearTimeout(sketchTimer); sketchTimer=setTimeout(()=>{ if(note.textContent==='جاري الرسم...') note.textContent=''; },T+900);
+  els.forEach((el,i)=>{
+    const cs=getComputedStyle(el), isText=el.tagName==='text';
+    let len=600; try{ if(!isText) len=el.getTotalLength()||600; }catch(_){}
+    const fin={fill:cs.fill, stroke:cs.stroke, strokeWidth:cs.strokeWidth};
+    const pen={fill:'rgba(0,0,0,0)', stroke:PEN, strokeWidth:isText?'1.5px':'2.4px'};
+    const a=el.animate([
+      {strokeDasharray:len, strokeDashoffset:len, stroke:PEN, strokeWidth:pen.strokeWidth, fill:pen.fill},
+      {strokeDasharray:len, strokeDashoffset:0, stroke:PEN, strokeWidth:pen.strokeWidth, fill:pen.fill}
+    ],{duration:dur,delay:i*gap,easing:'ease-in-out',fill:'both'});
+    el.animate([pen,{fill:fin.fill,stroke:fin.stroke,strokeWidth:fin.strokeWidth}],
+      {duration:500,delay:T+i*50,easing:'ease-out',fill:'both'}).onfinish=function(){ this.cancel(); };
+    a.onfinish=()=>{ /* keep line visible until colour step takes over */ };
+    setTimeout(()=>{ try{a.cancel();}catch(_){} },T+i*50+520);
+  });
+}
+/* ---------- drawing lessons: a pencil draws construction lines step by step, with a fresh random example each time ---------- */
+let run=0;
+const NS='http://www.w3.org/2000/svg';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
+const ln=(a,b)=>{const j=()=>(Math.random()-.5)*2.4,m=lerp(a,b,.5);return `M${a[0]} ${a[1]} Q${m[0]+j()} ${m[1]+j()} ${b[0]} ${b[1]}`;};
+const poly=pts=>'M'+pts.map(p=>p.join(' ')).join(' L')+'Z';
+const circ=(cx,cy,r)=>`M${cx-r} ${cy} a${r} ${r} 0 1 1 ${2*r} 0 a${r} ${r} 0 1 1 ${-2*r} 0`;
+const inter=(a,b,c,d)=>{const den=(a[0]-b[0])*(c[1]-d[1])-(a[1]-b[1])*(c[0]-d[0]);const t=((a[0]-c[0])*(c[1]-d[1])-(a[1]-c[1])*(c[0]-d[0]))/den;return [a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])];};
+function mk(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+const GUIDE=S, LINE=P;
+
+async function drawStroke(g,pen,st,my){
+  const p=mk('path',{d:st.d,fill:'none',stroke:st.c||LINE,'stroke-width':st.w||3,'stroke-linecap':'round'},g);
+  const len=p.getTotalLength()||1; p.style.strokeDasharray=len; p.style.strokeDashoffset=len;
+  pen.setAttribute('opacity',1);
+  const dur=Math.max(380,Math.min(1100,len*5.5)), t0=performance.now();
+  await new Promise(res=>{
+    (function tick(now){
+      if(my!==run) return res();
+      const k=Math.min(1,(now-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      p.style.strokeDashoffset=len*(1-e);
+      const pt=p.getPointAtLength(len*e); pen.setAttribute('transform',`translate(${pt.x} ${pt.y})`);
+      if(k<1) requestAnimationFrame(tick); else res();
+    })(t0);
+  });
+  if(st.dash){ p.style.strokeDasharray=st.dash; p.style.strokeDashoffset=0; }
+}
+function fadeIn(e,to,ms){ e.style.transition=`opacity ${ms||600}ms`; requestAnimationFrame(()=>requestAnimationFrame(()=>{ e.style.opacity=to; })); }
+async function runLesson(L){
+  const my=++run; clearTimeout(sketchTimer);
+  tag.textContent=L.t; qcard.hidden=true; fact.textContent=''; note.textContent='';
+  art.innerHTML='<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+L.t+'"></svg>';
+  const svg=art.firstChild, g=mk('g',{},svg), pen=mk('g',{opacity:0},svg);
+  pen.innerHTML='<g transform="rotate(35)"><path d="M0 0 L-4 -10 L4 -10Z" fill="#f2c9a0"/><rect x="-4" y="-36" width="8" height="26" fill="#e0a93f"/><rect x="-4" y="-41" width="8" height="5" rx="1" fill="#c0243f"/></g>';
+  const n=L.steps.length;
+  for(let i=0;i<n;i++){
+    if(my!==run) return;
+    const s=L.steps[i];
+    fact.textContent='الخطوة '+(i+1)+' من '+n+': '+s.cap;
+    for(const st of s.strokes||[]){ await drawStroke(g,pen,st,my); if(my!==run) return; }
+    for(const f of s.fills||[]){ const p=mk('path',{d:f.d,fill:f.c,opacity:0},g); g.insertBefore(p,g.firstChild); fadeIn(p,f.o||.5,700); }
+    for(const d of s.dots||[]){ const c=mk('circle',{cx:d.p[0],cy:d.p[1],r:5,fill:d.c||G,opacity:0},g); fadeIn(c,1,400); }
+    for(const l of s.labels||[]){ const tx=mk('text',{x:l.x,y:l.y,'text-anchor':'middle','font-size':l.s||14,fill:l.c||P,'font-family':'Tajawal,sans-serif',opacity:0},g); tx.textContent=l.t; fadeIn(tx,1,500); }
+    await sleep(s.wait||700);
+  }
+  pen.setAttribute('opacity',0);
+  if(my===run) note.textContent='انتهى المثال. قل: مثال جديد، لمثال مختلف';
+}
+const lessons={
+ vp1:()=>{
+  const hy=rnd(100,130), vx=rnd(160,240), VP=[vx,hy];
+  const w=rnd(70,100), h=rnd(55,80), x0=rnd(40,360-w), y0=hy+rnd(40,60);
+  const A=[x0,y0],B=[x0+w,y0],C=[x0+w,y0+h],D=[x0,y0+h], t=rnd(.3,.45);
+  const a=lerp(A,VP,t),b=lerp(B,VP,t),c=lerp(C,VP,t),d=lerp(D,VP,t);
+  const right=x0+w<vx, left=x0>vx;
+  const solid=[ln(A,a),ln(B,b),ln(a,b)]; const fills=[{d:poly([A,B,C,D]),c:G,o:.3},{d:poly([A,B,b,a]),c:G,o:.6}];
+  if(right){ solid.push(ln(C,c),ln(b,c)); fills.push({d:poly([B,C,c,b]),c:G,o:.45}); }
+  if(left){ solid.push(ln(D,d),ln(a,d)); fills.push({d:poly([A,D,d,a]),c:G,o:.45}); }
+  return {t:'نقطة التلاشي',steps:[
+   {cap:'ارسم خط الأفق، وهو مستوى نظر العين.',strokes:[{d:ln([15,hy],[385,hy]),w:2.4}],labels:[{x:330,y:hy-8,t:'خط الأفق'}]},
+   {cap:'حدّد نقطة التلاشي على الخط. كل الخطوط العميقة تتجه إليها.',dots:[{p:VP}],labels:[{x:vx,y:hy-14,t:'نقطة التلاشي',c:G}]},
+   {cap:'ارسم الوجه الأمامي للصندوق كمستطيل عادي.',strokes:[ln(A,B),ln(B,C),ln(C,D),ln(D,A)].map(d=>({d}))},
+   {cap:'صل كل زاوية بنقطة التلاشي بخط خفيف.',strokes:[A,B,C,D].map(q=>({d:ln(q,VP),c:GUIDE,w:1.6,dash:'5 5'}))},
+   {cap:'قصّ الخطوط عند العمق الذي تريده، وأغلق الصندوق.',strokes:solid.map(d=>({d}))},
+   {cap:'لوّن كل وجه بدرجة مختلفة ليظهر الحجم.',fills}
+  ]};
+ },
+ vp2:()=>{
+  const hy=rnd(90,110), VPL=[rnd(8,40),hy], VPR=[rnd(360,392),hy];
+  const ex=rnd(190,215), top=hy+rnd(35,50), bot=top+rnd(80,105);
+  const Lx=ex-rnd(65,90), Rx=ex+rnd(65,90), T=[ex,top], Bt=[ex,bot];
+  const yAt=(p,vp,x)=>p[1]+(vp[1]-p[1])*(p[0]-x)/(p[0]-vp[0]);
+  const Lt=[Lx,yAt(T,VPL,Lx)], Lb=[Lx,yAt(Bt,VPL,Lx)], Rt=[Rx,yAt(T,VPR,Rx)], Rb=[Rx,yAt(Bt,VPR,Rx)];
+  const far=inter(Lt,VPR,Rt,VPL);
+  return {t:'المنظور بنقطتين',steps:[
+   {cap:'ارسم خط الأفق.',strokes:[{d:ln([8,hy],[392,hy]),w:2.4}],labels:[{x:200,y:hy-10,t:'خط الأفق'}]},
+   {cap:'ضع نقطتي تلاشي، واحدة على كل طرف.',dots:[{p:VPL},{p:VPR}],labels:[{x:VPL[0]+28,y:hy-12,t:'نقطة ١',c:G},{x:VPR[0]-28,y:hy-12,t:'نقطة ٢',c:G}]},
+   {cap:'ارسم الحافة الأمامية للصندوق، خطاً عمودياً.',strokes:[{d:ln(T,Bt),w:3.4}]},
+   {cap:'صل طرفي الحافة بنقطتي التلاشي بخطوط خفيفة.',strokes:[[T,VPL],[Bt,VPL],[T,VPR],[Bt,VPR]].map(([p,q])=>({d:ln(p,q),c:GUIDE,w:1.6,dash:'5 5'}))},
+   {cap:'ارسم الحافتين الجانبيتين عموديتين.',strokes:[{d:ln(Lt,Lb),w:3},{d:ln(Rt,Rb),w:3}]},
+   {cap:'ارسم خطي السطح العلوي، يلتقيان في الزاوية البعيدة.',strokes:[{d:ln(Lt,far),w:3},{d:ln(Rt,far),w:3},{d:ln(T,Lt),w:3},{d:ln(T,Rt),w:3},{d:ln(Lb,Bt),w:3},{d:ln(Bt,Rb),w:3}]},
+   {cap:'لوّن الأوجه الثلاثة بدرجات مختلفة.',fills:[{d:poly([T,Lt,Lb,Bt]),c:G,o:.3},{d:poly([T,Rt,Rb,Bt]),c:G,o:.5},{d:poly([T,Lt,far,Rt]),c:G,o:.75}]}
+  ]};
+ },
+ road:()=>{
+  const hy=rnd(105,135), vx=rnd(170,230), VP=[vx,hy], bl=[rnd(10,70),296], br=[rnd(330,390),296];
+  const k=.84, pl=lerp(bl,VP,k), pr=lerp(br,VP,k), mid=[(bl[0]+br[0])/2,296];
+  const poles=[.1,.3,.48,.62,.72].map(tt=>{const b=lerp(bl,VP,tt);b[0]-=16*(1-tt);return {b,top:[b[0],b[1]-105*(1-tt)],w:4*(1-tt)+1};});
+  return {t:'المنظور: الطريق',steps:[
+   {cap:'ارسم خط الأفق ونقطة التلاشي.',strokes:[{d:ln([10,hy],[390,hy]),w:2.4}],dots:[{p:VP}],labels:[{x:vx,y:hy-12,t:'نقطة التلاشي',c:G}]},
+   {cap:'ارسم حافتي الطريق من أسفل الصفحة نحو النقطة.',strokes:[{d:ln(bl,pl),w:3.2},{d:ln(br,pr),w:3.2}]},
+   {cap:'ارسم الخط الأوسط بشرطات تصغر مع البعد.',strokes:[{d:ln(mid,lerp(mid,VP,k)),c:G,w:2.4,dash:'12 9'}]},
+   {cap:'ارسم أعمدة على الجانب. كل عمود أقصر مما قبله.',strokes:poles.map(p=>({d:ln(p.b,p.top),w:p.w+1.2}))},
+   {cap:'صل رؤوس الأعمدة بسلك، فيظهر اتجاه العمق.',strokes:poles.slice(1).map((p,i)=>({d:ln(poles[i].top,p.top),w:1.6,c:GUIDE}))},
+   {cap:'لوّن الأرض والطريق.',fills:[{d:poly([[0,hy],[400,hy],[400,300],[0,300]]),c:S,o:.25},{d:poly([bl,br,pr,pl]),c:'#4a4a55',o:.85}]}
+  ]};
+ },
+ shade:()=>{
+  const s=Math.random()<.5?-1:1, cx=200, cy=140, r=rnd(50,60);
+  const a=[s*.7071,-.7071], p=[-a[1],a[0]];
+  const hatch=(from,to,step)=>{const out=[];for(let q=from;q<=to;q+=step){const sv=-q*r,hl=Math.sqrt(Math.max(0,r*r-sv*sv));const c=[cx+a[0]*sv,cy+a[1]*sv];out.push({d:ln([c[0]-p[0]*hl,c[1]-p[1]*hl],[c[0]+p[0]*hl,c[1]+p[1]*hl]),c:'#4a1426',w:1.8});}return out;};
+  const gy=cy+r+16, sh=[cx-s*r*1.15,gy+2];
+  return {t:'الظل والنور',steps:[
+   {cap:'ارسم دائرة خفيفة، وهي شكل الكرة.',strokes:[{d:circ(cx,cy,r),w:3}]},
+   {cap:'حدّد اتجاه الضوء بسهم. من هنا يأتي النور.',strokes:[{d:ln([cx+a[0]*(r+50),cy+a[1]*(r+50)],[cx+a[0]*(r+12),cy+a[1]*(r+12)]),c:G,w:3}],labels:[{x:cx+a[0]*(r+50)-s*30,y:cy+a[1]*(r+50)+4,t:'الضوء',c:G}]},
+   {cap:'لوّن الكرة بلون فاتح كأساس.',fills:[{d:circ(cx,cy,r),c:P,o:.9}]},
+   {cap:'ظلّل الجهة البعيدة عن الضوء بخطوط خفيفة.',strokes:hatch(.15,1,.13)},
+   {cap:'أضف طبقة ثانية من الخطوط للظل الأغمق.',strokes:hatch(.5,1,.1)},
+   {cap:'ارسم خط الأرض وظل الكرة بعيداً عن الضوء.',strokes:[{d:ln([60,gy],[340,gy]),w:2.4}],fills:[{d:`M${sh[0]-r*1.2} ${sh[1]} a${r*1.2} ${r*.22} 0 1 1 ${r*2.4} 0 a${r*1.2} ${r*.22} 0 1 1 ${-r*2.4} 0`,c:'#000',o:.5}]}
+  ]};
+ }
+};
+/* ---------- command handling ---------- */
+const questions={
+ 'ألوان':'ما هي الألوان الأساسية؟',
+ 'بيكاسو':'من هو الفنان بيكاسو؟',
+ 'فان':'من هو الفنان فان غوخ، وما اسم لوحته الشهيرة ليلة النجوم؟',
+ 'ليوناردو':'من رسم الموناليزا؟'
+};
+/* normalize Arabic so أ/إ/آ, ى/ي, ة/ه and tashkeel never block a match */
+function norm(s){return String(s).replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim();}
+let lastSig='';
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function handle(raw,interim){
+  const t=norm(raw);
+  if(!t) return;
+  setLive(raw.trim(),false);
+  const cw=Object.keys(colorWords).find(w=>t.includes(norm(w)));
+  const hit0=keys.find(([re])=>re.test(t));
+  const sig=(hit0?hit0[1]:'')+'|'+(cw||'')+'|'+(/سؤال/.test(t)?'q':'');
+  if(interim){ if(sig==='||'||sig===lastSig) return; lastSig=sig; } else lastSig='';
+  const qTrig=/سؤال/.test(t);
+  if(qTrig){
+    let hitQ=Object.keys(questions).find(k=>t.includes(norm(k)));
+    if(hitQ==='ألوان' && GPT.key && !/اساسي/.test(t)) hitQ=null;
+    if(hitQ){ showQuestion(questions[hitQ]); return; }
+  }
+  if(/نظف|امسح|مسح/.test(t)){ clearAll(); return; }
+  if(/مره ثانيه|اعد|كرر|مثال جديد|من جديد/.test(t) && currentKey){ show(currentKey); return; }
+  const hit=keys.find(([re])=>re.test(t));
+  if(hit){ color=cw?colorWords[cw]:null; show(hit[1]); note.textContent=cw?'اللون: '+cw:''; return; }
+  if(cw && currentKey){ color=colorWords[cw]; show(currentKey,true); note.textContent='اللون: '+cw; return; }
+  if(/^(ال)?اجابه/.test(t) && lastAnswer && !qcard.hidden){ qtext.textContent=lastAnswer; qcard.querySelector('b').textContent='الإجابة'; return; }
+  if(qTrig && GPT.key && !interim){ aiQuestion(raw.replace(/سؤال/,'').trim()||raw); return; }
+  const cmd=raw.trim().match(/^(?:تخيل|تخيّل|اعرض|أعرض|اظهر|أظهر|وريني|ورني|ارسم)\s*(.+)$/);
+  if(cmd && !interim){ showGeneric(cmd[1]); if(GPT.key) aiDraw(cmd[1]); else note.textContent='اربط ChatGPT ليرسم أي موضوع غير الموجود في القائمة.'; }
+}
+/* any other spoken topic: big animated word card */
+function showGeneric(topic){
+  currentKey=null; color=null;
+  const word=esc(topic.replace(/[.،؟!?]+$/,'').trim().slice(0,40));
+  const size=word.length>14?30:word.length>7?44:60;
+  tag.innerHTML=word;
+  fact.textContent='';
+  qcard.hidden=true;
+  art.innerHTML=`<svg viewBox="0 0 400 300" role="img" aria-label="${word}">
+    <circle cx="200" cy="150" r="110" fill="none" stroke="${G}" stroke-width="4" class="spin" stroke-dasharray="18 12"/>
+    <circle cx="200" cy="150" r="80" fill="${M}" opacity=".85" class="bob"/>
+    <text x="200" y="165" text-anchor="middle" font-family="Reem Kufi,Tajawal,sans-serif" font-size="${size}" fill="${P}" class="pop">${word}</text></svg>`;
+  sketch(art.querySelector('svg'));
+}
+function clearAll(){
+  run++;
+  art.innerHTML=''; fact.textContent=''; tag.textContent='الفنون البصرية';
+  qcard.hidden=true; currentKey=null; color=null; setLive('',false);
+  live.textContent='قل: تخيل نخلة، تخيل سدو، تخيل المحمل...'; live.classList.add('hint');
+}
+
+/* ---------- speech (Web Speech API, Arabic) ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null, listening=false, lastFinal='';
+function setListening(on){
+  listening=on;
+  document.body.classList.toggle('on',on);
+  mic.textContent=on?'إيقاف':'مايك';
+  status.textContent=on?'جاري الاستماع':'متوقف';
+}
+if(SR){
+  rec=new SR();
+  rec.lang='ar-SA'; rec.continuous=true; rec.interimResults=true;
+  rec.onresult=e=>{
+    let interim='', finalTxt='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const r=e.results[i];
+      if(r.isFinal) finalTxt+=r[0].transcript+' '; else interim+=r[0].transcript;
+    }
+    if(interim){ setLive(interim,false); handle(interim,true); }
+    if(finalTxt.trim()){ handle(finalTxt,false); }
+  };
+  rec.onerror=e=>{
+    if(e.error==='language-not-supported'&&rec.lang!=='ar'){ rec.lang='ar'; return; }
+    if(e.error==='no-speech') return;
+    status.textContent='المايك: '+e.error;
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      listening=false; setListening(false);
+      note.textContent='المايك ممنوع. افتح الدرس من Safari أو Chrome (مو من الملفات) وفعّل إذن الميكروفون، أو اكتب في الخانة.';
+    }
+  };
+  rec.onend=()=>{ if(listening){ try{ rec.start(); }catch(_){ setListening(false); } } };
+} else {
+  mic.disabled=true;
+}
+if(!SR) note.textContent='هذا المتصفح لا يدعم مايك الصفحة. اضغط على الخانة ثم زر المايك في كيبورد الآيفون، وكلامك يتنفذ مباشرة.';
+else if(!window.isSecureContext||location.protocol==='file:') note.textContent='المايك يحتاج فتح الصفحة من رابط https في Safari. الآن استخدم مايك الكيبورد داخل الخانة.';
+mic.addEventListener('click',()=>{
+  if(!rec) return;
+  if(listening){ listening=false; rec.stop(); setListening(false); }
+  else { try{ rec.start(); setListening(true); }catch(_){ } }
+});
+
+/* ---------- ChatGPT (OpenAI API): draws any topic as SVG and writes questions ---------- */
+const GPT={key:null,model:'gpt-4o-mini',cache:{}};
+try{ GPT.key=localStorage.getItem('oa_key')||null; }catch(_){}
+let lastAnswer='';
+const SYS_DRAW='أنت رسام ومعلم فنون بصرية للصفين الخامس والسادس في قطر. أعد JSON فقط بهذا الشكل: {"title":"عنوان عربي قصير","caption":"جملة شرح عربية واحدة للطلاب، أقل من 25 كلمة","svg":"<svg ...>...</svg>"}. شروط الرسم: viewBox="0 0 400 300"، بدون مستطيل خلفية لأن الخلفية داكنة، من 8 إلى 30 عنصراً فقط من path و circle و ellipse و rect و line و polygon، رتّب العناصر بترتيب الرسم: الخطوط الأساسية أولاً ثم التفاصيل، ألوان واضحة تظهر على خلفية داكنة، لا نصوص داخل الرسم إلا عند الضرورة، لا script ولا صور. إذا كان الموضوع درساً فنياً (منظور، تظليل، تناسب، ألوان) ارسم الخطوط الإرشادية بخط متقطع stroke-dasharray.';
+const SYS_Q='أنت معلم فنون بصرية للصفين الخامس والسادس في قطر. اكتب سؤالاً واحداً قصيراً وواضحاً للطلاب عن الموضوع، وإجابته المختصرة. أعد JSON فقط: {"question":"...","answer":"..."}';
+async function callGPT(sys,user){
+  const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),25000);
+  try{
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',signal:ctl.signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GPT.key},
+      body:JSON.stringify({model:GPT.model,temperature:.7,response_format:{type:'json_object'},messages:[{role:'system',content:sys},{role:'user',content:user}]})});
+    if(r.status===401) throw new Error('المفتاح غير صحيح. افتح "ربط ChatGPT" وأدخله من جديد.');
+    if(r.status===429) throw new Error('الرصيد انتهى أو الطلبات كثيرة. تأكد من رصيد حساب OpenAI.');
+    if(!r.ok) throw new Error('ChatGPT رد بخطأ '+r.status+'.');
+    const j=await r.json();
+    return JSON.parse(j.choices[0].message.content);
+  }catch(e){
+    if(e.name==='AbortError') throw new Error('ChatGPT تأخر أكثر من 25 ثانية. جرّب مرة ثانية.');
+    if(e instanceof TypeError) throw new Error('تعذّر الاتصال بـ ChatGPT. تأكد من الإنترنت.');
+    throw e;
+  }finally{ clearTimeout(to); }
+}
+function cleanSvg(txt){
+  const m=String(txt||'').match(/<svg[\s\S]*<\/svg>/i); if(!m) return null;
+  /* the HTML parser puts <svg> in the SVG namespace even without xmlns, and never runs scripts */
+  const svg=new DOMParser().parseFromString(m[0],'text/html').querySelector('svg');
+  if(!svg) return null;
+  svg.querySelectorAll('script,foreignObject,iframe,image,use,a,style,animate,set,animateTransform,animateMotion').forEach(e=>e.remove());
+  [svg,...svg.querySelectorAll('*')].forEach(e=>[...e.attributes].forEach(a=>{ if(/^on/i.test(a.name)||/href/i.test(a.name)||/javascript:/i.test(a.value)) e.removeAttribute(a.name); }));
+  if(!svg.getAttribute('viewBox')) svg.setAttribute('viewBox','0 0 400 300');
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+  return document.importNode(svg,true);
+}
+async function aiDraw(topic){
+  const my=++run, k=norm(topic);
+  note.textContent='ChatGPT يرسم "'+topic+'"...';
+  try{
+    const res=GPT.cache[k]||await callGPT(SYS_DRAW,'ارسم: '+topic);
+    if(my!==run) return;
+    const svg=cleanSvg(res.svg);
+    if(!svg) throw new Error('وصل رسم غير صالح من ChatGPT. قل الأمر مرة ثانية.');
+    GPT.cache[k]=res;
+    tag.textContent=res.title||topic; fact.textContent=res.caption||'';
+    art.innerHTML=''; art.appendChild(svg); note.textContent='';
+    sketch(svg);
+  }catch(e){ if(my===run) note.textContent=e.message; }
+}
+async function aiQuestion(topic){
+  const my=++run;
+  note.textContent='ChatGPT يكتب سؤالاً...';
+  try{
+    const res=await callGPT(SYS_Q,topic);
+    if(my!==run) return;
+    lastAnswer=res.answer||'';
+    showQuestion(res.question||topic); note.textContent='قل "الإجابة" لعرض الجواب';
+  }catch(e){ if(my===run) note.textContent=e.message; }
+}
+/* key panel */
+const gptChip=document.createElement('button');
+gptChip.type='button'; gptChip.className='chip gptchip';
+function paintChip(){ gptChip.textContent=GPT.key?'ChatGPT متصل':'ربط ChatGPT'; gptChip.classList.toggle('linked',!!GPT.key); }
+paintChip();
+gptChip.addEventListener('click',()=>{ $('gptbox').hidden=!$('gptbox').hidden; if(!$('gptbox').hidden) $('key').focus(); });
+$('keysave').addEventListener('click',()=>{
+  const v=$('key').value.trim();
+  if(!/^sk-/.test(v)){ $('keymsg').textContent='المفتاح يبدأ بـ sk- . انسخه كاملاً من platform.openai.com'; return; }
+  GPT.key=v; try{ localStorage.setItem('oa_key',v); }catch(_){}
+  $('key').value=''; $('keymsg').textContent='تم الحفظ على هذا الجهاز.'; paintChip();
+  setTimeout(()=>{ $('gptbox').hidden=true; $('keymsg').textContent=''; },1200);
+});
+$('keydel').addEventListener('click',()=>{
+  GPT.key=null; try{ localStorage.removeItem('oa_key'); }catch(_){}
+  $('keymsg').textContent='تم حذف المفتاح من هذا الجهاز.'; paintChip();
+});
+
+/* ---------- typed input and buttons ---------- */
+let sayTimer=null;
+function submitSay(){ clearTimeout(sayTimer); const v=say.value; say.value=''; if(v.trim()) handle(v,false); }
+$('show').addEventListener('click',submitSay);
+say.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submitSay(); } });
+/* iPhone keyboard dictation types words into the box: show them live, run built-in commands at once, finish after a 2 s pause */
+say.addEventListener('input',()=>{ if(!say.value.trim()) return; handle(say.value,true); clearTimeout(sayTimer); sayTimer=setTimeout(submitSay,2000); });
+$('clr').addEventListener('click',clearAll);
+$('exit').addEventListener('click',()=>{ document.body.classList.remove('show'); });
+
+/* quick chips: tap to show a topic */
+const chipList=[['نقطة التلاشي','vp1'],['منظور بنقطتين','vp2'],['طريق','road'],['الظل والنور','shade'],['نخلة','palm'],['سدو','sadu'],['محمل','mahmal'],['سفينة','dhow'],['خيمة','tent'],['جمل','camel'],['عمارة','mosque'],['زخرفة هندسية','geo'],['زخرفة نباتية','plant'],['خط عربي','calli']];
+chips.appendChild(gptChip);
+chipList.forEach(([label,key])=>{
+  const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=label;
+  b.addEventListener('click',()=>{ color=null; show(key); });
+  chips.appendChild(b);
+});
+})();
+</script>
+</body></html>
