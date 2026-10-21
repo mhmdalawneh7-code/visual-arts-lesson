@@ -253,7 +253,7 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
     <button class="btn" id="restartMic">إعادة تشغيل المايك</button>
     <button class="btn" id="fsBtn">ملء الشاشة</button>
     <button class="btn" id="aiBtn">⚙︎ الذكاء الاصطناعي</button>
-    <button class="btn" id="prepBtn2">⚡ جهّز الرسومات</button>
+    <button class="btn" id="prepBtn2">⚡ جهّز الصور</button>
   </div>
   <p class="note">
     هذه الأزرار احتياط لو ضعف الإنترنت أو المايك داخل الصف.<br>
@@ -276,8 +276,15 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
     <label>موديل النصوص (اختياري — اتركه فارغاً للأسرع)</label>
     <input id="modelInp" type="text" placeholder="claude-haiku-5-5" autocomplete="off" spellcheck="false">
 
-    <div class="sep">🎨 رسومات الذكاء الاصطناعي</div>
-    <p style="font-size:14px;margin:0 0 4px">الصور تحتاج مفتاح <strong>OpenAI</strong> تحديداً.
+    <div class="sep">🖼️ مصدر الصور</div>
+    <label>ماذا يظهر عند «ارسم لي…»</label>
+    <select id="srcSel">
+      <option value="photo">صور حقيقية — مجاناً وبدون مفتاح</option>
+      <option value="ai">رسومات الذكاء الاصطناعي — تحتاج مفتاح OpenAI</option>
+      <option value="builtin">الرسومات المدمجة — فورية دائماً</option>
+    </select>
+    <p style="font-size:14px;margin:10px 0 0">الصور الحقيقية من ويكيميديا كومنز مع ذكر المصوّر والرخصة.
+       <br>رسومات الذكاء الاصطناعي تحتاج مفتاح <strong>OpenAI</strong> تحديداً؛
        إن كان المزوّد أعلاه OpenAI فاترك الخانة فارغة.</p>
     <label>مفتاح OpenAI للصور</label>
     <input id="imgKeyInp" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false">
@@ -287,21 +294,17 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
       <option value="medium">متوازنة — ١٠ ثوانٍ تقريباً</option>
       <option value="high">أعلى جودة — أبطأ</option>
     </select>
-    <label style="display:flex;align-items:center;gap:10px;justify-content:flex-start;margin-top:14px">
-      <input id="useImgChk" type="checkbox" style="width:22px;height:22px;flex:none">
-      <span>استخدم صور الذكاء الاصطناعي بدل الرسومات المدمجة</span>
-    </label>
     <div class="row">
       <button class="btn" id="saveSet">حفظ</button>
-      <button class="btn" id="prepBtn">⚡ جهّز كل الرسومات</button>
+      <button class="btn" id="prepBtn">⚡ جهّز كل الصور</button>
     </div>
     <div class="row">
-      <button class="btn" id="clearImgs">حذف الصور المحفوظة</button>
+      <button class="btn" id="clearImgs">حذف المحفوظ</button>
       <button class="btn" id="clearKey">حذف المفاتيح</button>
       <button class="btn" id="closeSet">إغلاق</button>
     </div>
     <p style="font-size:13px;margin-top:14px;opacity:.75">
-      جهّز الرسومات في البيت قبل الحصة: تُحفظ على جهازك وتظهر فوراً في الصف بدون انتظار.</p>
+      جهّز الصور في البيت قبل الحصة: تُحفظ على جهازك وتظهر فوراً في الصف بدون انتظار.</p>
   </div>
 </div>
 
@@ -796,15 +799,23 @@ function showArtSVG(a){
 }
 async function showArt(key){
   const a=ART[key];if(!a)return;
-  if(!useImages()){showArtSVG(a);return;}
-  const hit=await imgGet('img:'+a.title);
-  if(hit){renderImg(hit,a.title,a.note);return;}
-  try{
-    showLoader('يرسم: '+a.title);
-    const b64=await genImage(a.title);
-    await imgSet('img:'+a.title,b64);
-    renderImg(b64,a.title,a.note);
-  }catch(e){showArtSVG(a);}
+  const mode=srcMode();
+  if(mode==='photo'){
+    try{await showPhoto(a.title,a.note);return;}
+    catch(e){showArtSVG(a);return;}
+  }
+  if(mode==='ai'&&imgKey()){
+    const hit=await imgGet('img:'+a.title);
+    if(hit){renderImg(hit,a.title,a.note);return;}
+    try{
+      showLoader('يرسم: '+a.title);
+      const b64=await genImage(a.title);
+      await imgSet('img:'+a.title,b64);
+      renderImg(b64,a.title,a.note);
+      return;
+    }catch(e){showArtSVG(a);return;}
+  }
+  showArtSVG(a);
 }
 
 function showQuiz(lessonKey,count){
@@ -1031,13 +1042,88 @@ async function imgClearAll(){try{const db=await idbOpen();
   await new Promise(r=>{const q=db.transaction('imgs','readwrite').objectStore('imgs').clear();
     q.onsuccess=q.onerror=()=>r();});}catch(e){}}
 
+/* ===== صور حقيقية من ويكيميديا كومنز (بدون مفتاح) ===== */
+const PHOTO_Q={
+  'الخيمة العربية':'Bedouin tent desert Qatar camp',
+  'الدَّلة':'Dallah Arabic coffee pot brass',
+  'قلعة الزُّبارة':'Al Zubarah Fort Qatar',
+  'المركب الشراعي (البوم)':'Dhow Qatar traditional wooden boat',
+  'البَرجيل (ملقف الهواء)':'Wind tower barjeel Qatar architecture',
+  'القُبّة':'Mosque dome Islamic architecture interior',
+  'المئذنة':'Minaret mosque Islamic architecture',
+  'القوس المُفصَّص':'Islamic arch arcade mosque architecture',
+  'النجمة الثمانية':'Islamic geometric star pattern tile',
+  'الزخرفة النباتية (التوريق)':'Arabesque Islamic floral ornament',
+  'نسيج السَّدو':'Al Sadu weaving Bedouin textile',
+  'المشربية':'Mashrabiya wooden lattice window',
+  'الصقر':'Falcon falconry Qatar',
+  'الألعاب الشعبية القطرية':'Traditional children games Gulf Qatar',
+  'اللؤلؤ والمحار':'Pearl oyster pearling Gulf Qatar'
+};
+
+async function fetchPhoto(topic){
+  const q=PHOTO_Q[topic]||topic;
+  const url='https://commons.wikimedia.org/w/api.php?origin=*&format=json&action=query'
+    +'&generator=search&gsrnamespace=6&gsrlimit=14'
+    +'&gsrsearch='+encodeURIComponent('filetype:bitmap '+q)
+    +'&prop=imageinfo&iiprop=url%7Cextmetadata%7Csize&iiurlwidth=1200';
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  const pages=(j.query&&j.query.pages)?Object.values(j.query.pages):[];
+  pages.sort((a,b)=>(a.index||99)-(b.index||99));
+  const ok=pages.map(p=>p.imageinfo&&p.imageinfo[0]).filter(Boolean)
+    .filter(i=>/jpe?g|png/i.test(i.mime||'')&&(i.width||0)>=700);
+  if(!ok.length)throw new Error('no-photo');
+  const best=ok.find(i=>(i.width||0)>=(i.height||0)*1.1)||ok[0];
+  const meta=best.extmetadata||{};
+  const artist=String((meta.Artist&&meta.Artist.value)||'')
+    .replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,55);
+  const lic=String((meta.LicenseShortName&&meta.LicenseShortName.value)||'').trim();
+  return {src:best.thumburl||best.url,
+          credit:[artist,lic].filter(Boolean).join(' · ')||'Wikimedia Commons'};
+}
+
+async function toDataURL(src){
+  const r=await fetch(src);
+  if(!r.ok)throw new Error('fetch');
+  const b=await r.blob();
+  return await new Promise((res,rej)=>{const fr=new FileReader();
+    fr.onload=()=>res(fr.result);fr.onerror=()=>rej(new Error('read'));fr.readAsDataURL(b);});
+}
+
+function renderPhoto(src,title,note,credit){
+  setStage(`<div class="art-wrap"><img src="${src}" alt="">
+    <div class="art-title">${esc(title)}</div>
+    ${note?`<div class="art-note">${note}</div>`:''}
+    <div class="ai-badge">📷 ${esc(credit||'Wikimedia Commons')}</div></div>`);
+  speak(title);
+}
+
+async function showPhoto(topic,note){
+  const ck='ph:'+topic;
+  const hit=await imgGet(ck);
+  if(hit&&hit.src){renderPhoto(hit.src,topic,note,hit.credit);return true;}
+  showLoader('يجلب صورة: '+topic);
+  const p=await fetchPhoto(topic);
+  let src=p.src;
+  try{src=await toDataURL(p.src);}catch(e){}
+  await imgSet(ck,{src:src,credit:p.credit});
+  renderPhoto(src,topic,note,p.credit);
+  return true;
+}
+
 /* ===== توليد الصور ===== */
 function imgKey(){
   const k=(aiCfg.imgKey||'').trim();
   if(k)return k;
   return (aiCfg.provider==='openai')?(aiCfg.key||'').trim():'';
 }
-function useImages(){return aiCfg.useImages!==false && !!imgKey();}
+function srcMode(){
+  if(aiCfg.src)return aiCfg.src;
+  return (aiCfg.useImages!==false&&imgKey())?'ai':'photo';
+}
+function useImages(){return srcMode()==='ai' && !!imgKey();}
 
 function imgPrompt(topic){
   return 'Elegant digital illustration for a Qatari school art lesson: '+topic+'. '
@@ -1098,21 +1184,32 @@ async function drawTopic(topic,note){
 let prepping=false;
 async function prepareAll(){
   if(prepping)return;
-  if(!imgKey()){openSet();return;}
+  if(srcMode()==='ai'&&!imgKey()){openSet();return;}
   prepping=true;
   setModal.classList.add('hidden');
+  const photo=srcMode()==='photo';
   const keys=Object.keys(ART);
   let done=0,fail=0,made=0;
   for(let i=0;i<keys.length;i++){
     const t=ART[keys[i]].title;
     showLoader(`يجهّز ${i+1} من ${keys.length}: ${t}`);
-    if(await imgGet('img:'+t)){done++;continue;}
-    try{const b=await genImage(t);await imgSet('img:'+t,b);done++;made++;}
-    catch(e){fail++;}
+    const ck=(photo?'ph:':'img:')+t;
+    if(await imgGet(ck)){done++;continue;}
+    try{
+      if(photo){
+        const p=await fetchPhoto(t);
+        let src=p.src;
+        try{src=await toDataURL(p.src);}catch(e){}
+        await imgSet(ck,{src:src,credit:p.credit});
+      }else{
+        const b=await genImage(t);await imgSet(ck,b);
+      }
+      done++;made++;
+    }catch(e){fail++;}
   }
   prepping=false;
   showMsg('جاهز للحصة ✓',
-    `محفوظ على جهازك: ${done} رسمة${made?` (جديدة: ${made})`:''}${fail?`<br>تعذّر: ${fail}`:''}.`,
+    `محفوظ على جهازك: ${done} ${srcMode()==='photo'?'صورة':'رسمة'}${made?` (جديدة: ${made})`:''}${fail?`<br>تعذّر: ${fail}`:''}.`,
     'الآن تظهر فوراً بدون انتظار');
 }
 
@@ -1190,8 +1287,8 @@ async function aiFallback(raw){
   const isQ=/(اسئل|سؤال|سوال|اسال|اختبر|كروت|بطاقات|كارت|امتحن)/.test(t);
   const isD=/(ارسم|ارسملي|اعرض|وريني|اظهر|صمم|رسمه|صوره)/.test(t);
   if(!isQ&&!isD)return;
-  const hasText=!!(aiCfg.key||'').trim(), hasImg=!!imgKey();
-  if((isQ&&!hasText)||(isD&&!hasImg&&!hasText)){
+  const hasText=!!(aiCfg.key||'').trim(), hasImg=!!imgKey(), photoMode=srcMode()==='photo';
+  if((isQ&&!hasText)||(isD&&!photoMode&&!hasImg&&!hasText)){
     showMsg('الذكاء الاصطناعي غير مفعّل',
       'افتح الإعدادات ⚙︎ في الأعلى والصق مفتاح الـ API مرة واحدة.<br>يُحفظ على جهازك فقط.',
       'الرسومات والأسئلة الجاهزة تعمل بدون مفتاح');
@@ -1204,7 +1301,8 @@ async function aiFallback(raw){
     }else{
       const topic=stripCmd(t);
       if(!topic)return;
-      if(hasImg){await drawTopic(topic);}
+      if(photoMode){await showPhoto(topic);}
+      else if(hasImg){await drawTopic(topic);}
       else{await aiDraw(topic);}
     }
   }catch(e){
@@ -1221,13 +1319,13 @@ async function aiFallback(raw){
 const setModal=document.getElementById('setModal');
 const provSel=document.getElementById('provSel'),keyInp=document.getElementById('keyInp'),
       modelInp=document.getElementById('modelInp'),imgKeyInp=document.getElementById('imgKeyInp'),
-      qualSel=document.getElementById('qualSel'),useImgChk=document.getElementById('useImgChk');
+      qualSel=document.getElementById('qualSel'),srcSel=document.getElementById('srcSel');
 function openSet(){
   provSel.value=aiCfg.provider||'anthropic';
   keyInp.value=aiCfg.key||'';modelInp.value=aiCfg.model||'';
   imgKeyInp.value=aiCfg.imgKey||'';
   qualSel.value=aiCfg.quality||'low';
-  useImgChk.checked=aiCfg.useImages!==false;
+  srcSel.value=srcMode();
   modelInp.placeholder=DEFAULT_MODEL[provSel.value];
   setModal.classList.remove('hidden');panel.classList.remove('open');
 }
@@ -1238,7 +1336,7 @@ document.getElementById('closeSet').onclick=()=>setModal.classList.add('hidden')
 provSel.onchange=()=>modelInp.placeholder=DEFAULT_MODEL[provSel.value];
 function saveCfg(){
   aiCfg={provider:provSel.value,key:keyInp.value.trim(),model:modelInp.value.trim(),
-    imgKey:imgKeyInp.value.trim(),quality:qualSel.value,useImages:useImgChk.checked};
+    imgKey:imgKeyInp.value.trim(),quality:qualSel.value,src:srcSel.value};
   try{localStorage.setItem(AI_CFG,JSON.stringify(aiCfg));}catch(e){}
 }
 document.getElementById('saveSet').onclick=()=>{
@@ -1246,7 +1344,7 @@ document.getElementById('saveSet').onclick=()=>{
   setModal.classList.add('hidden');
   showMsg('تم الحفظ ✓',
     'قل مثلاً: «ارسم لي سوق واقف» أو «أعطني خمسة أسئلة عن متحف الفن الإسلامي»',
-    useImages()?'نصيحة: اضغط «جهّز كل الرسومات» قبل الحصة':'');
+    srcMode()==='builtin'?'':'نصيحة: اضغط «جهّز كل الصور» قبل الحصة');
 };
 document.getElementById('prepBtn').onclick=()=>{saveCfg();prepareAll();};
 document.getElementById('clearImgs').onclick=async()=>{
@@ -1255,7 +1353,7 @@ document.getElementById('clearImgs').onclick=async()=>{
   showMsg('تم الحذف ✓','حُذفت الصور المحفوظة من هذا الجهاز');
 };
 document.getElementById('clearKey').onclick=()=>{
-  aiCfg={provider:provSel.value,key:'',model:'',imgKey:'',quality:qualSel.value,useImages:useImgChk.checked};
+  aiCfg={provider:provSel.value,key:'',model:'',imgKey:'',quality:qualSel.value,src:srcSel.value};
   try{localStorage.removeItem(AI_CFG);}catch(e){}
   keyInp.value='';modelInp.value='';imgKeyInp.value='';
   setModal.classList.add('hidden');showWelcome();
