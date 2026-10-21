@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>الرسّام الحي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;700&display=swap">
+<style>
+  /* Layout: one big sheet of paper (the stage) that fills piece by piece as Claude draws, over a compact dock for speaking or typing. Paper stays light in both themes so colours read true. */
+  :root{
+    --bg:#f4f5f8; --surface:#ffffff; --ink:#18203a; --muted:#6a7288; --accent:#2f5bea; --line:#dde1ea; --paper:#fffdf8; --danger:#c8283c;
+    --font-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+    --font-display:"Reem Kufi","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){--bg:#0e1322;--surface:#182036;--ink:#eef1f9;--muted:#9aa5bf;--accent:#7b9bff;--line:#2a3452;--danger:#ff7a8a;color-scheme:dark}
+  }
+  :root[data-theme="dark"]{--bg:#0e1322;--surface:#182036;--ink:#eef1f9;--muted:#9aa5bf;--accent:#7b9bff;--line:#2a3452;--danger:#ff7a8a;color-scheme:dark}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);direction:rtl;
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+    display:flex;flex-direction:column;gap:12px;padding-block:12px}
+  #top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:28px}
+  #brand{font-family:var(--font-display);font-size:19px}
+  #dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  #dots button{width:10px;height:10px;border-radius:50%;border:0;padding:0;background:var(--line);cursor:pointer}
+  #dots button.on{background:var(--accent);width:24px;border-radius:6px}
+  #stage{flex:1;min-height:0;container-type:size;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  #paper{position:relative;width:min(100cqw,1100px,calc((100cqh - 64px) * 1.6));aspect-ratio:8/5;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 8px 30px rgba(20,32,63,.12);cursor:pointer}
+  #canvas{display:block;width:100%;height:100%}
+  #canvas > *{animation:appear .55s ease backwards}
+  @keyframes appear{from{opacity:0}to{opacity:1}}
+  #busy{position:absolute;top:12px;inset-inline-start:12px;display:none;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:15px}
+  #paper.busy #busy{display:flex}
+  #busy i{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:beat 1s infinite ease-in-out}
+  #busy i:nth-of-type(2){animation-delay:.15s}#busy i:nth-of-type(3){animation-delay:.3s}
+  @keyframes beat{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
+  #caption{margin:0;min-height:40px;text-align:center;font-family:var(--font-display);font-size:clamp(20px,3.4vw,38px);line-height:1.4;text-wrap:balance}
+  #dock{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:env(safe-area-inset-bottom,0px)}
+  #examples{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  #examples::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:14px;padding:7px 14px;border-radius:999px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  #row{display:flex;gap:8px;align-items:center}
+  #cmd{flex:1;min-width:0;font:inherit;font-size:17px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+  #cmd:focus-visible,.btn:focus-visible,.chip:focus-visible,#dots button:focus-visible,#paper:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  .btn{font:inherit;font-size:16px;font-weight:600;border:0;border-radius:14px;padding:12px 18px;background:var(--accent);color:#fff;cursor:pointer;flex:none}
+  .btn.ghost{background:var(--bg);color:var(--ink);border:1.5px solid var(--line)}
+  .btn:disabled{opacity:.45;cursor:default}
+  #stop{background:var(--danger);display:none}
+  #mic{font-size:22px;padding:9px 14px}
+  #status{color:var(--muted);font-size:14px;min-height:1.4em;line-height:1.5}
+  #status.err{color:var(--danger)}
+  #nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  [hidden]{display:none!important}
+  #mic.on{background:#16a58a;color:#fff;border-color:transparent;animation:ring 1.6s infinite}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(22,165,138,.5)}100%{box-shadow:0 0 0 14px rgba(22,165,138,0)}}
+  #keybtn{padding:6px 12px;font-size:14px}
+  #keybox{position:fixed;inset:0;background:rgba(10,14,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+  #keycard{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(480px,100%);display:flex;flex-direction:column;gap:12px}
+  #keycard h2{margin:0;font-family:var(--font-display);font-size:22px}
+  #keycard p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+  #keycard input,#keycard select{font:inherit;font-size:16px;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+  #keycard input{direction:ltr;text-align:left}
+  #keyrow{display:flex;gap:8px;justify-content:flex-start}
+  @media (prefers-reduced-motion:reduce){#canvas > *,#busy i{animation:none}#mic.on{animation:none}}
+</style>
+
+<div id="top">
+  <div id="brand">الرسّام الحي</div>
+  <button class="btn ghost" id="keybtn" type="button">المفتاح</button>
+  <div id="dots" role="tablist" aria-label="الرسومات"></div>
+</div>
+<main id="stage">
+  <div id="paper" tabindex="0" role="img" aria-label="الرسمة">
+    <svg id="canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="busy"><i></i><i></i><i></i><span>الرسّام يرسم</span></div>
+  </div>
+  <p id="caption" aria-live="polite"></p>
+</main>
+<section id="dock">
+  <div id="examples"></div>
+  <form id="row" autocomplete="off">
+    <button class="btn ghost" id="mic" type="button" aria-label="تكلّم">🎤</button>
+    <input id="cmd" type="text" enterkeyhint="send" autocorrect="off" autocapitalize="off" placeholder="اضغط 🎤 وتكلّم، أو اكتب هنا ما تريد رسمه">
+    <button class="btn" id="send" type="submit">ارسم</button>
+    <button class="btn" id="stop" type="button">إيقاف</button>
+  </form>
+  <div id="status"></div>
+  <div id="nav">
+    <button class="btn ghost" id="prev" type="button">السابق</button>
+    <button class="btn ghost" id="again" type="button">ارسمها من جديد</button>
+    <button class="btn ghost" id="next" type="button">التالي</button>
+  </div>
+</section>
+
+<div id="keybox" hidden>
+  <form id="keycard" autocomplete="off">
+    <h2>مفتاح الذكاء الاصطناعي</h2>
+    <p>اختر الخدمة التي عندك مفتاحها. الصفحة تتصل بها من متصفحك مباشرة لترسم. الصق المفتاح مرة واحدة. يُحفظ في هذا المتصفح فقط ولا يُرسل لغير الخدمة التي اخترتها. تكلفة الرسم تُحسب على حسابك هناك.</p>
+    <input id="key" type="password" placeholder="sk-..." aria-label="مفتاح API">
+    <select id="provider" aria-label="الخدمة"><option value="anthropic">Claude (Anthropic)</option><option value="openai">ChatGPT (OpenAI)</option></select>
+    <input id="model" list="models" aria-label="اسم النموذج" placeholder="اسم النموذج" style="direction:ltr;text-align:left">
+    <datalist id="models"></datalist>
+    <div id="keyrow"><button class="btn" type="submit">حفظ</button><button class="btn ghost" id="keycancel" type="button">إغلاق</button></div>
+  </form>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var STARTER = {"title": "سفينة شراعية في البحر", "lines": ["<defs><linearGradient id=\"sk\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#7fd3f7\"/><stop offset=\"1\" stop-color=\"#fff1c9\"/><\/linearGradient><linearGradient id=\"sea\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2fa4d8\"/><stop offset=\"1\" stop-color=\"#1668a8\"/><\/linearGradient><\/defs>", "<rect width=\"800\" height=\"500\" fill=\"url(#sk)\"/>", "<g transform=\"translate(655 100)\"><g><polygon points=\"0.0,-84.0 16.0,-59.9 42.0,-72.7 43.8,-43.8 72.7,-42.0 59.9,-16.0 84.0,0.0 59.9,16.0 72.7,42.0 43.8,43.8 42.0,72.7 16.0,59.9 0.0,84.0 -16.0,59.9 -42.0,72.7 -43.8,43.8 -72.7,42.0 -59.9,16.0 -84.0,0.0 -59.9,-16.0 -72.7,-42.0 -43.8,-43.8 -42.0,-72.7 -16.0,-59.9\" fill=\"#ffe27a\" opacity=\".75\"/><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0\" to=\"360\" dur=\"30s\" repeatCount=\"indefinite\"/><\/g><circle r=\"46\" fill=\"#ffc928\" stroke=\"#f59e0b\" stroke-width=\"5\"/><circle cx=\"-15\" cy=\"-8\" r=\"5\" fill=\"#3b2a12\"/><circle cx=\"15\" cy=\"-8\" r=\"5\" fill=\"#3b2a12\"/><path d=\"M-18 12 Q0 30 18 12\" fill=\"none\" stroke=\"#3b2a12\" stroke-width=\"4\" stroke-linecap=\"round\"/><circle cx=\"-29\" cy=\"9\" r=\"7\" fill=\"#ff9d6b\" opacity=\".6\"/><circle cx=\"29\" cy=\"9\" r=\"7\" fill=\"#ff9d6b\" opacity=\".6\"/><\/g>", "<g><g fill=\"#fff\" stroke=\"#bfe6f7\" stroke-width=\"3\"><ellipse rx=\"46\" ry=\"22\"/><ellipse cx=\"-30\" cy=\"8\" rx=\"30\" ry=\"16\"/><ellipse cx=\"32\" cy=\"8\" rx=\"34\" ry=\"17\"/><ellipse cx=\"6\" cy=\"-14\" rx=\"26\" ry=\"18\"/><\/g><animateTransform attributeName=\"transform\" type=\"translate\" from=\"-120 78\" to=\"920 78\" dur=\"46s\" repeatCount=\"indefinite\"/><\/g>", "<g><g transform=\"scale(.7)\"><g fill=\"#fff\" stroke=\"#bfe6f7\" stroke-width=\"3\"><ellipse rx=\"46\" ry=\"22\"/><ellipse cx=\"-30\" cy=\"8\" rx=\"30\" ry=\"16\"/><ellipse cx=\"32\" cy=\"8\" rx=\"34\" ry=\"17\"/><ellipse cx=\"6\" cy=\"-14\" rx=\"26\" ry=\"18\"/><\/g><\/g><animateTransform attributeName=\"transform\" type=\"translate\" from=\"-300 160\" to=\"900 160\" dur=\"64s\" repeatCount=\"indefinite\"/><\/g>", "<rect y=\"292\" width=\"800\" height=\"208\" fill=\"url(#sea)\"/>", "<g><path d=\"M-160 300 q20 -14 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 L1000 500 L-160 500 Z\" fill=\"#46b8e6\" stroke=\"#2a8fc0\" stroke-width=\"3\"/><animateTransform attributeName=\"transform\" type=\"translate\" from=\"0 0\" to=\"80 0\" dur=\"7s\" repeatCount=\"indefinite\"/><\/g>", "<g><path d=\"M-160 334 q20 -14 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 L1000 500 L-160 500 Z\" fill=\"#2a9bd2\" stroke=\"#1d7db0\" stroke-width=\"3\"/><animateTransform attributeName=\"transform\" type=\"translate\" from=\"80 0\" to=\"0 0\" dur=\"5.5s\" repeatCount=\"indefinite\"/><\/g>", "<g><animateTransform attributeName=\"transform\" type=\"rotate\" values=\"-2 420 380;2 420 380;-2 420 380\" dur=\"4s\" repeatCount=\"indefinite\"/><path d=\"M414 134 Q560 200 604 322 L420 322 Z\" fill=\"#fff6e0\" stroke=\"#4a2e12\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M404 152 Q334 214 300 322 L404 322 Z\" fill=\"#ffd9a0\" stroke=\"#4a2e12\" stroke-width=\"5\" stroke-linejoin=\"round\"/><line x1=\"410\" y1=\"336\" x2=\"410\" y2=\"128\" stroke=\"#4a2e12\" stroke-width=\"7\" stroke-linecap=\"round\"/><path d=\"M410 128 l52 14 l-52 14 z\" fill=\"#8a1538\" stroke=\"#4a2e12\" stroke-width=\"3\" stroke-linejoin=\"round\"><animate attributeName=\"d\" values=\"M410 128 l52 14 l-52 14 z;M410 128 l48 6 l-48 22 z;M410 128 l52 14 l-52 14 z\" dur=\"1.2s\" repeatCount=\"indefinite\"/><\/path><path d=\"M230 322 Q250 392 330 398 L520 398 Q585 392 612 316 Q540 338 420 338 Q310 338 230 322 Z\" fill=\"#a1672f\" stroke=\"#4a2e12\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M250 352 Q330 366 420 366 Q530 366 598 348\" fill=\"none\" stroke=\"#f4c15b\" stroke-width=\"7\" stroke-linecap=\"round\"/><g><path d=\"M482 340 Q482 318 500 318 Q518 318 518 340 Z\" fill=\"#fff\" stroke=\"#4a2e12\" stroke-width=\"3\" stroke-linejoin=\"round\"/><circle cx=\"500\" cy=\"302\" r=\"15\" fill=\"#e8b08a\" stroke=\"#4a2e12\" stroke-width=\"3\"/><path d=\"M484 300 Q486 280 500 280 Q514 280 516 300 Q508 292 500 292 Q492 292 484 300 Z\" fill=\"#fff\" stroke=\"#4a2e12\" stroke-width=\"3\" stroke-linejoin=\"round\"/><circle cx=\"494\" cy=\"304\" r=\"2.5\" fill=\"#222\"/><circle cx=\"506\" cy=\"304\" r=\"2.5\" fill=\"#222\"/><path d=\"M494 310 Q500 316 506 310\" fill=\"none\" stroke=\"#222\" stroke-width=\"2.5\" stroke-linecap=\"round\"/><g><line x1=\"516\" y1=\"326\" x2=\"542\" y2=\"300\" stroke=\"#e8b08a\" stroke-width=\"8\" stroke-linecap=\"round\"/><animateTransform attributeName=\"transform\" type=\"rotate\" values=\"-18 516 326;18 516 326;-18 516 326\" dur=\"1.4s\" repeatCount=\"indefinite\"/><\/g><\/g><\/g>", "<g><path d=\"M-160 372 q20 -14 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 L1000 500 L-160 500 Z\" fill=\"#1f86bf\" stroke=\"#16699a\" stroke-width=\"3\"/><animateTransform attributeName=\"transform\" type=\"translate\" from=\"0 0\" to=\"80 0\" dur=\"4.2s\" repeatCount=\"indefinite\"/><\/g>", "<g fill=\"none\" stroke=\"#33415c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M0 0 q12 -14 24 0 q12 -14 24 0\"><animate attributeName=\"d\" values=\"M0 0 q12 -14 24 0 q12 -14 24 0;M0 0 q12 10 24 0 q12 10 24 0;M0 0 q12 -14 24 0 q12 -14 24 0\" dur=\".9s\" repeatCount=\"indefinite\"/><\/path><animateMotion path=\"M-60 120 C 200 40 500 200 900 70\" dur=\"16s\" begin=\"0s\" repeatCount=\"indefinite\"/><\/g>", "<g fill=\"none\" stroke=\"#33415c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M0 0 q12 -14 24 0 q12 -14 24 0\"><animate attributeName=\"d\" values=\"M0 0 q12 -14 24 0 q12 -14 24 0;M0 0 q12 10 24 0 q12 10 24 0;M0 0 q12 -14 24 0 q12 -14 24 0\" dur=\".9s\" repeatCount=\"indefinite\"/><\/path><animateMotion path=\"M-60 190 C 250 120 480 260 900 150\" dur=\"20s\" begin=\"-7s\" repeatCount=\"indefinite\"/><\/g>", "<g><ellipse rx=\"22\" ry=\"12\" fill=\"#ff8a3d\" stroke=\"#7a3a10\" stroke-width=\"3\"/><path d=\"M20 0 L37 -11 L37 11 Z\" fill=\"#ff8a3d\" stroke=\"#7a3a10\" stroke-width=\"3\" stroke-linejoin=\"round\"/><circle cx=\"-10\" cy=\"-3\" r=\"3\" fill=\"#222\"/><animateMotion path=\"M900 450 C 600 425 300 475 -60 445\" dur=\"12s\" repeatCount=\"indefinite\"/><\/g>", "<circle cx=\"120\" cy=\"470\" r=\"6\" fill=\"none\" stroke=\"#e6f6ff\" stroke-width=\"2.5\"><animate attributeName=\"cy\" values=\"480;390\" dur=\"3.2s\" begin=\"0s\" repeatCount=\"indefinite\"/><animate attributeName=\"opacity\" values=\"0;1;0\" dur=\"3.2s\" begin=\"0s\" repeatCount=\"indefinite\"/><\/circle>", "<circle cx=\"200\" cy=\"470\" r=\"6\" fill=\"none\" stroke=\"#e6f6ff\" stroke-width=\"2.5\"><animate attributeName=\"cy\" values=\"480;390\" dur=\"4s\" begin=\"-1.5s\" repeatCount=\"indefinite\"/><animate attributeName=\"opacity\" values=\"0;1;0\" dur=\"4s\" begin=\"-1.5s\" repeatCount=\"indefinite\"/><\/circle>", "<circle cx=\"690\" cy=\"470\" r=\"6\" fill=\"none\" stroke=\"#e6f6ff\" stroke-width=\"2.5\"><animate attributeName=\"cy\" values=\"480;390\" dur=\"3.6s\" begin=\"-2.2s\" repeatCount=\"indefinite\"/><animate attributeName=\"opacity\" values=\"0;1;0\" dur=\"3.6s\" begin=\"-2.2s\" repeatCount=\"indefinite\"/><\/circle>"]};
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  /* ===== تنظيف الـ SVG القادم من الذكاء الاصطناعي: أشكال وحركة فقط ===== */
+  var OK = {};
+  ("g defs linearGradient radialGradient stop path circle ellipse rect line polyline polygon text tspan clipPath mask use animate animateTransform animateMotion mpath set").split(" ").forEach(function(n){ OK[n] = 1; });
+  var budget = 0;
+  function cleanNode(node, depth){
+    if(depth > 14 || budget > 700) return null;
+    var name = node.localName;
+    if(!OK[name]) return null;
+    if((name === "animate" || name === "set") && /href|^on/i.test(node.getAttribute("attributeName") || "")) return null;
+    var el = document.createElementNS(NS, name);
+    budget++;
+    for(var i = 0; i < node.attributes.length; i++){
+      var a = node.attributes[i], n = a.name, ln = n.toLowerCase(), v = a.value;
+      if(/^on/.test(ln) || ln.indexOf("xmlns") === 0) continue;
+      if(ln === "href" || ln === "xlink:href"){ if(v.charAt(0) !== "#") continue; el.setAttribute("href", v); continue; }
+      var unsafe = /javascript:|data:|@import|expression\(/i.test(v) || /url\(\s*['"]?\s*[^#'"\s)]/i.test(v);
+      if(unsafe){ if(ln === "fill" || ln === "stroke") el.setAttribute(n, "none"); continue; }
+      if(ln === "filter" || ln === "style" && /position|behavior/i.test(v)) continue;
+      try{ el.setAttribute(n, v); }catch(e){}
+    }
+    for(var c = node.firstChild; c; c = c.nextSibling){
+      if(c.nodeType === 1){ var k = cleanNode(c, depth + 1); if(k) el.appendChild(k); }
+      else if(c.nodeType === 3 && (name === "text" || name === "tspan")){ el.appendChild(document.createTextNode(c.nodeValue)); }
+    }
+    return el;
+  }
+  function tryParse(src){
+    var doc = new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' + src + '</svg>', "image/svg+xml");
+    if(doc.getElementsByTagName("parsererror").length) return null;
+    return Array.prototype.slice.call(doc.documentElement.childNodes).filter(function(n){ return n.nodeType === 1; });
+  }
+
+  /* ===== استقبال النص سطراً سطراً ورسمه على الورقة ===== */
+  var canvas = $("canvas");
+  var st = {consumed:0, buf:"", title:"", count:0};
+  function resetStream(){ st = {consumed:0, buf:"", title:"", count:0}; budget = 0; canvas.innerHTML = ""; }
+  function pushLine(line){
+    line = line.trim();
+    if(!line || /^```/.test(line)) return;
+    var t = line.match(/^(?:عنوان|العنوان|title)\s*[:：]\s*(.+)$/i);
+    if(t && !st.title){ st.title = t[1].trim().slice(0, 70); $("caption").textContent = st.title; return; }
+    if(/^<svg\b[^>]*>$/i.test(line) || /^<\/svg>$/i.test(line)) return;
+    st.buf = st.buf ? st.buf + "\n" + line : line;
+    var nodes = tryParse(st.buf);
+    if(nodes){
+      nodes.forEach(function(n){
+        var list = n.localName === "svg" ? Array.prototype.slice.call(n.childNodes).filter(function(x){ return x.nodeType === 1; }) : [n];
+        list.forEach(function(m){ var k = cleanNode(m, 0); if(k){ canvas.appendChild(k); st.count++; } });
+      });
+      st.buf = "";
+    } else if(st.buf.split("\n").length > 16){ st.buf = ""; }
+  }
+  function feed(text, final){
+    var upto = final ? text.length : text.lastIndexOf("\n") + 1;
+    if(upto <= st.consumed) return;
+    var chunk = text.slice(st.consumed, upto); st.consumed = upto;
+    chunk.split("\n").forEach(pushLine);
+  }
+
+  /* ===== السجل ===== */
+  var drawings = [], cur = -1, ctl = null, busy = false, paused = false;
+  function lsGet(k){ try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  var KEY, MODEL;
+  function status(t, err){ var e = $("status"); e.textContent = t || ""; e.className = err ? "err" : ""; }
+  function showCurrent(){
+    var d = drawings[cur];
+    canvas.innerHTML = d.markup; paused = false;
+    $("caption").textContent = d.title; $("paper").setAttribute("aria-label", d.title);
+    renderDots();
+  }
+  function renderDots(){
+    var box = $("dots"); box.innerHTML = "";
+    drawings.forEach(function(d, i){
+      var b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-label", "رسمة " + (i + 1) + ": " + d.title);
+      if(i === cur) b.className = "on";
+      b.onclick = function(){ if(!busy){ cur = i; showCurrent(); } };
+      box.appendChild(b);
+    });
+    $("prev").disabled = busy || cur <= 0; $("next").disabled = busy || cur >= drawings.length - 1;
+    $("again").disabled = busy || cur < 0 || !drawings[cur] || !drawings[cur].cmd;
+  }
+  function go(i){ if(busy || !drawings.length) return; cur = Math.max(0, Math.min(drawings.length - 1, i)); showCurrent(); }
+  function setBusy(b){
+    busy = b; $("paper").classList.toggle("busy", b);
+    $("send").style.display = b ? "none" : ""; $("stop").style.display = b ? "block" : "none";
+    renderDots();
+  }
+
+  /* ===== الطلب من Claude ===== */
+  function buildPrompt(cmd){
+    var prev = drawings[cur] ? drawings[cur].title : "";
+    return [
+      "أنت رسّام كتب أطفال محترف. المطلوب رسمة كرتونية متحركة بصيغة SVG عن طلب مدرّس فنون بصرية، تُعرض أمام طلاب الصفين الخامس والسادس في قطر.",
+      "طلب المدرّس: «" + cmd.replace(/[«»]/g, "") + "»" + (prev ? "  (الرسمة السابقة كانت: «" + prev + "»)" : ""),
+      "",
+      "الشكل المطلوب للإجابة، بلا شرح ولا علامات ```:",
+      "السطر الأول: عنوان: <عنوان قصير بالعربية من ٢ إلى ٦ كلمات>",
+      "بعده عناصر SVG الداخلية فقط، بدون وسم <svg> نفسه. كل عنصر رئيسي كامل في سطر واحد (أي <g>…</g> كاملة في سطر واحد).",
+      "",
+      "القواعد:",
+      "١) مساحة الرسم 800×500. ابدأ بسطر <defs> للتدرجات إن لزم (بمعرّفات id فريدة)، ثم الخلفية، ثم المشهد من الخلف إلى الأمام، ثم الشخصيات والتفاصيل.",
+      "٢) أسلوب كرتوني مسطح: ألوان زاهية متناسقة، خطوط خارجية سميكة مستديرة (stroke-width من 3 إلى 6 مع stroke-linejoin=\"round\" و stroke-linecap=\"round\")، أشكال مبسطة، ووجوه ودودة للكائنات الحية (عينان كبيرتان وابتسامة).",
+      "٣) الحركة إلزامية: من ٦ إلى ١٢ عنصراً يتحرك باستمرار بـ SMIL فقط: <animateTransform> و<animate> و<animateMotion> مع repeatCount=\"indefinite\" ومدد مختلفة من ٢ إلى ٢٠ ثانية. أمثلة: تمايل، دوران، طفو، طيران على مسار، رمش، تلألؤ، حركة الغيوم والموج.",
+      "٤) ممنوع: <style> و<script> و<image> و<foreignObject> والفلاتر والخطوط الخارجية وأي رابط خارجي وأي حدث مثل onclick.",
+      "٥) ارسم شخصيات وأشياء أصلية من تخيلك، ولا ترسم شخصيات كرتونية معروفة ولا شعارات ولا علامات تجارية.",
+      "٦) لا تكتب نصاً داخل الرسمة (<text>) إلا إذا طلب المدرّس كلمات، وعندها بخط كبير واضح وبعربية صحيحة.",
+      "٧) إن كان الطلب لا يناسب الأطفال فارسم بدله مشهداً لطيفاً عن الفنون.",
+      "٨) الحجم: من ٣٥ إلى ٦٠ سطراً، كل سطر أقل من ٧٠٠ حرف، وكل شيء داخل حدود الرسمة.",
+      "",
+      "مثال على شكل الأسطر:",
+      "عنوان: شمس مبتسمة",
+      '<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd3f7"/><stop offset="1" stop-color="#fff1c9"/></linearGradient></defs>',
+      '<rect width="800" height="500" fill="url(#g1)"/>',
+      '<g><circle cx="120" cy="90" r="40" fill="#ffd23f" stroke="#f59e0b" stroke-width="4"/><animateTransform attributeName="transform" type="translate" values="0 0;0 -8;0 0" dur="4s" repeatCount="indefinite"/></g>'
+    ].join("\n");
+  }
+  function errCopy(e){
+    var c = e && e.code;
+    if(c === "bad_key"){ openKey(); return "المفتاح غير صحيح أو غير مفعّل. تأكد منه وتأكد من اختيار الخدمة الصحيحة."; }
+    if(c === "rate_limited") return "الطلبات كثيرة أو رصيد الحساب منخفض. انتظر قليلاً.";
+    if(c === "empty_completion") return "ما قدرت أرسم هذا الطلب. جرّب صياغة ثانية.";
+    if(c === "network") return "تعذّر الاتصال بالإنترنت أو بـ Claude.";
+    return "حصل خطأ أثناء الرسم" + (e && e.message ? ": " + e.message : "") + ".";
+  }
+  async function streamModel(prompt, signal, onText){
+    var isO = PROVIDER === "openai", url, headers, body;
+    if(isO){
+      url = "https://api.openai.com/v1/chat/completions";
+      headers = {"content-type":"application/json", "authorization":"Bearer " + KEYS.openai};
+      body = {model:MODELS.openai, stream:true, max_completion_tokens:16000, messages:[{role:"user", content:prompt}]};
+    } else {
+      url = "https://api.anthropic.com/v1/messages";
+      headers = {"content-type":"application/json", "x-api-key":KEYS.anthropic, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true"};
+      body = {model:MODELS.anthropic, max_tokens:8000, stream:true, messages:[{role:"user", content:prompt}]};
+    }
+    var res;
+    try{ res = await fetch(url, {method:"POST", signal:signal, headers:headers, body:JSON.stringify(body)}); }
+    catch(e){ if(e && e.name === "AbortError") throw e; throw {code:"network"}; }
+    if(!res.ok){
+      var msg = ""; try{ msg = (await res.json()).error.message; }catch(e){}
+      throw {code: (res.status === 401 || res.status === 403) ? "bad_key" : (res.status === 429 ? "rate_limited" : "http"), message: msg};
+    }
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = "", text = "";
+    for(;;){
+      var r = await reader.read();
+      if(r.done) break;
+      buf += dec.decode(r.value, {stream:true});
+      var parts = buf.split("\n\n"); buf = parts.pop();
+      for(var i = 0; i < parts.length; i++){
+        var m = parts[i].match(/^data: (.*)$/m);
+        if(!m || m[1] === "[DONE]") continue;
+        var ev; try{ ev = JSON.parse(m[1]); }catch(e){ continue; }
+        if(isO){
+          var d = ev.choices && ev.choices[0] && ev.choices[0].delta;
+          if(d && d.content){ text += d.content; onText(text); }
+          else if(ev.error){ throw {code:"http", message: ev.error.message}; }
+        } else if(ev.type === "content_block_delta" && ev.delta && ev.delta.type === "text_delta"){ text += ev.delta.text; onText(text); }
+        else if(ev.type === "error"){ throw {code:"http", message: ev.error && ev.error.message}; }
+      }
+    }
+    return text;
+  }
+
+  async function draw(cmd, fresh){
+    if(!KEYS[PROVIDER]){ openKey(); status("أدخل مفتاح الذكاء الاصطناعي أولاً.", true); return; }
+    if(busy){ status("الرسّام مشغول، انتظر قليلاً."); return; }
+    var keep = cur;
+    var my = ctl = new AbortController();
+    setBusy(true); resetStream(); $("caption").textContent = ""; status("🗣 " + cmd);
+    try{
+      var full = await streamModel(buildPrompt(cmd), my.signal, function(t){ feed(t, false); });
+      feed(full, true);
+      if(st.count < 4) throw {code:"empty_completion"};
+      drawings.push({title: st.title || cmd.slice(0, 40), markup: canvas.innerHTML, cmd: cmd});
+      cur = drawings.length - 1; setBusy(false); showCurrent(); status("🗣 " + cmd);
+    }catch(e){
+      if(e && e.name === "AbortError") e = {code:"cancelled"};
+      setBusy(false);
+      if(keep >= 0) showCurrent(); else { canvas.innerHTML = ""; }
+      if(e && e.code === "cancelled") status("أوقفت الرسم.");
+      else status(errCopy(e), true);
+    }
+  }
+
+  /* ===== الأوامر ===== */
+  function norm(t){
+    return t.toLowerCase().replace(/[ً-ْـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه")
+      .replace(/[٠-٩]/g, function(d){ return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).replace(/\s+/g, " ").trim();
+  }
+  function local(raw){
+    var t = norm(raw), m;
+    if(t.length > 24) return false;
+    if((m = t.match(/^(?:اذهب الي |روح )?(?:رسمه|شريحه) (\d+)$/))){ go(parseInt(m[1], 10) - 1); return true; }
+    if(/^(التالي|التاليه|كمل|بعدها|next)$/.test(t)){ go(cur + 1); return true; }
+    if(/^(السابق|السابقه|ارجع|رجوع|قبل|back|previous)$/.test(t)){ go(cur - 1); return true; }
+    if(/^(الاولي|الاولى|البدايه|اول رسمه)$/.test(t)){ go(0); return true; }
+    if(/^(الاخيره|اخر رسمه)$/.test(t)){ go(drawings.length - 1); return true; }
+    if(/^(اعد|اعد الرسم|ارسم من جديد|ارسمها من جديد|مره ثانيه)$/.test(t)){ again(); return true; }
+    if(/^(وقف|قف|وقفها|جمد|تجميد)$/.test(t)){ togglePause(); return true; }
+    if(/^(احذف|امسح)( هذي| هذه)?( الرسمه)?$/.test(t)){
+      if(drawings.length > 1 && !busy){ drawings.splice(cur, 1); cur = Math.min(cur, drawings.length - 1); showCurrent(); status("حُذفت الرسمة"); }
+      return true;
+    }
+    return false;
+  }
+  function again(){ if(cur >= 0 && drawings[cur] && drawings[cur].cmd) draw(drawings[cur].cmd, true); }
+  function togglePause(){
+    try{ if(paused){ canvas.unpauseAnimations(); } else { canvas.pauseAnimations(); } paused = !paused; status(paused ? "الحركة متوقفة. المس الرسمة لتتحرك." : ""); }catch(e){}
+  }
+  function run(){
+    var el = $("cmd"), v = el.value.trim();
+    if(!v) return;
+    el.value = "";
+    if(local(v)){ if(!/^$/.test(v)) status("🗣 " + v); return; }
+    draw(v, false);
+  }
+
+  /* ===== الربط ===== */
+  var dt;
+  $("row").addEventListener("submit", function(e){ e.preventDefault(); clearTimeout(dt); run(); });
+  $("cmd").addEventListener("keydown", function(e){ e.stopPropagation(); });
+  $("cmd").addEventListener("input", function(){
+    clearTimeout(dt);
+    var v = $("cmd").value.trim();
+    if(!v) return;
+    var isNav = v.length <= 24 && /^(التالي|السابق|ارجع|رجوع|احذف|اعد|وقف|قف|جمد)/.test(v);
+    dt = setTimeout(run, isNav ? 900 : 2200);
+  });
+  $("prev").onclick = function(){ go(cur - 1); };
+  $("next").onclick = function(){ go(cur + 1); };
+  $("again").onclick = again;
+  $("stop").onclick = function(){ if(ctl) ctl.abort(); };
+  $("paper").addEventListener("click", function(){ if(!busy) togglePause(); });
+  $("paper").addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); if(!busy) togglePause(); } });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "ArrowLeft") go(cur + 1);
+    if(e.key === "ArrowRight") go(cur - 1);
+  });
+  var EX = ["سفينة شراعية تبحر وطيور فوقها", "قطة صغيرة ترسم لوحة بالفرشاة", "سوق واقف في المساء", "نجمة ثمانية تتلألأ في السماء", "غواص لؤلؤ بين الأسماك", "حرف الألف يتحول إلى طائر"];
+  EX.forEach(function(t){
+    var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t;
+    b.onclick = function(){ $("cmd").value = ""; draw(t, false); };
+    $("examples").appendChild(b);
+  });
+
+  /* رسمة البداية */
+  resetStream();
+  STARTER.lines.forEach(pushLine);
+  drawings.push({title: STARTER.title, markup: canvas.innerHTML, cmd: ""});
+  cur = 0; showCurrent();
+  /* ===== المفتاح ===== */
+  var DEFAULT_MODELS = {anthropic:"claude-sonnet-5-5", openai:"gpt-4.1"};
+  var SUGGEST = {anthropic:["claude-sonnet-5-5","claude-haiku-5-5"], openai:["gpt-4.1","gpt-4o","gpt-4o-mini"]};
+  var PROVIDER = lsGet("lp_provider") || "anthropic";
+  var KEYS = {anthropic: lsGet("lp_key"), openai: lsGet("lp_key_openai")};
+  var MODELS = {anthropic: lsGet("lp_model") || DEFAULT_MODELS.anthropic, openai: lsGet("lp_model_openai") || DEFAULT_MODELS.openai};
+  function fillKeyForm(){
+    $("provider").value = PROVIDER; $("key").value = KEYS[PROVIDER]; $("model").value = MODELS[PROVIDER];
+    $("key").placeholder = PROVIDER === "openai" ? "sk-..." : "sk-ant-...";
+    $("models").innerHTML = SUGGEST[PROVIDER].map(function(m){ return '<option value="' + m + '">'; }).join("");
+  }
+  function openKey(){ $("keybox").hidden = false; fillKeyForm(); $("key").focus(); }
+  $("keybtn").onclick = openKey;
+  $("provider").onchange = function(){ PROVIDER = $("provider").value; fillKeyForm(); };
+  $("keycancel").onclick = function(){ PROVIDER = lsGet("lp_provider") || "anthropic"; $("keybox").hidden = true; };
+  $("keycard").addEventListener("submit", function(e){
+    e.preventDefault();
+    var k = $("key").value.trim();
+    if(!k){ return; }
+    PROVIDER = $("provider").value; KEYS[PROVIDER] = k; MODELS[PROVIDER] = $("model").value.trim() || DEFAULT_MODELS[PROVIDER];
+    lsSet("lp_provider", PROVIDER);
+    lsSet(PROVIDER === "openai" ? "lp_key_openai" : "lp_key", k);
+    lsSet(PROVIDER === "openai" ? "lp_model_openai" : "lp_model", MODELS[PROVIDER]);
+    $("keybox").hidden = true; status("تم حفظ المفتاح. اضغط 🎤 وتكلّم.");
+  });
+
+  /* ===== المايك ===== */
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, want = false;
+  function micState(on){ want = on; $("mic").classList.toggle("on", on); $("mic").setAttribute("aria-pressed", on ? "true" : "false"); }
+  function startRec(){
+    rec = new SR(); rec.lang = "ar-SA"; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = function(e){
+      for(var i = e.resultIndex; i < e.results.length; i++){
+        var r = e.results[i], tx = r[0].transcript.trim();
+        if(r.isFinal){ if(tx){ $("cmd").value = tx; run(); } else { $("cmd").value = ""; } }
+        else { $("cmd").value = tx; }
+      }
+    };
+    rec.onerror = function(e){
+      if(e.error === "no-speech" || e.error === "aborted") return;
+      var msg = {"not-allowed":"الميكروفون محظور. اضغط على أيقونة القفل بجانب العنوان واسمح له.", "service-not-allowed":"الميكروفون محظور في هذا المتصفح.", "network":"التعرف على الصوت يحتاج إنترنت.", "audio-capture":"ما لقيت ميكروفون."}[e.error] || ("خطأ في المايك: " + e.error);
+      micState(false); status(msg, true);
+    };
+    rec.onend = function(){ if(want){ try{ rec.start(); }catch(e){} } };
+    rec.start();
+  }
+  $("mic").onclick = function(){
+    if(!SR){ status("هذا المتصفح لا يدعم التعرف على الصوت. افتح الملف في Chrome أو Safari على الكمبيوتر.", true); return; }
+    if(want){ micState(false); try{ rec.stop(); }catch(e){} status("المايك متوقف."); return; }
+    micState(true); status("أسمعك... قل ما تريد رسمه."); startRec();
+  };
+
+  if(!KEYS[PROVIDER]){ status("ابدأ بإدخال مفتاح الذكاء الاصطناعي من زر «المفتاح»، ثم اضغط 🎤."); }
+  else { status("اضغط 🎤 وقل ما تريد رسمه. المس الرسمة لإيقاف الحركة."); }
+  if(!SR){ status("المايك يحتاج Chrome أو Safari على الكمبيوتر. الكتابة تعمل في كل المتصفحات."); }
+})();
+</script>
+
+</body>
+</html>
