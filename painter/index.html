@@ -13,26 +13,27 @@
 <style>
   /* Layout: one big sheet of paper (the stage) that fills piece by piece as Claude draws, over a compact dock for speaking or typing. Paper stays light in both themes so colours read true. */
   :root{
-    --bg:#f4f5f8; --surface:#ffffff; --ink:#18203a; --muted:#6a7288; --accent:#2f5bea; --line:#dde1ea; --paper:#fffdf8; --danger:#c8283c;
+    --bg:#f4ead7; --surface:#fffaf0; --ink:#16090e; --muted:#6b5a5f; --accent:#8a1538; --line:#e2d3bd; --paper:#fffdf7; --danger:#b3123a; --gold:#e0a93f;
     --font-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
     --font-display:"Reem Kufi","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
   }
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){--bg:#0e1322;--surface:#182036;--ink:#eef1f9;--muted:#9aa5bf;--accent:#7b9bff;--line:#2a3452;--danger:#ff7a8a;color-scheme:dark}
+    :root:not([data-theme="light"]){--bg:#16090e;--surface:#241017;--ink:#f4ead7;--muted:#b9a79f;--accent:#e0a93f;--line:#3a2028;--paper:#1f0d14;--danger:#ff7a8a;--gold:#e0a93f;color-scheme:dark}
   }
-  :root[data-theme="dark"]{--bg:#0e1322;--surface:#182036;--ink:#eef1f9;--muted:#9aa5bf;--accent:#7b9bff;--line:#2a3452;--danger:#ff7a8a;color-scheme:dark}
+  :root[data-theme="dark"]{--bg:#16090e;--surface:#241017;--ink:#f4ead7;--muted:#b9a79f;--accent:#e0a93f;--line:#3a2028;--paper:#1f0d14;--danger:#ff7a8a;--gold:#e0a93f;color-scheme:dark}
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);direction:rtl;
     padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
     display:flex;flex-direction:column;gap:12px;padding-block:12px}
   #top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:28px}
-  #brand{font-family:var(--font-display);font-size:19px}
+  #brand{font-family:var(--font-display);font-size:20px;display:flex;align-items:center;gap:10px}
+  #brand::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 25%,transparent)}
   #dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   #dots button{width:10px;height:10px;border-radius:50%;border:0;padding:0;background:var(--line);cursor:pointer}
   #dots button.on{background:var(--accent);width:24px;border-radius:6px}
   #stage{flex:1;min-height:0;container-type:size;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
-  #paper{position:relative;width:min(100cqw,1100px,calc((100cqh - 64px) * 1.6));aspect-ratio:8/5;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 8px 30px rgba(20,32,63,.12);cursor:pointer}
+  #paper{position:relative;border-width:2px;width:min(100cqw,1100px,calc((100cqh - 64px) * 1.6));aspect-ratio:8/5;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 40px rgba(22,9,14,.18),inset 0 0 0 10px var(--paper);cursor:pointer}
   #canvas{display:block;width:100%;height:100%}
   #canvas > *{animation:appear .55s ease backwards}
   @keyframes appear{from{opacity:0}to{opacity:1}}
@@ -41,8 +42,9 @@
   #busy i{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:beat 1s infinite ease-in-out}
   #busy i:nth-of-type(2){animation-delay:.15s}#busy i:nth-of-type(3){animation-delay:.3s}
   @keyframes beat{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
-  #caption{margin:0;min-height:40px;text-align:center;font-family:var(--font-display);font-size:clamp(20px,3.4vw,38px);line-height:1.4;text-wrap:balance}
-  #dock{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:env(safe-area-inset-bottom,0px)}
+  #caption{margin:0;min-height:40px;text-align:center;font-family:var(--font-display);font-size:clamp(20px,3.4vw,38px);line-height:1.4;text-wrap:balance;color:var(--ink)}
+  #caption:empty{display:none}
+  #dock{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 6px 20px rgba(22,9,14,.08);padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:env(safe-area-inset-bottom,0px)}
   #examples{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
   #examples::-webkit-scrollbar{display:none}
   .chip{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:14px;padding:7px 14px;border-radius:999px;cursor:pointer}
@@ -50,7 +52,8 @@
   #row{display:flex;gap:8px;align-items:center}
   #cmd{flex:1;min-width:0;font:inherit;font-size:17px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
   #cmd:focus-visible,.btn:focus-visible,.chip:focus-visible,#dots button:focus-visible,#paper:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-  .btn{font:inherit;font-size:16px;font-weight:600;border:0;border-radius:14px;padding:12px 18px;background:var(--accent);color:#fff;cursor:pointer;flex:none}
+  .btn{font:inherit;font-size:16px;font-weight:600;border:0;border-radius:14px;padding:12px 18px;background:var(--accent);color:#fff;cursor:pointer;flex:none;transition:transform .15s ease,opacity .15s}
+  .btn:active{transform:scale(.97)}
   .btn.ghost{background:var(--bg);color:var(--ink);border:1.5px solid var(--line)}
   .btn:disabled{opacity:.45;cursor:default}
   #stop{background:var(--danger);display:none}
