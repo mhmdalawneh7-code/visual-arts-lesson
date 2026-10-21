@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>شاشة الكلام</title>
+<style>
+  :root{--maroon:#7a1430;--deep:#4e0b1e;--sand:#f1dfb5;--cream:#fff7e6;--gold:#e0a93f}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:radial-gradient(120% 90% at 50% 0%,#8a1a3a 0%,var(--deep) 70%);color:var(--cream);font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;display:flex;flex-direction:column;overflow:hidden;
+    padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  #bar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;opacity:.9}
+  #bar .group{display:flex;gap:8px;align-items:center}
+  button{font:inherit;font-size:16px;font-weight:600;border:0;border-radius:14px;padding:11px 16px;background:var(--sand);color:var(--deep);cursor:pointer}
+  button.ghost{background:transparent;color:var(--cream);border:1.5px solid #a33a57}
+  button.on{background:#16a58a;color:#fff}
+  button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  #status{font-size:14px;color:var(--sand);min-height:1.3em;flex:1;text-align:center;padding:0 8px}
+  #status.err{color:#ffb4c2}
+  #stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:18px;padding:12px 0;overflow:hidden}
+  #history{width:100%;text-align:center;color:#e8cfa0;opacity:.65;font-size:clamp(16px,2.6vw,30px);line-height:1.6;max-height:28vh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+  #history div{margin:2px 0}
+  #live{width:100%;text-align:center;font-family:"Reem Kufi","IBM Plex Sans Arabic",sans-serif;font-weight:700;line-height:1.35;text-wrap:balance;color:var(--cream);font-size:var(--fs,8vw);word-break:break-word;transition:font-size .15s ease}
+  #live.empty{color:#c99aa8;font-size:clamp(26px,5vw,56px)}
+  #live .interim{color:var(--sand);opacity:.85}
+  #dock{display:flex;gap:8px;align-items:center}
+  #typed{flex:1;min-width:0;font:inherit;font-size:17px;padding:12px 14px;border-radius:14px;border:1.5px solid #a33a57;background:var(--cream);color:#16090e}
+  @media (prefers-reduced-motion:reduce){#live{transition:none}}
+</style>
+</head>
+<body>
+<div id="bar">
+  <div class="group"><span style="font-weight:700">شاشة الكلام</span></div>
+  <div id="status"></div>
+  <div class="group">
+    <button class="ghost" id="smaller" type="button" aria-label="تصغير الخط">أ−</button>
+    <button class="ghost" id="bigger" type="button" aria-label="تكبير الخط">أ+</button>
+    <button class="ghost" id="clear" type="button">مسح</button>
+    <button id="full" type="button">ملء الشاشة</button>
+  </div>
+</div>
+
+<main id="stage">
+  <div id="history" aria-live="off"></div>
+  <div id="live" class="empty" aria-live="polite">اضغط 🎤 وتكلّم، وسيظهر كلامك هنا بخط كبير</div>
+</main>
+
+<form id="dock">
+  <button id="mic" type="button" aria-pressed="false" class="ghost" style="font-size:22px;padding:9px 16px">🎤</button>
+  <input id="typed" type="text" autocomplete="off" placeholder="أو اكتب هنا وتظهر على الشاشة" enterkeyhint="send">
+</form>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = null, want = false, finals = [], interim = "", fs = null;
+  var MAX_LINES = 6;
+
+  function setStatus(t, err){ var s = $("status"); s.textContent = t || ""; s.className = err ? "err" : ""; }
+
+  /* حجم الخط يتكيّف مع طول الكلام: الجمل القصيرة كبيرة جداً، والطويلة تصغر حتى تتسع للشاشة */
+  function autoSize(){
+    var live = $("live");
+    var txt = (live.textContent || "").length;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var base = Math.min(vw * 0.11, vh * 0.16);
+    var factor = txt <= 20 ? 1 : txt <= 60 ? 0.8 : txt <= 120 ? 0.62 : txt <= 200 ? 0.48 : 0.38;
+    var size = Math.max(22, base * factor * (fs || 1));
+    live.style.setProperty("--fs", size + "px");
+  }
+  function render(){
+    var all = finals.slice();
+    var hist = all.slice(0, -1).slice(-MAX_LINES);
+    $("history").innerHTML = hist.map(function(t){ return "<div>" + esc(t) + "</div>"; }).join("");
+    var last = all.length ? all[all.length - 1] : "";
+    var live = $("live");
+    if(!last && !interim){ live.className = "empty"; live.textContent = "اضغط 🎤 وتكلّم، وسيظهر كلامك هنا بخط كبير"; }
+    else {
+      live.className = "";
+      live.innerHTML = esc(last) + (interim ? (last ? " " : "") + '<span class="interim">' + esc(interim) + "</span>" : "");
+    }
+    autoSize();
+    var h = $("history"); h.scrollTop = h.scrollHeight;
+  }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function addFinal(t){ t = (t || "").trim(); if(!t) return; finals.push(t); if(finals.length > 40) finals = finals.slice(-40); interim = ""; render(); }
+
+  function start(){
+    if(!SR){ setStatus("هذا المتصفح لا يدعم التعرف على الصوت. افتح الصفحة في Chrome أو Safari على الكمبيوتر، أو اكتب في الخانة بالأسفل.", true); return; }
+    rec = new SR(); rec.lang = "ar-SA"; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = function(e){
+      var iv = "";
+      for(var i = e.resultIndex; i < e.results.length; i++){
+        var r = e.results[i];
+        if(r.isFinal) addFinal(r[0].transcript);
+        else iv += r[0].transcript;
+      }
+      interim = iv.trim(); render();
+    };
+    rec.onerror = function(e){
+      if(e.error === "no-speech" || e.error === "aborted") return;
+      var msg = {"not-allowed":"المايك ممنوع. اضغط القفل بجانب العنوان واسمح له ثم حدّث الصفحة.","service-not-allowed":"المايك ممنوع في هذا المتصفح.","network":"التعرف على الصوت يحتاج إنترنت.","audio-capture":"ما لقيت ميكروفون."}[e.error] || ("خطأ: " + e.error);
+      want = false; paintMic(); setStatus(msg, true);
+    };
+    rec.onend = function(){ if(want){ try{ rec.start(); }catch(err){} } };
+    try{ rec.start(); }catch(err){ want = false; paintMic(); setStatus("تعذّر تشغيل المايك. جرّب مرة ثانية.", true); return; }
+    setStatus("أسمعك...");
+  }
+  function stop(){ want = false; try{ rec && rec.stop(); }catch(e){} setStatus("المايك متوقف. الكتابة ما زالت تعمل."); }
+  function paintMic(){ var b = $("mic"); b.classList.toggle("on", want); b.setAttribute("aria-pressed", want ? "true" : "false"); }
+
+  $("mic").onclick = function(){ want = !want; paintMic(); if(want){ start(); } else { stop(); } };
+  $("dock").addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = $("typed").value; if(!v.trim()) return;
+    addFinal(v); $("typed").value = "";
+  });
+  $("bigger").onclick = function(){ fs = Math.min(1.6, (fs || 1) + 0.15); autoSize(); };
+  $("smaller").onclick = function(){ fs = Math.max(0.5, (fs || 1) - 0.15); autoSize(); };
+  $("clear").onclick = function(){ finals = []; interim = ""; render(); setStatus(""); };
+  $("full").onclick = function(){
+    var el = document.documentElement;
+    if(document.fullscreenElement){ document.exitFullscreen && document.exitFullscreen(); }
+    else if(el.requestFullscreen){ el.requestFullscreen().catch(function(){ setStatus("ملء الشاشة غير متاح في هذا المتصفح.", true); }); }
+    else setStatus("ملء الشاشة غير متاح في هذا المتصفح.", true);
+  };
+  window.addEventListener("resize", autoSize);
+  document.addEventListener("keydown", function(e){ if(e.target === document.body && e.key === " "){ e.preventDefault(); $("mic").click(); } });
+  if(!SR) setStatus("المايك يحتاج Chrome أو Safari على الكمبيوتر. الكتابة في الأسفل تعمل في كل مكان.");
+  render();
+})();
+</script>
+</body>
+</html>
