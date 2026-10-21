@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>اختبار الفنون البصرية</title>
+<style>
+  :root{--bg:#e9d6ac;--card:#fff7e6;--ink:#16090e;--maroon:#7a1430;--gold:#e0a93f;--ok:#2d7a4f;--bad:#b3123a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+  header{background:var(--maroon);color:#f6ead2;border-radius:18px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  header b{font-size:20px}
+  #prog{font-variant-numeric:tabular-nums;color:#f1dfb5}
+  main{max-width:720px;margin:18px auto 0}
+  .card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 8px 24px rgba(22,9,14,.1)}
+  h2{font-size:clamp(20px,3.4vw,28px);line-height:1.5;margin:0 0 14px;text-wrap:balance}
+  .opt{display:block;width:100%;text-align:right;font:inherit;font-size:17px;padding:14px 16px;margin:8px 0;border-radius:14px;border:1.5px solid #d8c4a2;background:#fffdf7;color:var(--ink);cursor:pointer}
+  .opt:hover:not(:disabled){border-color:var(--maroon)}
+  .opt.ok{background:#dff3e6;border-color:var(--ok)}
+  .opt.bad{background:#fbe1e6;border-color:var(--bad)}
+  .opt:disabled{cursor:default}
+  #exp{margin-top:12px;font-size:16px;line-height:1.7;min-height:1.7em;color:#4a3a40}
+  .row{display:flex;gap:10px;justify-content:space-between;margin-top:16px;flex-wrap:wrap}
+  button.main{font:inherit;font-size:16px;font-weight:700;border:0;border-radius:14px;padding:12px 20px;background:var(--maroon);color:#f6ead2;cursor:pointer}
+  button.main:disabled{opacity:.4;cursor:default}
+  button.ghost{font:inherit;font-size:16px;font-weight:600;border:1.5px solid var(--maroon);border-radius:14px;padding:11px 18px;background:transparent;color:var(--maroon);cursor:pointer}
+  button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .bar{height:10px;background:#d8c4a2;border-radius:99px;overflow:hidden;margin:12px 0 0}
+  .bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+  #result{text-align:center}
+  #result .big{font-size:56px;font-weight:700;color:var(--maroon);margin:8px 0}
+</style>
+</head>
+<body>
+<header><b>اختبار الفنون البصرية</b><span id="prog"></span></header>
+<main>
+  <div class="card" id="card"></div>
+  <div class="bar"><i id="bar"></i></div>
+</main>
+<script>
+var QS = [{"q": "ما الألوان الأساسية الثلاثة؟", "o": ["الأحمر والأزرق والأصفر", "الأخضر والبرتقالي والبنفسجي", "الأبيض والأسود والرمادي", "الأحمر والأخضر والأزرق"], "a": 0, "e": "الألوان الأساسية لا تُصنع من ألوان أخرى، ومنها تُصنع بقية الألوان."}, {"q": "اللون البرتقالي لون ثانوي، ومن أي لونين يُصنع؟", "o": ["الأحمر والأصفر", "الأزرق والأصفر", "الأحمر والأزرق", "الأخضر والأزرق"], "a": 0, "e": "البرتقالي = أحمر + أصفر."}, {"q": "أي الألوان الآتية يُصنع من الأزرق والأصفر؟", "o": ["الأخضر", "البنفسجي", "البرتقالي", "الوردي"], "a": 0, "e": "الأزرق + الأصفر = الأخضر."}, {"q": "أي الألوان الآتية من الألوان الدافئة؟", "o": ["الأزرق", "الأخضر", "الأصفر", "البنفسجي"], "a": 2, "e": "الألوان الدافئة: الأحمر والأصفر والبرتقالي، وتعطي إحساساً بالحرارة."}, {"q": "ما الفرق بين اللون الفاتح (التِّنت) واللون الداكن (الشيد)؟", "o": ["التنت يُضاف إليه الأبيض، والشيد يُضاف إليه الأسود", "التنت يُضاف إليه الأسود، والشيد يُضاف إليه الأبيض", "كلاهما يُضاف إليه الأحمر", "لا فرق بينهما"], "a": 0, "e": "إضافة الأبيض تُفتّح اللون، وإضافة الأسود تُغمقه."}, {"q": "الخط المنكسر المتعرج يعطي إحساساً بـ:", "o": ["الهدوء", "الحركة والنشاط", "السكون التام", "الحزن"], "a": 1, "e": "الخطوط المتعرجة والمنكسرة توحي بالحركة والنشاط."}, {"q": "أي هذه الأشكال يُعتبر شكلاً هندسياً؟", "o": ["المربع", "الشجرة", "الإنسان", "السحاب"], "a": 0, "e": "الأشكال الهندسية: المربع والدائرة والمثلث والمستطيل."}, {"q": "ما الزخرفة الهندسية التي تتكرر فيها أشكال النجوم والأضلاع بنظام؟", "o": ["الزخرفة النباتية", "الزخرفة الهندسية الإسلامية", "الرسم الواقعي", "فن البورتريه"], "a": 1, "e": "الزخرفة الهندسية الإسلامية تقوم على التكرار المنتظم للأشكال."}, {"q": "الأرابيسك في الفن الإسلامي يعتمد على:", "o": ["الأغصان والأوراق والزهور المتشابكة", "صور الناس المباشرة", "المناظر الطبيعية الواقعية", "الأشكال الثلاثية الأبعاد"], "a": 0, "e": "الأرابيسك زخرفة نباتية متشابكة ومتكررة."}, {"q": "لماذا تجنّب الفنانون المسلمون رسم الكائنات الحية في بعض الزخارف؟", "o": ["لأنهم لا يعرفون الرسم", "تركيزاً على الجمال المجرد والزخرفة الهندسية والنباتية", "لأن الألوان كانت ممنوعة", "لأن الورق لم يكن موجوداً"], "a": 1, "e": "اتجه الفن الإسلامي إلى الزخارف الهندسية والنباتية، مع تنوع كبير في الفنون الأخرى."}, {"q": "أي نوع من الخط العربي يمتاز بالزوايا الحادة والقوة؟", "o": ["الكوفي", "الثلث", "الرقعة", "الديواني"], "a": 0, "e": "خط الكوفي خط زاوي قوي، ومن أقدم أنواع الخط العربي."}, {"q": "أي نوع من الخط العربي يُستخدم كثيراً في تزيين المساجد والمصاحف؟", "o": ["الثلث", "الرقعة", "النسخ", "الفارسي"], "a": 0, "e": "خط الثلث جميل ومتقن، ويُستخدم في الزخرفة والعناوين."}, {"q": "ما الخط الذي نكتب به الكتب والمصاحف عادةً لوضوحه؟", "o": ["النسخ", "الكوفي", "الديواني", "المغربي"], "a": 0, "e": "خط النسخ واضح ومقروء، ولذلك يُستخدم في الكتب."}, {"q": "السدو فن قطري تقليدي، وهو:", "o": ["نسيج يدوي من الوبر والصوف والشعر", "نحت على الخشب", "رسم بالماء على الجدران", "خزف يُحرق في فرن"], "a": 0, "e": "السدو نسيج يدوي يصنعه البدو من وبر الإبل وصوف الأغنام وشعر الماعز."}, {"q": "السدو يتميز بالزخارف الهندسية مثل:", "o": ["المعينات والخطوط والمربعات", "الزهور المائية الواقعية", "الوجوه البشرية الكبيرة", "المناظر الجبلية"], "a": 0, "e": "من أشهر زخارف السدو المعينات والخطوط المتكررة والألوان الزاهية."}, {"q": "ماذا يُسمى الفن الذي يُصنع من الطين ويُحرق في الفرن؟", "o": ["الخزف", "النحت", "الطباعة", "التطريز"], "a": 0, "e": "الخزف فن من الطين يُشكَّل ثم يُحرق ليصبح صلباً."}, {"q": "أين يقع متحف الفن الإسلامي؟", "o": ["الدوحة", "الخور", "الوكرة", "الريان"], "a": 0, "e": "متحف الفن الإسلامي يقع في الدوحة على كورنيش الدوحة."}, {"q": "أي سوق تراثي شهير في الدوحة يُعدّ من معالم المدينة القديمة؟", "o": ["سوق واقف", "سوق الجمعة", "سوق البلد", "سوق الذهب"], "a": 0, "e": "سوق واقف من أشهر المعالم التراثية في الدوحة، ويضم حرف الحياة القديمة."}, {"q": "ما نوع الخط الذي يكون مائلاً وممتداً ومتصلاً؟", "o": ["الديواني", "الكوفي", "النسخ", "الرقعة"], "a": 0, "e": "الديواني خط منحنٍ ومتداخل، وكان يُستخدم في المراسلات الرسمية."}, {"q": "ما الفرق بين التوازن المتماثل والتوازن غير المتماثل؟", "o": ["المتماثل: الجانبان متشابهان، وغير المتماثل: الجانبان مختلفان لكن متوازنان", "المتماثل يعني أن كل شيء مائل", "لا فرق بينهما", "غير المتماثل يعني أن الصورة فارغة"], "a": 0, "e": "التوازن المتماثل يُشبه الميزان المتساوي، وغير المتماثل يحقق الاتزان بعناصر مختلفة."}, {"q": "التكرار في الفن يعني:", "o": ["تكرار العنصر بنظام لخلق إيقاع", "رسم شيء واحد فقط", "إخفاء بعض الألوان", "تغيير الحجم عشوائياً"], "a": 0, "e": "التكرار المنتظم يخلق إيقاعاً بصرياً، وهو أساس الزخرفة الإسلامية."}, {"q": "ما اللون الناتج من خلط الأحمر والأزرق؟", "o": ["البنفسجي", "الأخضر", "البرتقالي", "الأسود"], "a": 0, "e": "الأحمر + الأزرق = البنفسجي."}, {"q": "ما اسم الفنّ الذي يُنجز بالتقطيع والتركيب بقصاصات الورق الملوّنة؟", "o": ["الكولاج", "الخزف", "الحفر", "النحت"], "a": 0, "e": "الكولاج: تركيب قصاصات من مواد مختلفة على سطح واحد."}, {"q": "أي هذه المواد تُستخدم في الرسم بالألوان المائية؟", "o": ["الماء والألوان الشفافة على الورق", "الزيت على الخشب", "الطين المحروق", "الحجر"], "a": 0, "e": "الألوان المائية شفافة وتُمزج بالماء على ورق خاص."}, {"q": "ما الفنّ الذي يعتمد على إضافة مساحات بارزة أو غائرة في مادة صلبة كالخشب والحجر؟", "o": ["النحت", "الرسم بالفحم", "التصوير الفوتوغرافي", "الخط"], "a": 0, "e": "النحت فن ثلاثي الأبعاد يُشكّل فيه الفنان المادة."}, {"q": "ما الدور الذي كان يقوم به صيادو اللؤلؤ في تاريخ قطر؟", "o": ["الغوص لاستخراج اللؤلؤ", "صناعة الفخار فقط", "زراعة النخيل", "بناء المساجد"], "a": 0, "e": "الغوص على اللؤلؤ من أهم أنشطة قطر الاقتصادية قديماً، وهو من تراثها."}, {"q": "أي هذه السفن الخشبية التقليدية ترتبط بتراث الخليج والبحر في قطر؟", "o": ["الداو", "الطائرة", "القطار", "الغواصة"], "a": 0, "e": "الداو سفينة شراعية خشبية تقليدية مرتبطة بتاريخ الخليج."}, {"q": "ما الفرق بين الظل والضوء في الرسم؟", "o": ["الظل مساحة أغمق تعطي إحساس الحجم، والضوء مساحة فاتحة", "الظل لون الأبيض، والضوء لون الأسود", "لا فرق بينهما", "الظل يكون على الورق فقط"], "a": 0, "e": "الضوء والظل يعطيان الأشكال إحساساً بالحجم والعمق."}];
+(function(){
+  var i=0, score=0, answered=false, order=QS.map(function(_,k){return k;});
+  for(var k=order.length-1;k>0;k--){ var j=Math.floor(Math.random()*(k+1)); var t=order[k]; order[k]=order[j]; order[j]=t; }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+  function render(){
+    var card=document.getElementById("card");
+    document.getElementById("prog").textContent = (i+1)+" / "+QS.length+"  ·  النتيجة "+score;
+    document.getElementById("bar").style.width = (i/QS.length*100)+"%";
+    var q = QS[order[i]]; answered=false;
+    var opts = q.o.map(function(o,k){ return '<button class="opt" data-k="'+k+'">'+esc(o)+'</button>'; }).join("");
+    card.innerHTML = '<h2>'+esc(q.q)+'</h2>'+opts+'<div id="exp"></div><div class="row"><span></span><button class="main" id="next" disabled>'+(i===QS.length-1?"النتيجة":"التالي")+'</button></div>';
+    Array.prototype.forEach.call(card.querySelectorAll(".opt"), function(b){ b.onclick=function(){ choose(+b.dataset.k); }; });
+    document.getElementById("next").onclick=function(){ if(!answered) return; if(i===QS.length-1){ finish(); } else { i++; render(); } };
+  }
+  function choose(k){
+    if(answered) return; answered=true;
+    var q=QS[order[i]]; var btns=document.querySelectorAll(".opt");
+    btns.forEach(function(b,idx){ b.disabled=true; if(idx===q.a) b.classList.add("ok"); if(idx===k && k!==q.a) b.classList.add("bad"); });
+    if(k===q.a) score++;
+    document.getElementById("exp").textContent = (k===q.a?"أحسنت. ":"الإجابة الصحيحة: "+q.o[q.a]+". ")+q.e;
+    document.getElementById("next").disabled=false;
+    document.getElementById("prog").textContent=(i+1)+" / "+QS.length+"  ·  النتيجة "+score;
+  }
+  function finish(){
+    document.getElementById("bar").style.width="100%";
+    document.getElementById("prog").textContent="انتهى الاختبار";
+    document.getElementById("card").innerHTML='<div id="result"><p>نتيجتك</p><div class="big">'+score+' / '+QS.length+'</div><p>'+(score>=QS.length*0.8?"ممتاز، أنت متقن للفنون البصرية.":score>=QS.length*0.5?"جيد، راجع ما أخطأت فيه.":"ابدأ من جديد وراجع الدرس.")+'</p><div class="row" style="justify-content:center"><button class="main" id="again">إعادة الاختبار</button></div></div>';
+    document.getElementById("again").onclick=function(){ location.reload(); };
+  }
+  render();
+})();
+</script>
+</body>
+</html>
