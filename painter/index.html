@@ -400,7 +400,15 @@
   $("mic").onclick = function(){
     if(!SR){ status("هذا المتصفح لا يدعم التعرف على الصوت. افتح الملف في Chrome أو Safari على الكمبيوتر.", true); return; }
     if(want){ micState(false); try{ rec.stop(); }catch(e){} status("المايك متوقف."); return; }
-    micState(true); status("أسمعك... قل ما تريد رسمه."); startRec();
+    micState(true); status("اسمح للمايك إن سألك المتصفح...");
+    function begin(){ if(!want) return; status("أسمعك... قل ما تريد رسمه."); startRec(); }
+    if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){ begin(); return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){ s.getTracks().forEach(function(tr){ tr.stop(); }); begin(); }).catch(function(err){
+      micState(false);
+      var n = err && err.name;
+      if(n === "NotFoundError" || n === "OverconstrainedError") status("ما لقيت ميكروفون في الجهاز. وصّل ميكروفوناً ثم جرّب.", true);
+      else status("الميكروفون ممنوع. (١) اضغط أيقونة القفل بجانب عنوان الصفحة ← الميكروفون ← سماح، ثم حدّث الصفحة. (٢) على ماك: إعدادات النظام ← الخصوصية والأمان ← الميكروفون ← فعّل Chrome أو Safari. (٣) إن فتحت الرابط من داخل تطبيق، افتحه في Chrome أو Safari.", true);
+    });
   };
 
   if(!KEYS[PROVIDER]){ status("ابدأ بإدخال مفتاح الذكاء الاصطناعي من زر «المفتاح»، ثم اضغط 🎤."); }
