@@ -146,6 +146,11 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
 /* ====== شريط الكلام ====== */
 #talk{position:fixed;bottom:34px;left:0;width:100%;z-index:5;padding:0 18px;
   display:flex;justify-content:center;pointer-events:none}
+#pttBtn{pointer-events:auto;background:var(--gold);color:#4a0d1f;border:none;border-radius:16px;
+  padding:13px 26px;font-family:'Reem Kufi',serif;font-size:clamp(16px,2vw,22px);font-weight:700;
+  cursor:pointer;margin-inline-end:12px;box-shadow:0 8px 22px rgba(240,196,90,.3);
+  flex:none;transition:.18s;white-space:nowrap}
+#pttBtn.on{background:#35d07f;color:#06240f}
 #talkBox{background:rgba(10,3,8,.72);backdrop-filter:blur(8px);
   border:2px solid rgba(240,196,90,.5);border-radius:18px;padding:11px 22px;
   max-width:1100px;width:100%;text-align:center;font-size:clamp(16px,2.1vw,27px);
@@ -237,7 +242,10 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
   <main><div id="stage"></div></main>
 </div>
 
-<div id="talk"><div id="talkBox" class="idle">… تفضل، تكلّم وأنا أسمعك</div></div>
+<div id="talk">
+  <button id="pttBtn" class="hidden">🎤 اضغط لأتكلم</button>
+  <div id="talkBox" class="idle">… تفضل، تكلّم وأنا أسمعك</div>
+</div>
 
 <div id="panel">
   <button class="close-x" id="closePanel">×</button>
@@ -275,6 +283,20 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
     <input id="keyInp" type="password" placeholder="الصق المفتاح هنا" autocomplete="off" spellcheck="false">
     <label>موديل النصوص (اختياري — اتركه فارغاً للأسرع)</label>
     <input id="modelInp" type="text" placeholder="claude-haiku-5-5" autocomplete="off" spellcheck="false">
+
+    <div class="sep">🎙️ الصوت والاستماع</div>
+    <label>طريقة الاستماع</label>
+    <select id="listenSel">
+      <option value="always">يسمع دائماً — الأسهل</option>
+      <option value="wake">كلمة نداء — لا ينفّذ إلا بعدها</option>
+      <option value="push">زر المايك — يسمع وأنت ضاغط فقط</option>
+    </select>
+    <label>كلمة النداء</label>
+    <input id="wakeInp" type="text" placeholder="يا فنان" style="direction:rtl;text-align:right">
+    <label style="display:flex;align-items:center;gap:10px;justify-content:flex-start;margin-top:14px">
+      <input id="speakChk" type="checkbox" style="width:22px;height:22px;flex:none">
+      <span>يردّ بصوت المتصفح (صوت آلي — مطفأ افتراضياً)</span>
+    </label>
 
     <div class="sep">🖼️ مصدر الصور</div>
     <label>ماذا يظهر عند «ارسم لي…»</label>
@@ -713,6 +735,197 @@ const ART={
         <circle cx="330" cy="100" r="6"><animate attributeName="cy" values="150;30" dur="5s" repeatCount="indefinite"/></circle>
         <circle cx="260" cy="70" r="5"><animate attributeName="cy" values="130;20" dur="4.4s" repeatCount="indefinite"/></circle>
       </g>
+    </svg>`},
+  souq:{keys:['سوق واقف','السوق','سوق'],title:'سوق واقف',
+    note:'سوق الدوحة التراثي بأزقته وممراته ومحلاته، أُعيد بناؤه بالطراز القطري القديم.',
+    svg:`<svg viewBox="0 0 520 340">
+      <g class="fillin">
+        <rect x="20" y="120" width="480" height="190" fill="#c9a46d"/>
+        <rect x="20" y="120" width="480" height="20" fill="#b08f55"/>
+        <g fill="#a87f4e">
+          ${Array.from({length:8},(_,i)=>`<rect x="${34+i*60}" y="100" width="22" height="22"/>`).join('')}
+        </g>
+        <g>
+          ${Array.from({length:4},(_,i)=>`
+            <path d="M${48+i*118} 310 L${48+i*118} 220 Q${48+i*118} 172 ${90+i*118} 172
+                     Q${132+i*118} 172 ${132+i*118} 220 L${132+i*118} 310 Z" fill="#3a0f1e"/>
+            <path d="M${90+i*118} 172 Q${132+i*118} 172 ${132+i*118} 220" fill="none" stroke="#f0c45a" stroke-width="4"/>
+            <rect x="${40+i*118}" y="200" width="100" height="14" rx="6" fill="#8b1538"/>
+            <rect x="${62+i*118}" y="214" width="56" height="10" rx="4" fill="#fff6e6" opacity=".8"/>`).join('')}
+        </g>
+        <g fill="#f0c45a">
+          ${Array.from({length:5},(_,i)=>`<g transform="translate(${80+i*90},96)">
+            <rect x="-2" y="-30" width="4" height="22" fill="#5c3a1e"/>
+            <path d="M-13 -8 L13 -8 L9 16 L-9 16 Z" opacity=".95"/>
+            <animateTransform attributeName="transform" type="rotate" values="0;3;0;-3;0" dur="${4+i*0.4}s" repeatCount="indefinite" additive="sum"/>
+          </g>`).join('')}
+        </g>
+      </g>
+      <path class="ink" d="M20 310 L500 310 M20 120 L500 120" fill="none" stroke="#f0c45a" stroke-width="5" stroke-linecap="round"/>
+    </svg>`},
+  fanjan:{keys:['فنجان','الفنجان','فناجين'],title:'الفنجان',
+    note:'فنجان القهوة العربية، يُقدَّم باليد اليمنى ويُملأ ثلثه فقط إكراماً للضيف.',
+    svg:`<svg viewBox="0 0 400 340">
+      <ellipse cx="200" cy="300" rx="120" ry="16" fill="#a87f4e" opacity=".45"/>
+      <g class="fillin">
+        <path d="M118 290 Q106 240 112 186 L288 186 Q294 240 282 290 Z" fill="#fff6e6"/>
+        <path d="M112 186 L288 186 L286 206 L114 206 Z" fill="#f0dcb8"/>
+        <ellipse cx="200" cy="186" rx="88" ry="20" fill="#e8d4ae"/>
+        <ellipse cx="200" cy="188" rx="74" ry="15" fill="#5c3a1e"/>
+        <ellipse cx="200" cy="188" rx="74" ry="15" fill="#43372a" opacity=".5"/>
+        <g fill="none" stroke="#8b1538" stroke-width="4">
+          <path d="M128 238 Q200 252 272 238"/>
+        </g>
+        <g fill="none" stroke="#1f7a6f" stroke-width="3">
+          <circle cx="200" cy="262" r="16"/><rect x="186" y="248" width="28" height="28"/>
+          <rect x="186" y="248" width="28" height="28" transform="rotate(45 200 262)"/>
+        </g>
+        <rect x="104" y="288" width="192" height="16" rx="8" fill="#f0c45a"/>
+        <ellipse cx="200" cy="288" rx="130" ry="18" fill="#f0c45a" opacity=".35"/>
+      </g>
+      <g class="fillin" opacity=".7">
+        <path d="M178 166 Q166 142 180 120" fill="none" stroke="#fff6e6" stroke-width="5" stroke-linecap="round">
+          <animate attributeName="opacity" values="0;.9;0" dur="2.8s" repeatCount="indefinite"/></path>
+        <path d="M212 168 Q226 144 212 122" fill="none" stroke="#fff6e6" stroke-width="4" stroke-linecap="round">
+          <animate attributeName="opacity" values="0;.8;0" dur="2.8s" begin="1s" repeatCount="indefinite"/></path>
+      </g>
+    </svg>`},
+  mabkhara:{keys:['مبخره','بخور','المبخره','عود'],title:'المبخرة والبخور',
+    note:'يُبخَّر بها المجلس والضيوف بالعود، ومن عادات الكرم في قطر تبخير الضيف عند وداعه.',
+    svg:`<svg viewBox="0 0 400 420">
+      <ellipse cx="200" cy="392" rx="110" ry="15" fill="#a87f4e" opacity=".45"/>
+      <g class="fillin">
+        <path d="M128 380 L272 380 L254 300 L146 300 Z" fill="#8b1538"/>
+        <path d="M146 300 L254 300 L250 282 L150 282 Z" fill="#f0c45a"/>
+        <rect x="118" y="262" width="164" height="22" rx="8" fill="#f0c45a"/>
+        <path d="M150 262 L250 262 L240 212 L160 212 Z" fill="#6d1430"/>
+        <g fill="#f0c45a">
+          <rect x="156" y="226" width="14" height="24" rx="4"/><rect x="186" y="226" width="14" height="24" rx="4"/>
+          <rect x="216" y="226" width="14" height="24" rx="4"/>
+        </g>
+        <rect x="152" y="196" width="96" height="18" rx="7" fill="#f0c45a"/>
+        <g fill="none" stroke="#f0c45a" stroke-width="3">
+          <circle cx="200" cy="340" r="22"/><rect x="182" y="322" width="36" height="36"/>
+          <rect x="182" y="322" width="36" height="36" transform="rotate(45 200 340)"/>
+        </g>
+        <g fill="#43372a"><rect x="110" y="376" width="180" height="14" rx="6" fill="#5c3a1e"/></g>
+      </g>
+      <g class="fillin" opacity=".75" fill="none" stroke="#fff6e6" stroke-linecap="round">
+        <path d="M184 190 Q168 150 186 112 Q200 78 188 44" stroke-width="5">
+          <animate attributeName="opacity" values=".15;.85;.15" dur="3.4s" repeatCount="indefinite"/></path>
+        <path d="M214 190 Q232 152 214 116 Q200 86 212 56" stroke-width="4">
+          <animate attributeName="opacity" values=".8;.15;.8" dur="3.4s" repeatCount="indefinite"/></path>
+      </g>
+    </svg>`},
+  khanjar:{keys:['خنجر','الخنجر','سيف'],title:'الخنجر',
+    note:'سلاح تقليدي يُلبس في الحزام، وغمده مزخرف بالفضة، ويرمز للرجولة والفخر.',
+    svg:`<svg viewBox="0 0 440 340">
+      <g class="fillin" transform="rotate(-14 220 170)">
+        <path d="M96 150 Q210 98 318 150 Q346 162 352 190 Q330 176 300 180 Q206 158 112 182 Q96 168 96 150 Z" fill="#f0c45a"/>
+        <path d="M106 156 Q212 110 312 158 Q324 164 330 178 Q214 150 114 176 Z" fill="#e0ab3d"/>
+        <g fill="none" stroke="#8a5e12" stroke-width="2.5" opacity=".85">
+          <path d="M130 162 Q214 132 300 168"/>
+          <circle cx="170" cy="160" r="7"/><circle cx="214" cy="150" r="7"/><circle cx="258" cy="156" r="7"/>
+        </g>
+        <rect x="74" y="140" width="34" height="52" rx="8" fill="#1f7a6f"/>
+        <rect x="74" y="140" width="34" height="52" rx="8" fill="none" stroke="#f0c45a" stroke-width="3"/>
+        <path d="M22 142 Q58 132 76 146 L76 186 Q58 200 22 190 Q10 166 22 142 Z" fill="#5c3a1e"/>
+        <path d="M30 150 Q58 142 70 152 L70 180 Q58 190 30 182 Q22 166 30 150 Z" fill="#6b4a24"/>
+        <g fill="#f0c45a"><circle cx="46" cy="166" r="7"/><circle cx="26" cy="166" r="4"/><circle cx="66" cy="166" r="4"/></g>
+      </g>
+      <g class="fillin" opacity=".3">
+        <ellipse cx="220" cy="300" rx="150" ry="14" fill="#a87f4e"/>
+      </g>
+    </svg>`},
+  thobe:{keys:['الملابس','ملابس','ثوب','الثوب','غتره','عقال','عبايه','الزي'],title:'الملابس التقليدية',
+    note:'الثوب الأبيض مع الغترة والعقال للرجال، والعباءة والشيلة للنساء، ملابس تناسب حرارة الجو.',
+    svg:`<svg viewBox="0 0 440 420">
+      <g class="fillin">
+        <path d="M150 400 L150 180 Q150 140 180 128 L210 118 L250 118 L280 128 Q310 140 310 180 L310 400 Z" fill="#fff6e6"/>
+        <path d="M150 180 Q122 196 110 240 L142 252 Q150 214 158 196 Z" fill="#f4ead6"/>
+        <path d="M310 180 Q338 196 350 240 L318 252 Q310 214 302 196 Z" fill="#f4ead6"/>
+        <path d="M210 118 L230 168 L250 118 Z" fill="#e8dcc4"/>
+        <path d="M228 168 L228 300" stroke="#e0d2b4" stroke-width="3"/>
+        <g fill="#f0c45a"><circle cx="228" cy="196" r="5"/><circle cx="228" cy="226" r="5"/><circle cx="228" cy="256" r="5"/></g>
+        <circle cx="230" cy="78" r="44" fill="#e8d4ae"/>
+        <path d="M186 74 Q188 30 230 28 Q272 30 274 74 Q274 96 266 110 L194 110 Q186 96 186 74 Z" fill="#fff6e6"/>
+        <path d="M186 74 Q188 30 230 28 Q272 30 274 74" fill="none" stroke="#f0c45a" stroke-width="3"/>
+        <ellipse cx="230" cy="40" rx="48" ry="13" fill="#17140f"/>
+        <ellipse cx="230" cy="32" rx="48" ry="12" fill="#2a2520"/>
+      </g>
+      <path class="ink" d="M150 400 L150 180 Q150 140 180 128 L210 118 L250 118 L280 128 Q310 140 310 180 L310 400"
+        fill="none" stroke="#f0c45a" stroke-width="5" stroke-linejoin="round"/>
+    </svg>`},
+  majlis:{keys:['مجلس','المجلس','ديوانيه'],title:'المجلس',
+    note:'مكان استقبال الضيوف: مساند على الأرض وسجاد وقهوة وتمر، وفيه تُروى القصص وتُحلّ الأمور.',
+    svg:`<svg viewBox="0 0 520 340">
+      <g class="fillin">
+        <rect x="20" y="60" width="480" height="180" fill="#6d1430"/>
+        <g fill="none" stroke="#f0c45a" stroke-width="3" opacity=".6">
+          ${Array.from({length:6},(_,i)=>`<g transform="translate(${70+i*76},120)">
+            <circle r="20"/><rect x="-14" y="-14" width="28" height="28"/>
+            <rect x="-14" y="-14" width="28" height="28" transform="rotate(45)"/></g>`).join('')}
+        </g>
+        <rect x="20" y="240" width="480" height="80" fill="#8b1538"/>
+        <g>
+          <rect x="40" y="246" width="440" height="56" rx="8" fill="#a8294a"/>
+          <g fill="#fff6e6" opacity=".85">
+            ${Array.from({length:11},(_,i)=>`<path d="M${52+i*40} 302 L${72+i*40} 262 L${92+i*40} 302 Z"/>`).join('')}
+          </g>
+          <g fill="#1f7a6f">
+            ${Array.from({length:10},(_,i)=>`<path d="M${72+i*40} 262 L${92+i*40} 302 L${112+i*40} 262 Z"/>`).join('')}
+          </g>
+        </g>
+        <g>
+          <rect x="44" y="196" width="94" height="48" rx="12" fill="#1f7a6f"/>
+          <rect x="150" y="196" width="94" height="48" rx="12" fill="#fff6e6"/>
+          <rect x="256" y="196" width="94" height="48" rx="12" fill="#1f7a6f"/>
+          <rect x="362" y="196" width="94" height="48" rx="12" fill="#fff6e6"/>
+          <g fill="none" stroke="#f0c45a" stroke-width="3">
+            <rect x="44" y="196" width="94" height="48" rx="12"/><rect x="150" y="196" width="94" height="48" rx="12"/>
+            <rect x="256" y="196" width="94" height="48" rx="12"/><rect x="362" y="196" width="94" height="48" rx="12"/>
+          </g>
+        </g>
+        <g transform="translate(250,168)">
+          <path d="M-16 28 Q-20 0 -12 -14 Q-6 -24 0 -24 Q6 -24 12 -14 Q20 0 16 28 Z" fill="#f0c45a"/>
+          <path d="M0 -24 Q-6 -36 -2 -44 L4 -44 Q8 -36 0 -24 Z" fill="#f0c45a"/>
+          <path d="M16 -2 Q34 4 30 20" fill="none" stroke="#f0c45a" stroke-width="6" stroke-linecap="round"/>
+        </g>
+      </g>
+      <path class="ink" d="M20 240 L500 240" fill="none" stroke="#f0c45a" stroke-width="5"/>
+    </svg>`},
+  museum:{keys:['متحف','المتحف','متحف الفن الاسلامي'],title:'متحف الفن الإسلامي',
+    note:'متحف الدوحة الذي يجمع تحفاً إسلامية من ثلاث قارات، وتصميمه مستوحى من العمارة الإسلامية.',
+    svg:`<svg viewBox="0 0 520 360">
+      <g class="fillin">
+        <rect x="0" y="286" width="520" height="74" fill="#1f7a6f" opacity=".55"/>
+        <g fill="#e8dcc4">
+          <rect x="150" y="150" width="220" height="140"/>
+          <rect x="186" y="96" width="148" height="56"/>
+          <rect x="214" y="58" width="92" height="40"/>
+          <rect x="236" y="30" width="48" height="30"/>
+        </g>
+        <g fill="#d2c3a2">
+          <path d="M150 150 L186 96 L186 152 Z"/><path d="M370 150 L334 96 L334 152 Z"/>
+          <path d="M186 96 L214 58 L214 98 Z"/><path d="M334 96 L306 58 L306 98 Z"/>
+          <path d="M214 58 L236 30 L236 60 Z"/><path d="M306 58 L284 30 L284 60 Z"/>
+        </g>
+        <g fill="#3a0f1e">
+          <rect x="176" y="190" width="26" height="60" rx="12"/><rect x="226" y="190" width="26" height="60" rx="12"/>
+          <rect x="276" y="190" width="26" height="60" rx="12"/><rect x="326" y="190" width="26" height="60" rx="12"/>
+          <rect x="246" y="116" width="28" height="30" rx="13"/>
+        </g>
+        <rect x="100" y="282" width="320" height="12" rx="5" fill="#c9a46d"/>
+        <g fill="#2a9b8c" opacity=".5">
+          <path d="M0 316 Q60 302 120 316 T240 316 T360 316 T520 316" fill="none" stroke="#2a9b8c" stroke-width="6">
+            <animate attributeName="d" dur="4s" repeatCount="indefinite"
+              values="M0 316 Q60 302 120 316 T240 316 T360 316 T520 316;
+                      M0 316 Q60 330 120 316 T240 316 T360 316 T520 316;
+                      M0 316 Q60 302 120 316 T240 316 T360 316 T520 316"/></path>
+        </g>
+      </g>
+      <path class="ink" d="M150 290 L150 150 L186 96 L214 58 L236 30 L284 30 L306 58 L334 96 L370 150 L370 290"
+        fill="none" stroke="#f0c45a" stroke-width="5" stroke-linejoin="round"/>
     </svg>`}
 };
 
@@ -725,7 +938,12 @@ const LESSONS={
     ['لماذا اتجه الفنان المسلم للزخرفة الهندسية والنباتية؟','ابتعاداً عن تصوير الكائنات الحية، فأبدع في الأشكال المجردة والتجريد الزخرفي.'],
     ['ما أشهر وحدة هندسية في الفن الإسلامي؟','النجمة الثمانية، وتُبنى من مربعين متداخلين بزاوية ٤٥ درجة.'],
     ['ما هو التناظر (التماثل) في الزخرفة؟','تطابق نصفي التصميم حول محور، فيبدو متزناً ومتناسقاً.'],
-    ['أين نجد الزخارف الإسلامية في قطر؟','في المساجد وأبواب البيوت القديمة وسوق واقف ومتحف الفن الإسلامي.']
+    ['أين نجد الزخارف الإسلامية في قطر؟','في المساجد وأبواب البيوت القديمة وسوق واقف ومتحف الفن الإسلامي.'],
+    ['ما هو التشعّب في الزخرفة؟','تفرّع الخطوط والأغصان من أصل واحد لتملأ المساحة بانسجام.'],
+    ['ما معنى الأرابيسك؟','الاسم الأوروبي للزخرفة النباتية الإسلامية المتشابكة.'],
+    ['ما الفرق بين الزخرفة الهندسية والنباتية؟','الهندسية تعتمد الخطوط والأشكال كالمربع والنجمة، والنباتية تعتمد الأوراق والسيقان المتشابكة.'],
+    ['ما المواد التي نُفّذت عليها الزخارف الإسلامية؟','الجص والخشب والخزف والزجاج والمعادن والسجاد والمخطوطات.'],
+    ['ما هو التجريد في الفن الإسلامي؟','تحويل الأشكال الواقعية إلى أشكال مبسّطة ورموز بعيدة عن المحاكاة.']
   ]},
   imara:{keys:['العماره','عماره','معماري','المباني'],name:'العمارة الإسلامية',qs:[
     ['ما أبرز عناصر العمارة الإسلامية؟','القبة، والمئذنة، والأقواس، والمحراب، والصحن، والمشربية.'],
@@ -735,7 +953,12 @@ const LESSONS={
     ['ما هي المشربية؟','نافذة خشبية مخرّمة تُدخل الهواء والضوء وتحفظ خصوصية البيت.'],
     ['ما هو البَرجيل ولماذا استُخدم في قطر؟','ملقف هواء يُبرّد البيت طبيعياً بالتقاط الهواء من الأعلى، بسبب حرارة الجو.'],
     ['من أشهر المباني التراثية في قطر؟','قلعة الزبارة، وقلعة الكوت (الدوحة)، وبرج برزان، وسوق واقف.'],
-    ['ما المواد التي بُنيت بها البيوت القطرية قديماً؟','الحجر البحري والجص (الصاروج) وجذوع النخيل والخشب (الدنچل).']
+    ['ما المواد التي بُنيت بها البيوت القطرية قديماً؟','الحجر البحري والجص (الصاروج) وجذوع النخيل والخشب (الدنچل).'],
+    ['ما هو الصحن في المسجد؟','الساحة المكشوفة وسط المسجد تحيط بها الأروقة.'],
+    ['ما هي المقرنصات؟','حليات معمارية تشبه خلايا النحل تزيّن أسفل القباب والأقواس وتنقل الشكل من المربع إلى الدائرة.'],
+    ['ما هو الليوان؟','ممر مسقوف مفتوح على الفناء يحمي من الشمس والمطر.'],
+    ['لماذا كانت نوافذ البيوت القطرية صغيرة وعالية؟','لتقليل دخول حرارة الشمس وحفظ خصوصية البيت.'],
+    ['ما أشهر معالم الدوحة التي تجمع القديم والحديث؟','سوق واقف ومتحف الفن الإسلامي وحي كتارا الثقافي.']
   ]},
   khat:{keys:['الخط','خط عربي','الخط العربي','خطوط','الكتابه'],name:'الخط العربي',qs:[
     ['ما هو الخط العربي؟','فن كتابة الحروف العربية بقواعد وجمال، وهو من أرقى الفنون الإسلامية.'],
@@ -745,7 +968,12 @@ const LESSONS={
     ['ما الخط الذي نكتب به عادةً بسرعة؟','خط الرقعة، وهو أسهل الخطوط وأسرعها في الكتابة اليومية.'],
     ['ما أدوات الخطاط؟','القلم (القصبة أو البوص)، والحبر، والمِقطّة، والورق المصقول.'],
     ['من أشهر الخطاطين في التاريخ الإسلامي؟','ابن مقلة، وابن البوّاب، وياقوت المستعصمي.'],
-    ['كيف يصبح الخط زخرفة؟','بتكرار الكلمات وتشابكها وتكوينها في أشكال هندسية، كما في الزخرفة الكتابية.']
+    ['كيف يصبح الخط زخرفة؟','بتكرار الكلمات وتشابكها وتكوينها في أشكال هندسية، كما في الزخرفة الكتابية.'],
+    ['ما الخط المستخدم في العناوين والمساجد؟','خط الثلث، لجلاله وجمال تداخل حروفه.'],
+    ['ما الخط الذي يكثر في الوثائق الرسمية العثمانية؟','الخط الديواني، بانحناءاته المتصلة.'],
+    ['ما الفرق بين الكوفي والنسخ؟','الكوفي مستقيم بزوايا حادة، والنسخ ليّن بانحناءات واضحة وسهل القراءة.'],
+    ['ما المقصود بقياس القلم في الخط؟','وحدة قياس بالنقطة المعيّنة تحدد نسب الحرف وطوله.'],
+    ['كيف نحافظ على فن الخط العربي؟','بتعلّمه وممارسته وزيارة معارضه وتوظيفه في التصميم الحديث.']
   ]},
   fannanin:{keys:['الفنانين','فنان','فنانين','الفنانون','التشكيليين'],name:'الفنانون القطريون',qs:[
     ['من هو جاسم زيني؟','من روّاد الفن التشكيلي في قطر، اهتم برسم البيئة المحلية والبحر والغوص والحياة الشعبية.'],
@@ -754,14 +982,24 @@ const LESSONS={
     ['ما هي الحروفية في الفن؟','اتجاه فني يستخدم الحرف العربي كعنصر جمالي في اللوحة لا كنص للقراءة فقط.'],
     ['أين يمكن مشاهدة أعمال الفنانين القطريين؟','متحف: المتحف العربي للفن الحديث، ومتحف الفن الإسلامي، والصالات الفنية في كتارا.'],
     ['ما الموضوعات التي رسمها الفنانون القطريون؟','البحر والغوص والصحراء والخيمة والعمارة الشعبية والتراث والخط العربي.'],
-    ['ما دور الفنان في حفظ التراث؟','يوثّق عناصر التراث في أعماله فيحفظها للأجيال ويعرّف العالم بهويته.']
+    ['ما دور الفنان في حفظ التراث؟','يوثّق عناصر التراث في أعماله فيحفظها للأجيال ويعرّف العالم بهويته.'],
+    ['ما هو المتحف العربي للفن الحديث؟','متحف في الدوحة يضم أعمالاً عربية حديثة ومعاصرة، ومنها أعمال فنانين قطريين.'],
+    ['ما دور كتارا في دعم الفن؟','حي ثقافي فيه صالات عرض ومسارح وورش تدعم الفنانين وتقيم المعارض.'],
+    ['ما الخامات التي يستخدمها الفنانون القطريون؟','الألوان الزيتية والأكريليك والورق المصنوع يدوياً والطباعة والتصوير والتركيب.'],
+    ['لماذا يرسم كثير من الفنانين القطريين البحر؟','لأن البحر كان مصدر الرزق والغوص والسفر، فهو جزء من ذاكرة المكان.'],
+    ['كيف نصبح فنانين؟','بالممارسة اليومية والرسم من الملاحظة ودراسة أعمال الآخرين والمشاركة في المعارض.']
   ]},
   alab:{keys:['الالعاب','العاب شعبيه','لعبه','الالعاب الشعبيه'],name:'الألعاب الشعبية القطرية',qs:[
     ['ما هي الألعاب الشعبية؟','ألعاب توارثها الأبناء عن الآباء، تُلعب بأدوات بسيطة من البيئة وفي الأحياء والفرجان.'],
     ['اذكر أشهر الألعاب الشعبية القطرية.','الدحروي، وطاق طاق طاقية، وعظيم سرحان، والخشيشة، وأم الدرايس، والصقلة.'],
     ['ما فائدة الألعاب الشعبية؟','تقوّي الجسم وتنمّي التعاون والذكاء وتربط الأجيال بتراثهم.'],
     ['كيف نستفيد من الألعاب الشعبية في الفن؟','نرسم مشاهدها ونصمّم منها وحدات زخرفية وملصقات تُعرّف بها.'],
-    ['بماذا تختلف ألعاب الأمس عن ألعاب اليوم؟','ألعاب الأمس حركية جماعية بأدوات بسيطة، وألعاب اليوم غالباً إلكترونية فردية.']
+    ['بماذا تختلف ألعاب الأمس عن ألعاب اليوم؟','ألعاب الأمس حركية جماعية بأدوات بسيطة، وألعاب اليوم غالباً إلكترونية فردية.'],
+    ['كيف تُلعب «طاق طاق طاقية»؟','يجلس اللاعبون في دائرة، ويدور أحدهم خلفهم ويضع منديلاً خلف أحدهم ليطارده.'],
+    ['ما هي «الخشيشة»؟','لعبة شعبية تعتمد على تحريك أداة صغيرة تُصدر صوتاً، وتُلعب في الفرجان.'],
+    ['متى كانت تُلعب الألعاب الشعبية؟','بعد العصر وفي المساء وفي الأعياد والمناسبات، في ساحات الفرجان.'],
+    ['ما العلاقة بين اللعبة الشعبية والفن؟','كلاهما تعبير عن ثقافة المجتمع، ويمكن تحويل مشاهد اللعب إلى لوحات وتصاميم.'],
+    ['ما هي «القرنقعوه»؟','مناسبة شعبية في منتصف رمضان يتجوّل فيها الأطفال بملابس تراثية ويجمعون الحلوى والمكسّرات.']
   ]},
   turath:{keys:['التراث','تراث','تراثنا','التراث القطري'],name:'التراث القطري',qs:[
     ['ما المقصود بالتراث؟','كل ما ورثناه عن الآباء والأجداد من عادات وحرف وفنون ومبانٍ وقيم.'],
@@ -771,7 +1009,24 @@ const LESSONS={
     ['بماذا اشتهر القطريون قديماً؟','الغوص على اللؤلؤ وصيد الأسماك والتجارة البحرية ورعي الإبل.'],
     ['ما أهمية قلعة الزبارة؟','موقع أثري مُدرج في قائمة التراث العالمي لليونسكو، ويحكي تاريخ قطر التجاري.'],
     ['كيف نحافظ على تراثنا؟','بزيارة المتاحف وتعلّم الحرف وتوثيقها بالرسم والتصوير وتعريف الآخرين بها.'],
-    ['ما دور الفن في خدمة التراث؟','يوثّق عناصره ويعيد توظيفها في تصاميم حديثة تُبرز الهوية القطرية.']
+    ['ما دور الفن في خدمة التراث؟','يوثّق عناصره ويعيد توظيفها في تصاميم حديثة تُبرز الهوية القطرية.'],
+    ['ما هي الحرف التراثية في قطر؟','السدو، وصناعة السفن (القلافة)، وصناعة شباك الصيد، والفخار، والحدادة، وصناعة الحلي.'],
+    ['ما أهمية سوق واقف؟','سوق الدوحة التراثي الذي يحفظ شكل السوق القديم وفيه الحرف والمأكولات والمجالس.'],
+    ['ما هي القلافة؟','حرفة صناعة السفن الخشبية وإصلاحها، وكان القلاف من أهم أصحاب المهن.'],
+    ['ما دور المتاحف في حفظ التراث؟','تجمع القطع وتحفظها وتعرضها وتشرحها للزوار والأجيال الجديدة.'],
+    ['ما معنى التراث غير المادي؟','ما لا يُلمس من التراث: العادات والأهازيج والحكايات والحرف والمهارات المتوارثة.']
+  ]},
+  sadu:{keys:['السدو','سدو','النسيج','نسيج','حياكه','الحياكه'],name:'السَّدو',qs:[
+    ['ما هو السَّدو؟','حرفة نسيج بدوية تُنسج بها بيوت الشَّعر والمفارش والسجاد من صوف الغنم ووبر الإبل وشعر الماعز.'],
+    ['ما ألوان السدو الأساسية؟','الأحمر والأسود والأبيض والبني، وأحياناً الأخضر، وكانت تُستخرج قديماً من نباتات وأصباغ طبيعية.'],
+    ['ما أدوات السدو؟','النول الأرضي، والمِغزل لغزل الصوف، والمِنشزة لشدّ الخيوط، والمِدرى لتصفيف الخيط.'],
+    ['ما أشكال نقوش السدو؟','أشكال هندسية: مثلثات ومعيّنات وخطوط متوازية وأشرطة متكررة، مستوحاة من البيئة الصحراوية.'],
+    ['من كان ينسج السدو؟','النساء، وكنّ يجتمعن لنسجه في جلسات جماعية تُسمى أحياناً «التعاون».'],
+    ['ما استخدامات السدو قديماً؟','بيت الشَّعر، وفواصل الخيمة (القاطع)، والمفارش، والسروج، وأكياس حفظ المتاع.'],
+    ['لماذا السدو مهم اليوم؟','لأنه جزء من هوية قطر، وقد أُدرج في قائمة اليونسكو للتراث الثقافي غير المادي.'],
+    ['كيف نستفيد من السدو في الفن؟','نستخرج منه وحدات زخرفية ونوظّفها في التصميم والرسم والملابس والمنتجات الحديثة.'],
+    ['ما الفرق بين السدو والسجاد المصنّع؟','السدو يُنسج يدوياً بخيوط طبيعية وأشكال هندسية بسيطة، والمصنّع يُنتج بالآلة بكميات كبيرة.'],
+    ['ما معنى «الشَّجرة» في نقوش السدو؟','وحدة زخرفية متكررة تُشبه تفرّع الشجرة، وتُعدّ من أشهر نقوش السدو.']
   ]}
 };
 
@@ -841,6 +1096,7 @@ function showCalli(word,style){
 /* ============ النطق ============ */
 let speaking=false;
 function speak(text){
+  if(aiCfg.speak!==true)return;
   if(!('speechSynthesis'in window))return;
   try{
     speaking=true;
@@ -914,7 +1170,16 @@ function initRec(){
     const shown=(fin||interim).trim();
     if(shown){talkBox.classList.remove('idle');talkBox.textContent=shown;}
     if(fin.trim()){
-      if(!handle(fin))aiFallback(fin);
+      let cmd=fin;
+      if((aiCfg.listen||'always')==='wake'){
+        const w=norm(aiCfg.wake||'يا فنان'), nf=norm(fin), at=nf.indexOf(w);
+        if(at<0){clearTimeout(idleTimer);
+          idleTimer=setTimeout(()=>{talkBox.classList.add('idle');
+            talkBox.textContent='… قل «'+(aiCfg.wake||'يا فنان')+'» ثم طلبك';},6000);
+          return;}
+        cmd=nf.slice(at+w.length);
+      }
+      if(!handle(cmd))aiFallback(cmd);
       clearTimeout(idleTimer);
       idleTimer=setTimeout(()=>{talkBox.classList.add('idle');talkBox.textContent='… تفضل، تكلّم وأنا أسمعك';},7000);
     }
@@ -1058,7 +1323,14 @@ const PHOTO_Q={
   'المشربية':'Mashrabiya wooden lattice window',
   'الصقر':'Falcon falconry Qatar',
   'الألعاب الشعبية القطرية':'Traditional children games Gulf Qatar',
-  'اللؤلؤ والمحار':'Pearl oyster pearling Gulf Qatar'
+  'اللؤلؤ والمحار':'Pearl oyster pearling Gulf Qatar',
+  'سوق واقف':'Souq Waqif Doha Qatar alley',
+  'الفنجان':'Arabic coffee cup finjan dallah',
+  'المبخرة والبخور':'Incense burner mabkhara oud Arabian',
+  'الخنجر':'Khanjar dagger Arabian silver',
+  'الملابس التقليدية':'Traditional Qatari clothing thobe ghutra',
+  'المجلس':'Majlis Arabian room carpet cushions',
+  'متحف الفن الإسلامي':'Museum of Islamic Art Doha Qatar'
 };
 
 async function fetchPhoto(topic){
@@ -1315,17 +1587,52 @@ async function aiFallback(raw){
   }
 }
 
+/* ===== زر المايك (وضع الضغط) ===== */
+const pttBtn=document.getElementById('pttBtn');
+function applyListenMode(){
+  const m=aiCfg.listen||'always';
+  if(m==='push'){
+    pttBtn.classList.remove('hidden');
+    wantListen=false;
+    try{rec&&rec.stop();}catch(e){}
+    pttBtn.classList.remove('on');pttBtn.textContent='🎤 اضغط لأتكلم';
+    setMic('','جاهز — اضغط المايك');
+    talkBox.classList.add('idle');talkBox.textContent='… اضغط زر المايك ثم تكلّم';
+  }else{
+    pttBtn.classList.add('hidden');
+    startListen();
+    if(m==='wake'){talkBox.classList.add('idle');
+      talkBox.textContent='… قل «'+(aiCfg.wake||'يا فنان')+'» ثم طلبك';}
+  }
+}
+pttBtn.onclick=()=>{
+  if(wantListen){
+    wantListen=false;try{rec&&rec.stop();}catch(e){}
+    pttBtn.classList.remove('on');pttBtn.textContent='🎤 اضغط لأتكلم';
+    setMic('','متوقف');
+  }else{
+    startListen();
+    pttBtn.classList.add('on');pttBtn.textContent='⏹ أسمعك الآن';
+    talkBox.classList.remove('idle');talkBox.textContent='… تفضل';
+  }
+};
+
 /* ===== نافذة الإعدادات ===== */
 const setModal=document.getElementById('setModal');
 const provSel=document.getElementById('provSel'),keyInp=document.getElementById('keyInp'),
       modelInp=document.getElementById('modelInp'),imgKeyInp=document.getElementById('imgKeyInp'),
-      qualSel=document.getElementById('qualSel'),srcSel=document.getElementById('srcSel');
+      qualSel=document.getElementById('qualSel'),srcSel=document.getElementById('srcSel'),
+      listenSel=document.getElementById('listenSel'),wakeInp=document.getElementById('wakeInp'),
+      speakChk=document.getElementById('speakChk');
 function openSet(){
   provSel.value=aiCfg.provider||'anthropic';
   keyInp.value=aiCfg.key||'';modelInp.value=aiCfg.model||'';
   imgKeyInp.value=aiCfg.imgKey||'';
   qualSel.value=aiCfg.quality||'low';
   srcSel.value=srcMode();
+  listenSel.value=aiCfg.listen||'always';
+  wakeInp.value=aiCfg.wake||'';
+  speakChk.checked=aiCfg.speak===true;
   modelInp.placeholder=DEFAULT_MODEL[provSel.value];
   setModal.classList.remove('hidden');panel.classList.remove('open');
 }
@@ -1336,11 +1643,13 @@ document.getElementById('closeSet').onclick=()=>setModal.classList.add('hidden')
 provSel.onchange=()=>modelInp.placeholder=DEFAULT_MODEL[provSel.value];
 function saveCfg(){
   aiCfg={provider:provSel.value,key:keyInp.value.trim(),model:modelInp.value.trim(),
-    imgKey:imgKeyInp.value.trim(),quality:qualSel.value,src:srcSel.value};
+    imgKey:imgKeyInp.value.trim(),quality:qualSel.value,src:srcSel.value,
+    listen:listenSel.value,wake:(wakeInp.value.trim()||'يا فنان'),speak:speakChk.checked};
   try{localStorage.setItem(AI_CFG,JSON.stringify(aiCfg));}catch(e){}
 }
 document.getElementById('saveSet').onclick=()=>{
   saveCfg();
+  applyListenMode();
   setModal.classList.add('hidden');
   showMsg('تم الحفظ ✓',
     'قل مثلاً: «ارسم لي سوق واقف» أو «أعطني خمسة أسئلة عن متحف الفن الإسلامي»',
@@ -1353,7 +1662,8 @@ document.getElementById('clearImgs').onclick=async()=>{
   showMsg('تم الحذف ✓','حُذفت الصور المحفوظة من هذا الجهاز');
 };
 document.getElementById('clearKey').onclick=()=>{
-  aiCfg={provider:provSel.value,key:'',model:'',imgKey:'',quality:qualSel.value,src:srcSel.value};
+  aiCfg={provider:provSel.value,key:'',model:'',imgKey:'',quality:qualSel.value,src:srcSel.value,
+    listen:listenSel.value,wake:aiCfg.wake,speak:aiCfg.speak};
   try{localStorage.removeItem(AI_CFG);}catch(e){}
   keyInp.value='';modelInp.value='';imgKeyInp.value='';
   setModal.classList.add('hidden');showWelcome();
@@ -1367,7 +1677,7 @@ document.getElementById('startBtn').onclick=async()=>{
     const st=await navigator.mediaDevices.getUserMedia({audio:true});
     st.getTracks().forEach(t=>t.stop());
   }catch(e){}
-  startListen();
+  applyListenMode();
 };
 showWelcome();
 </script>
