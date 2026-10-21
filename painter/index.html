@@ -94,6 +94,7 @@
   <div id="examples"></div>
   <form id="row" autocomplete="off">
     <button class="btn ghost" id="mic" type="button" aria-label="تكلّم">🎤</button>
+    <button class="btn ghost" id="pastecmd" type="button" aria-label="لصق الطلب" style="font-size:20px;padding:9px 14px">📋</button>
     <input id="cmd" type="text" enterkeyhint="send" autocorrect="off" autocapitalize="off" placeholder="اضغط 🎤 وتكلّم، أو اكتب هنا ما تريد رسمه">
     <button class="btn" id="send" type="submit">ارسم</button>
     <button class="btn" id="stop" type="button">إيقاف</button>
@@ -111,6 +112,7 @@
     <h2>مفتاح الذكاء الاصطناعي</h2>
     <p>اختر الخدمة التي عندك مفتاحها. الصفحة تتصل بها من متصفحك مباشرة لترسم. الصق المفتاح مرة واحدة. يُحفظ في هذا المتصفح فقط ولا يُرسل لغير الخدمة التي اخترتها. تكلفة الرسم تُحسب على حسابك هناك.</p>
     <input id="key" type="password" placeholder="sk-..." aria-label="مفتاح API">
+    <button class="btn ghost" id="paste" type="button">📋 لصق المفتاح من الحافظة</button>
     <select id="provider" aria-label="الخدمة"><option value="anthropic">Claude (Anthropic)</option><option value="openai">ChatGPT (OpenAI)</option></select>
     <input id="model" list="models" aria-label="اسم النموذج" placeholder="اسم النموذج" style="direction:ltr;text-align:left">
     <datalist id="models"></datalist>
@@ -377,6 +379,14 @@ var LIB = [{"id": "sun", "k": ["شمس", "شمسه", "شروق", "صحرا"], "l
   function openKey(){ $("keybox").hidden = false; fillKeyForm(); $("key").focus(); }
   $("keybtn").onclick = openKey;
   $("provider").onchange = function(){ PROVIDER = $("provider").value; fillKeyForm(); };
+  $("paste").onclick = function(){
+    if(!(navigator.clipboard && navigator.clipboard.readText)){ status("المتصفح لا يسمح باللصق بالزر. اضغط مطولاً في خانة المفتاح واختر لصق.", true); return; }
+    navigator.clipboard.readText().then(function(t){ $("key").value = (t || "").trim(); $("key").focus(); status("تم اللصق. اضغط حفظ."); }).catch(function(){ status("لم يُسمح باللصق. اضغط مطولاً في خانة المفتاح واختر لصق.", true); });
+  };
+  $("pastecmd").onclick = function(){
+    if(!(navigator.clipboard && navigator.clipboard.readText)){ status("المتصفح لا يسمح باللصق بالزر. اضغط مطولاً في خانة الطلب واختر لصق.", true); return; }
+    navigator.clipboard.readText().then(function(t){ var c = $("cmd"); c.value = (t || "").trim(); c.focus(); status("تم لصق الطلب. اضغط ارسم."); }).catch(function(){ status("لم يُسمح باللصق. اضغط مطولاً في خانة الطلب واختر لصق.", true); });
+  };
   $("keycancel").onclick = function(){ PROVIDER = lsGet("lp_provider") || "anthropic"; $("keybox").hidden = true; };
   $("keycard").addEventListener("submit", function(e){
     e.preventDefault();
