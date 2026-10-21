@@ -26,6 +26,11 @@
   #keybox{display:none;gap:8px;width:min(92vw,520px);align-items:center}
   #keybox.show{display:flex}
   #keyin{flex:1;padding:10px;border-radius:10px;border:0;font-size:16px;direction:ltr}
+  #pic .pop{transform-box:fill-box;transform-origin:center;opacity:0;animation:pop .55s cubic-bezier(.34,1.56,.64,1) forwards;animation-delay:calc(var(--i) * 140ms)}
+  @keyframes pop{from{opacity:0;transform:scale(.15) rotate(-8deg)}60%{opacity:1}to{opacity:1;transform:scale(1) rotate(0)}}
+  #pic.bounce{animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @media (prefers-reduced-motion: reduce){ #pic .pop{animation:none;opacity:1} #pic.bounce{animation:none} }
   #chat{display:none;width:min(92vw,760px);max-height:30vh;overflow:auto;background:#fff7e6;color:#16090e;border-radius:14px;padding:10px 14px;font-size:clamp(16px,2.4vw,22px);line-height:1.7;text-align:right}
   #chat.show{display:block}
   #chat .me{color:#6e1028;font-weight:700}
@@ -56,11 +61,24 @@ function norm(t){ return (t||"").replace(/[ً-ْـ]/g,"").replace(/[إأآ]/g,"�
 function lsGet(k){ try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 
+/* each top-level part of the drawing pops in one after another, then the picture gently bobs */
+function animateIn(){
+  var svg = $("pic").querySelector("svg"); if(!svg) return;
+  var kids = Array.prototype.slice.call(svg.children).filter(function(c){ return c.localName !== "defs" && c.localName !== "style"; });
+  kids.forEach(function(c, i){
+    var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("class", "pop"); g.style.setProperty("--i", i);
+    svg.insertBefore(g, c); g.appendChild(c);
+  });
+  $("pic").className = "";
+  void $("pic").offsetWidth;
+  $("pic").className = "bounce";
+}
 function show(){
   if(!DECK.length){ $("q").textContent = "لا توجد أسئلة بعد"; return; }
   var s = DECK[idx];
   $("num").textContent = (idx+1) + " / " + DECK.length;
-  $("pic").innerHTML = s.svg || "";
+  $("pic").innerHTML = s.svg || ""; $("pic").className = ""; animateIn();
   $("q").textContent = s.q;
   $("opts").innerHTML = (s.o||[]).map(function(o){ return "<span>" + o + "</span>"; }).join("");
   $("ans").textContent = s.a ? ("الجواب: " + s.a + (s.e ? " - " + s.e : "")) : "";
