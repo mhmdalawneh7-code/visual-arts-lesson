@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفنون البصرية — التراث والفن الإسلامي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Reem+Kufi:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --maroon-1:#4a0d1f;
+  --maroon-2:#6d1430;
+  --maroon-3:#8b1538;
+  --sand-1:#e6c89a;
+  --sand-2:#c9a46d;
+  --sand-3:#a87f4e;
+  --gold:#f0c45a;
+  --gold-soft:#ffe9b0;
+  --cream:#fff6e6;
+  --teal:#1f7a6f;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Cairo',system-ui,sans-serif;
+  background:var(--maroon-1);
+  color:var(--cream);
+  overflow:hidden;
+  position:relative;
+}
+
+/* ====== الخلفية ====== */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+.sky{position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 15%, #8b1538 0%, #6d1430 38%, #4a0d1f 72%, #2e0714 100%);}
+.star{position:absolute;background:var(--gold-soft);border-radius:50%;opacity:.7;
+  animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:.95;transform:scale(1.15)}}
+
+.geo{position:absolute;opacity:.10;color:var(--gold);animation:floatGeo 22s linear infinite}
+@keyframes floatGeo{
+  0%{transform:translateY(20px) rotate(0deg)}
+  50%{transform:translateY(-25px) rotate(180deg)}
+  100%{transform:translateY(20px) rotate(360deg)}
+}
+
+.dunes{position:absolute;bottom:0;left:0;width:100%;height:42%}
+.palm{position:absolute;bottom:14%;transform-origin:bottom center;animation:sway 6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2.2deg)}50%{transform:rotate(2.2deg)}}
+
+.sadu-strip{position:absolute;bottom:0;left:0;width:100%;height:34px;z-index:2;
+  background:repeating-linear-gradient(90deg,
+    #8b1538 0 18px, #fff6e6 18px 24px, #1f7a6f 24px 34px, #fff6e6 34px 40px,
+    #0f0f0f 40px 50px, #fff6e6 50px 56px);
+  border-top:3px solid var(--gold);
+  animation:slideSadu 40s linear infinite}
+@keyframes slideSadu{to{background-position-x:-560px}}
+
+/* ====== الواجهة ====== */
+#app{position:relative;z-index:3;height:100%;display:flex;flex-direction:column}
+
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;
+  background:linear-gradient(180deg,rgba(0,0,0,.35),transparent)}
+h1{font-family:'Reem Kufi',serif;font-size:clamp(18px,2.4vw,30px);color:var(--gold);
+  letter-spacing:.5px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.spacer{flex:1}
+
+.pill{display:flex;align-items:center;gap:9px;background:rgba(0,0,0,.35);
+  border:2px solid rgba(240,196,90,.45);border-radius:999px;padding:8px 16px;
+  font-weight:700;font-size:clamp(13px,1.4vw,17px);cursor:pointer;color:var(--cream);
+  transition:.2s}
+.pill:hover{background:rgba(0,0,0,.55);border-color:var(--gold)}
+.dot{width:13px;height:13px;border-radius:50%;background:#777;flex:none}
+.dot.live{background:#35d07f;box-shadow:0 0 0 0 rgba(53,208,127,.7);animation:pulse 1.4s infinite}
+.dot.err{background:#ff5a5a}
+@keyframes pulse{70%{box-shadow:0 0 0 14px rgba(53,208,127,0)}100%{box-shadow:0 0 0 0 rgba(53,208,127,0)}}
+
+/* ====== المسرح ====== */
+main{flex:1;position:relative;display:flex;align-items:center;justify-content:center;
+  padding:10px 26px 80px;overflow:hidden}
+#stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+
+.welcome{text-align:center;animation:fadeUp .7s ease both}
+.welcome .big{font-family:'Reem Kufi',serif;font-size:clamp(28px,5vw,64px);color:var(--gold);
+  text-shadow:0 4px 18px rgba(0,0,0,.6);margin-bottom:10px}
+.welcome .sub{font-size:clamp(15px,1.9vw,24px);opacity:.9;line-height:2}
+.welcome .hint{margin-top:22px;font-size:clamp(13px,1.5vw,19px);color:var(--gold-soft);opacity:.85}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+
+.art-wrap{text-align:center;animation:popIn .6s cubic-bezier(.2,.9,.3,1.3) both;max-height:100%}
+@keyframes popIn{from{opacity:0;transform:scale(.72)}to{opacity:1;transform:scale(1)}}
+.art-wrap svg{width:min(62vw,560px);height:auto;max-height:58vh;
+  filter:drop-shadow(0 14px 30px rgba(0,0,0,.55))}
+.art-title{margin-top:14px;font-family:'Reem Kufi',serif;color:var(--gold);
+  font-size:clamp(22px,3.4vw,44px);text-shadow:0 3px 12px rgba(0,0,0,.6)}
+.art-note{margin-top:6px;font-size:clamp(14px,1.7vw,21px);opacity:.9;max-width:760px;
+  margin-inline:auto;line-height:1.9}
+
+/* رسم تدريجي */
+.ink{stroke-dasharray:1400;stroke-dashoffset:1400;animation:ink 1.8s ease forwards}
+@keyframes ink{to{stroke-dashoffset:0}}
+.fillin{opacity:0;animation:fillin .8s ease forwards;animation-delay:1.1s}
+@keyframes fillin{to{opacity:1}}
+
+/* ====== البطاقات ====== */
+.cards-head{text-align:center;margin-bottom:14px}
+.cards-head h2{font-family:'Reem Kufi',serif;color:var(--gold);
+  font-size:clamp(20px,2.8vw,36px)}
+.cards-wrap{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center}
+.cards{display:grid;gap:16px;justify-content:center;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));max-width:1240px;margin-inline:auto;
+  width:100%;overflow-y:auto;padding:6px}
+.card{perspective:1200px;min-height:190px;cursor:pointer;
+  animation:dealIn .55s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes dealIn{from{opacity:0;transform:translateY(40px) rotate(-6deg)}to{opacity:1;transform:none}}
+.card-inner{position:relative;width:100%;height:100%;min-height:190px;
+  transition:transform .65s cubic-bezier(.4,.1,.2,1);transform-style:preserve-3d}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:18px 16px;text-align:center;border:3px solid var(--gold);
+  box-shadow:0 12px 26px rgba(0,0,0,.45)}
+.front{background:linear-gradient(145deg,#fff6e6,#f0dcb8);color:#4a0d1f}
+.back{background:linear-gradient(145deg,#1f7a6f,#145a52);color:#fff6e6;transform:rotateY(180deg);
+  border-color:var(--gold-soft)}
+.q-num{font-family:'Reem Kufi',serif;font-size:15px;background:var(--maroon-3);color:var(--gold-soft);
+  border-radius:999px;padding:3px 13px;margin-bottom:10px}
+.q-txt{font-weight:700;font-size:clamp(15px,1.6vw,21px);line-height:1.8}
+.a-lbl{font-size:14px;color:var(--gold);margin-bottom:8px;font-weight:700}
+.a-txt{font-size:clamp(14px,1.5vw,20px);line-height:1.85}
+.tap{position:absolute;bottom:8px;font-size:12px;opacity:.6}
+
+/* الخط العربي */
+.calli{text-align:center;animation:popIn .6s ease both}
+.calli .word{font-size:clamp(50px,13vw,170px);color:var(--gold);line-height:1.6;
+  text-shadow:0 6px 24px rgba(0,0,0,.6);padding:0 14px}
+.calli .lbl{margin-top:8px;font-size:clamp(16px,2vw,26px);color:var(--cream);opacity:.9}
+.k-thuluth{font-family:'Aref Ruqaa','Amiri',serif}
+.k-kufi{font-family:'Reem Kufi',sans-serif}
+.k-naskh{font-family:'Amiri',serif}
+
+/* ====== شريط الكلام ====== */
+#talk{position:fixed;bottom:34px;left:0;width:100%;z-index:5;padding:0 18px;
+  display:flex;justify-content:center;pointer-events:none}
+#talkBox{background:rgba(10,3,8,.72);backdrop-filter:blur(8px);
+  border:2px solid rgba(240,196,90,.5);border-radius:18px;padding:11px 22px;
+  max-width:1100px;width:100%;text-align:center;font-size:clamp(16px,2.1vw,27px);
+  font-weight:700;min-height:56px;display:flex;align-items:center;justify-content:center;
+  color:var(--gold-soft);transition:.25s}
+#talkBox.idle{opacity:.5;font-weight:400}
+
+/* ====== لوحة الأزرار ====== */
+#panel{position:fixed;inset-inline-end:-430px;top:0;height:100%;width:420px;max-width:92vw;
+  background:rgba(14,4,10,.95);border-inline-start:3px solid var(--gold);z-index:20;
+  transition:inset-inline-end .35s ease;overflow-y:auto;padding:20px 18px 40px}
+#panel.open{inset-inline-end:0}
+#panel h3{font-family:'Reem Kufi',serif;color:var(--gold);margin:18px 0 10px;font-size:19px;
+  border-bottom:1px solid rgba(240,196,90,.3);padding-bottom:6px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{background:rgba(240,196,90,.12);border:2px solid rgba(240,196,90,.45);color:var(--cream);
+  border-radius:12px;padding:9px 14px;font-family:'Cairo',sans-serif;font-weight:700;font-size:15px;
+  cursor:pointer;transition:.18s}
+.btn:hover{background:var(--gold);color:#4a0d1f}
+.close-x{position:absolute;top:14px;inset-inline-start:14px;background:none;border:none;
+  color:var(--gold);font-size:30px;cursor:pointer;line-height:1}
+.note{font-size:13px;opacity:.75;line-height:1.9;margin-top:6px}
+
+/* ====== شاشة البدء ====== */
+#gate{position:fixed;inset:0;z-index:50;background:rgba(6,2,6,.93);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:26px;text-align:center}
+#gate .box{max-width:620px}
+#gate h2{font-family:'Reem Kufi',serif;color:var(--gold);font-size:clamp(24px,4vw,44px);margin-bottom:14px}
+#gate p{font-size:clamp(15px,1.9vw,21px);line-height:2;opacity:.92;margin-bottom:22px}
+#startBtn{background:var(--gold);color:#4a0d1f;border:none;border-radius:16px;
+  padding:17px 44px;font-family:'Reem Kufi',serif;font-size:clamp(19px,2.4vw,27px);font-weight:700;
+  cursor:pointer;box-shadow:0 10px 26px rgba(240,196,90,.3);transition:.2s}
+#startBtn:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(240,196,90,.45)}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:9px}
+::-webkit-scrollbar-thumb{background:rgba(240,196,90,.45);border-radius:9px}
+</style>
+</head>
+<body>
+
+<div id="bg">
+  <div class="sky"></div>
+  <div id="stars"></div>
+  <div id="geos"></div>
+  <svg class="dunes" viewBox="0 0 1200 420" preserveAspectRatio="none">
+    <path d="M0,230 C180,170 330,250 500,215 C680,178 820,245 1000,205 C1100,183 1160,200 1200,192 L1200,420 L0,420 Z" fill="#a87f4e" opacity=".55"/>
+    <path d="M0,285 C200,235 360,305 560,270 C760,235 900,300 1200,255 L1200,420 L0,420 Z" fill="#c9a46d" opacity=".8"/>
+    <path d="M0,340 C230,300 420,355 650,325 C880,295 1040,345 1200,318 L1200,420 L0,420 Z" fill="#e6c89a"/>
+  </svg>
+  <div id="palms"></div>
+  <div class="sadu-strip"></div>
+</div>
+
+<div id="app">
+  <header>
+    <h1>التراث القطري والفن الإسلامي</h1>
+    <div class="spacer"></div>
+    <div class="pill" id="micPill"><span class="dot" id="micDot"></span><span id="micTxt">المايك</span></div>
+    <button class="pill" id="panelBtn">☰ الأوامر</button>
+  </header>
+
+  <main><div id="stage"></div></main>
+</div>
+
+<div id="talk"><div id="talkBox" class="idle">… تفضل، تكلّم وأنا أسمعك</div></div>
+
+<div id="panel">
+  <button class="close-x" id="closePanel">×</button>
+  <h3>ارسم لي…</h3>
+  <div class="btns" id="drawBtns"></div>
+  <h3>أسئلة الدروس</h3>
+  <div class="btns" id="quizBtns"></div>
+  <h3>الخط العربي</h3>
+  <div class="btns" id="calliBtns"></div>
+  <h3>تحكّم</h3>
+  <div class="btns">
+    <button class="btn" id="clearBtn">مسح الشاشة</button>
+    <button class="btn" id="restartMic">إعادة تشغيل المايك</button>
+    <button class="btn" id="fsBtn">ملء الشاشة</button>
+  </div>
+  <p class="note">
+    هذه الأزرار احتياط لو ضعف الإنترنت أو المايك داخل الصف.<br>
+    أمثلة للكلام: «ارسم لي خيمة» · «أعطني خمسة أسئلة عن الزخارف الإسلامية» · «اكتب كلمة قطر بخط الثلث» · «امسح الشاشة».
+  </p>
+</div>
+
+<div id="gate">
+  <div class="box">
+    <h2>مرحباً أستاذ 👋</h2>
+    <p>
+      اضغط «ابدأ الحصة» ثم اسمح للمتصفح باستخدام <strong>الميكروفون</strong>.<br>
+      بعدها تكلّم بشكل طبيعي: كلامك يظهر على الشاشة، وينفّذ طلبك.<br>
+      <span style="color:var(--gold-soft)">الأفضل استخدام متصفح Chrome، ومن الأيقونة ☰ تجد كل الأوامر كأزرار احتياطية.</span>
+    </p>
+    <button id="startBtn">ابدأ الحصة</button>
+  </div>
+</div>
+
+<script>
+/* ============ خلفية ============ */
+(function(){
+  const s=document.getElementById('stars');
+  for(let i=0;i<70;i++){
+    const d=document.createElement('div');d.className='star';
+    const sz=Math.random()*3+1.2;
+    d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*62}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s`;
+    s.appendChild(d);
+  }
+  const g=document.getElementById('geos');
+  for(let i=0;i<7;i++){
+    const w=document.createElement('div');w.className='geo';
+    const sz=Math.random()*90+70;
+    w.style.cssText=`top:${Math.random()*65}%;left:${Math.random()*92}%;width:${sz}px;height:${sz}px;animation-delay:${-Math.random()*22}s;animation-duration:${18+Math.random()*12}s`;
+    w.innerHTML=`<svg viewBox="0 0 100 100" width="100%" height="100%"><g fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="22" y="22" width="56" height="56"/><rect x="22" y="22" width="56" height="56" transform="rotate(45 50 50)"/>
+      <circle cx="50" cy="50" r="28"/></g></svg>`;
+    g.appendChild(w);
+  }
+  const p=document.getElementById('palms');
+  [[4,105,.85],[16,72,.6],[82,96,.8],[93,66,.55],[68,60,.5]].forEach(([left,h,op],i)=>{
+    const d=document.createElement('div');d.className='palm';
+    d.style.cssText=`left:${left}%;width:${h}px;opacity:${op};animation-delay:${i*0.7}s`;
+    d.innerHTML=`<svg viewBox="0 0 100 150" width="100%"><g>
+      <path d="M50 150 C47 110 46 85 48 58" stroke="#5c3a1e" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <g fill="#2f7d4f">
+        <path d="M48 58 C28 44 14 46 4 56 C20 50 34 52 48 62Z"/>
+        <path d="M48 58 C68 44 82 46 92 56 C76 50 62 52 48 62Z"/>
+        <path d="M48 58 C36 36 22 28 10 30 C28 34 38 44 46 62Z"/>
+        <path d="M48 58 C60 36 74 28 86 30 C68 34 58 44 50 62Z"/>
+        <path d="M48 56 C46 34 50 20 58 10 C50 26 52 42 50 58Z"/>
+      </g>
+      <circle cx="44" cy="64" r="3.4" fill="#d98b2b"/><circle cx="54" cy="66" r="3.4" fill="#d98b2b"/>
+      <circle cx="49" cy="70" r="3.4" fill="#c97a1f"/></g></svg>`;
+    p.appendChild(d);
+  });
+})();
+
+/* ============ البيانات ============ */
+const G='#f0c45a', C='#fff6e6', T='#1f7a6f', M='#8b1538', S='#c9a46d', BR='#5c3a1e';
+
+const ART={
+  tent:{keys:['خيمه','بيت شعر','الخيمه'],title:'الخيمة العربية',
+    note:'بيت الشَّعر: تُنسج من وبر الإبل وشعر الماعز، وتُزيّن بنقوش السدو.',
+    svg:`<svg viewBox="0 0 500 330">
+      <ellipse cx="250" cy="300" rx="215" ry="22" fill="#a87f4e" opacity=".45"/>
+      <path class="fillin" d="M60 295 L250 90 L440 295 Z" fill="#3b2a1d"/>
+      <path class="fillin" d="M110 295 L250 140 L390 295 Z" fill="#2a1d13"/>
+      <g class="fillin">
+        <rect x="150" y="235" width="200" height="12" fill="${C}"/>
+        <rect x="150" y="247" width="200" height="12" fill="${M}"/>
+        <rect x="150" y="259" width="200" height="12" fill="${T}"/>
+        <rect x="150" y="271" width="200" height="12" fill="${C}"/>
+      </g>
+      <path class="fillin" d="M215 295 L250 190 L285 295 Z" fill="#120b07"/>
+      <path class="ink" d="M60 295 L250 90 L440 295" fill="none" stroke="${G}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+      <line class="ink" x1="250" y1="90" x2="250" y2="295" stroke="${G}" stroke-width="5"/>
+      <line class="ink" x1="60" y1="295" x2="440" y2="295" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+      <g class="fillin" fill="${G}"><circle cx="250" cy="84" r="9"/></g>
+      <g class="fillin"><path d="M250 76 L278 62 L250 50Z" fill="${M}" stroke="${G}" stroke-width="2">
+        <animateTransform attributeName="transform" type="rotate" values="0 250 76;-7 250 76;0 250 76" dur="2.6s" repeatCount="indefinite"/>
+      </path></g>
+    </svg>`},
+  dalla:{keys:['دله','الدله','ركوه','قهوه'],title:'الدَّلة',
+    note:'رمز الكرم القطري، تُقدَّم بها القهوة في الفنجان باليد اليمنى.',
+    svg:`<svg viewBox="0 0 400 420">
+      <ellipse cx="200" cy="392" rx="130" ry="18" fill="#a87f4e" opacity=".45"/>
+      <g class="fillin">
+        <path d="M130 370 Q110 290 128 215 Q140 170 200 162 Q260 170 272 215 Q290 290 270 370 Z" fill="${G}"/>
+        <path d="M150 365 Q136 290 150 222 Q160 188 200 182 Q240 188 250 222 Q264 290 250 365 Z" fill="#e0ab3d"/>
+        <path d="M128 215 Q200 240 272 215 L268 196 Q200 220 132 196 Z" fill="#c98f28"/>
+        <path d="M200 162 Q182 130 190 104 L210 104 Q218 130 200 162Z" fill="${G}"/>
+        <path d="M190 104 Q200 76 240 58 Q214 86 212 104 Z" fill="${G}"/>
+        <path d="M272 240 Q330 258 320 310 Q312 346 268 340" fill="none" stroke="${G}" stroke-width="17" stroke-linecap="round"/>
+        <rect x="140" y="368" width="120" height="18" rx="7" fill="#c98f28"/>
+      </g>
+      <g class="fillin" opacity=".75">
+        <path d="M234 56 Q222 34 236 14" fill="none" stroke="${C}" stroke-width="5" stroke-linecap="round">
+          <animate attributeName="opacity" values="0;.9;0" dur="2.6s" repeatCount="indefinite"/></path>
+        <path d="M250 60 Q262 38 248 18" fill="none" stroke="${C}" stroke-width="4" stroke-linecap="round">
+          <animate attributeName="opacity" values="0;.8;0" dur="2.6s" begin=".9s" repeatCount="indefinite"/></path>
+      </g>
+      <g class="fillin"><g fill="none" stroke="#8a5e12" stroke-width="3">
+        <circle cx="200" cy="268" r="30"/><rect x="180" y="248" width="40" height="40"/>
+        <rect x="180" y="248" width="40" height="40" transform="rotate(45 200 268)"/></g></g>
+    </svg>`},
+  fort:{keys:['قلعه','الزباره','زباره','حصن','قصر'],title:'قلعة الزُّبارة',
+    note:'بُنيت عام 1938م، ومدينة الزبارة الأثرية مُدرجة ضمن قائمة التراث العالمي لليونسكو.',
+    svg:`<svg viewBox="0 0 560 330">
+      <ellipse cx="280" cy="300" rx="250" ry="20" fill="#a87f4e" opacity=".4"/>
+      <g class="fillin">
+        <rect x="120" y="130" width="320" height="165" fill="${S}"/>
+        <rect x="120" y="130" width="320" height="18" fill="#b08f55"/>
+        <g fill="#b08f55">
+          <rect x="60" y="112" width="78" height="183" rx="4"/><rect x="422" y="112" width="78" height="183" rx="4"/>
+        </g>
+        <path d="M60 112 Q99 86 138 112 Z" fill="#9c7a44"/>
+        <path d="M422 112 Q461 86 500 112 Z" fill="#9c7a44"/>
+        <g fill="#9c7a44">
+          <rect x="150" y="112" width="22" height="22"/><rect x="196" y="112" width="22" height="22"/>
+          <rect x="242" y="112" width="22" height="22"/><rect x="288" y="112" width="22" height="22"/>
+          <rect x="334" y="112" width="22" height="22"/><rect x="380" y="112" width="22" height="22"/>
+        </g>
+        <path d="M250 295 L250 205 Q280 172 310 205 L310 295 Z" fill="#6b4a24"/>
+        <g fill="#7a5a2e">
+          <rect x="170" y="190" width="22" height="42" rx="10"/><rect x="368" y="190" width="22" height="42" rx="10"/>
+          <rect x="84" y="170" width="20" height="40" rx="9"/><rect x="456" y="170" width="20" height="40" rx="9"/>
+        </g>
+      </g>
+      <path class="ink" d="M60 295 L60 112 M500 295 L500 112 M120 130 L440 130 M20 295 L540 295" fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round"/>
+      <g class="fillin"><rect x="277" y="40" width="4" height="48" fill="${G}"/>
+        <path d="M281 44 L336 56 L281 70Z" fill="${M}" stroke="${G}" stroke-width="2">
+          <animateTransform attributeName="transform" type="rotate" values="0 281 56;5 281 56;0 281 56" dur="2.4s" repeatCount="indefinite"/></path></g>
+    </svg>`},
+  dhow:{keys:['سفينه','مركب','بوم','قارب','شراع','غوص'],title:'المركب الشراعي (البوم)',
+    note:'سفينة الغوص على اللؤلؤ، عماد حياة أهل قطر قديماً قبل النفط.',
+    svg:`<svg viewBox="0 0 520 360">
+      <g class="fillin">
+        <path d="M250 60 L250 275" stroke="${BR}" stroke-width="9" stroke-linecap="round"/>
+        <path d="M250 70 L386 262 L250 262 Z" fill="${C}" stroke="${G}" stroke-width="4">
+          <animateTransform attributeName="transform" type="skewX" values="0;-3;0;3;0" dur="5s" repeatCount="indefinite"/></path>
+        <path d="M250 120 L142 262 L250 262 Z" fill="#f0dcb8" stroke="${G}" stroke-width="3"/>
+        <path d="M86 262 L434 262 Q404 330 260 330 Q116 330 86 262 Z" fill="${BR}"/>
+        <path d="M86 262 L434 262 Q428 282 420 288 L100 288 Q92 282 86 262Z" fill="#7a5126"/>
+        <g fill="${G}"><circle cx="160" cy="300" r="7"/><circle cx="210" cy="306" r="7"/>
+          <circle cx="260" cy="308" r="7"/><circle cx="310" cy="306" r="7"/><circle cx="360" cy="300" r="7"/></g>
+      </g>
+      <g class="fillin" opacity=".9">
+        <path d="M20 330 Q70 316 120 330 T220 330 T320 330 T420 330 T520 330" fill="none" stroke="${T}" stroke-width="7" stroke-linecap="round">
+          <animate attributeName="d" dur="3.4s" repeatCount="indefinite"
+            values="M20 330 Q70 316 120 330 T220 330 T320 330 T420 330 T520 330;
+                    M20 330 Q70 344 120 330 T220 330 T320 330 T420 330 T520 330;
+                    M20 330 Q70 316 120 330 T220 330 T320 330 T420 330 T520 330"/></path>
+        <path d="M0 348 Q60 334 120 348 T240 348 T360 348 T520 348" fill="none" stroke="#2a9b8c" stroke-width="6" stroke-linecap="round" opacity=".7">
+          <animate attributeName="d" dur="4.2s" repeatCount="indefinite"
+            values="M0 348 Q60 334 120 348 T240 348 T360 348 T520 348;
+                    M0 348 Q60 360 120 348 T240 348 T360 348 T520 348;
+                    M0 348 Q60 334 120 348 T240 348 T360 348 T520 348"/></path>
+      </g>
+    </svg>`},
+  windtower:{keys:['برجيل','باد جير','ملقف','برج هواء'],title:'البَرجيل (ملقف الهواء)',
+    note:'مكيّف الهواء الطبيعي قديماً: يلتقط الهواء من أعلى ويدفعه بارداً إلى داخل البيت.',
+    svg:`<svg viewBox="0 0 400 420">
+      <g class="fillin">
+        <rect x="90" y="250" width="220" height="150" fill="${S}"/>
+        <rect x="140" y="60" width="120" height="200" fill="#b08f55"/>
+        <rect x="128" y="44" width="144" height="22" rx="5" fill="#9c7a44"/>
+        <g fill="#6b4a24"><rect x="160" y="86" width="26" height="130" rx="8"/><rect x="214" y="86" width="26" height="130" rx="8"/></g>
+        <rect x="178" y="316" width="52" height="84" rx="5" fill="#6b4a24"/>
+        <rect x="112" y="282" width="40" height="34" rx="6" fill="#7a5a2e"/>
+        <rect x="250" y="282" width="40" height="34" rx="6" fill="#7a5a2e"/>
+      </g>
+      <path class="ink" d="M90 400 L90 250 L140 250 L140 60 L260 60 L260 250 L310 250 L310 400" fill="none" stroke="${G}" stroke-width="5" stroke-linejoin="round"/>
+      <g class="fillin" opacity=".8" stroke="${C}" stroke-width="5" fill="none" stroke-linecap="round">
+        <path d="M40 100 Q90 86 130 100"><animate attributeName="opacity" values="0;1;0" dur="2.4s" repeatCount="indefinite"/></path>
+        <path d="M268 120 Q312 106 356 120"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin=".8s" repeatCount="indefinite"/></path>
+        <path d="M52 150 Q96 138 132 150"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin="1.4s" repeatCount="indefinite"/></path>
+      </g>
+    </svg>`},
+  dome:{keys:['قبه','القبه','مسجد'],title:'القُبّة',
+    note:'عنصر معماري إسلامي يرمز للسماء، ويزيد اتساع الصوت وانتشار الضوء في المسجد.',
+    svg:`<svg viewBox="0 0 440 400">
+      <g class="fillin">
+        <rect x="70" y="300" width="300" height="80" fill="${S}"/>
+        <rect x="100" y="230" width="240" height="72" fill="#b08f55"/>
+        <path d="M100 230 Q220 50 340 230 Z" fill="${T}"/>
+        <path d="M150 230 Q220 96 290 230 Z" fill="#2a9b8c" opacity=".55"/>
+        <g stroke="#0f5a52" stroke-width="3" fill="none">
+          <path d="M160 230 Q220 90 280 230"/><path d="M128 230 Q220 70 312 230"/>
+        </g>
+        <path d="M220 56 L220 22" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+        <path d="M212 22 Q220 2 228 22 Q220 14 212 22Z" fill="${G}"/>
+        <path d="M190 326 L190 262 Q220 228 250 262 L250 326Z" fill="#6b4a24"/>
+        <g fill="#7a5a2e"><rect x="120" y="258" width="24" height="40" rx="11"/><rect x="296" y="258" width="24" height="40" rx="11"/></g>
+      </g>
+      <path class="ink" d="M70 380 L70 300 L100 300 L100 230 Q220 50 340 230 L340 300 L370 300 L370 380" fill="none" stroke="${G}" stroke-width="5" stroke-linejoin="round"/>
+    </svg>`},
+  minaret:{keys:['مئذنه','مناره','ماذنه'],title:'المئذنة',
+    note:'يُرفع منها الأذان، وتتنوع أشكالها: مربعة في المغرب، أسطوانية في المشرق، حلزونية كمئذنة سامراء.',
+    svg:`<svg viewBox="0 0 300 460">
+      <g class="fillin">
+        <rect x="96" y="400" width="108" height="44" fill="${S}"/>
+        <rect x="108" y="200" width="84" height="204" fill="#b08f55"/>
+        <rect x="100" y="186" width="100" height="18" rx="4" fill="#9c7a44"/>
+        <rect x="112" y="120" width="76" height="68" fill="${S}"/>
+        <rect x="104" y="108" width="92" height="16" rx="4" fill="#9c7a44"/>
+        <path d="M118 108 Q150 42 182 108 Z" fill="${T}"/>
+        <path d="M150 46 L150 18" stroke="${G}" stroke-width="6" stroke-linecap="round"/>
+        <path d="M142 18 Q150 0 158 18 Q150 10 142 18Z" fill="${G}"/>
+        <g fill="#6b4a24"><rect x="124" y="136" width="18" height="40" rx="9"/><rect x="158" y="136" width="18" height="40" rx="9"/>
+          <rect x="138" y="226" width="24" height="52" rx="12"/><rect x="138" y="300" width="24" height="52" rx="12"/></g>
+      </g>
+      <path class="ink" d="M108 404 L108 200 M192 404 L192 200 M112 188 L188 188 M118 108 Q150 42 182 108" fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round"/>
+    </svg>`},
+  arch:{keys:['قوس','عقد','مقرنص'],title:'القوس المُفصَّص',
+    note:'من أشهر عناصر العمارة الإسلامية: يوزّع ثقل البناء ويضيف جمالاً للواجهات والأروقة.',
+    svg:`<svg viewBox="0 0 420 400">
+      <g class="fillin">
+        <rect x="40" y="90" width="340" height="290" fill="${S}"/>
+        <path d="M120 380 L120 210 Q120 120 210 120 Q300 120 300 210 L300 380 Z" fill="#3a0f1e"/>
+        <path d="M210 120 Q300 120 300 210" fill="none" stroke="${G}" stroke-width="6"/>
+        <g fill="none" stroke="${G}" stroke-width="4">
+          <path d="M132 206 a16 16 0 0 1 32 0 a16 16 0 0 1 32 0 a16 16 0 0 1 32 0 a16 16 0 0 1 32 0 a16 16 0 0 1 28 0"/>
+        </g>
+        <rect x="40" y="90" width="340" height="22" fill="#9c7a44"/>
+        <g fill="none" stroke="#8a5e12" stroke-width="3" opacity=".9">
+          <circle cx="80" cy="160" r="22"/><rect x="62" y="142" width="36" height="36"/><rect x="62" y="142" width="36" height="36" transform="rotate(45 80 160)"/>
+          <circle cx="340" cy="160" r="22"/><rect x="322" y="142" width="36" height="36"/><rect x="322" y="142" width="36" height="36" transform="rotate(45 340 160)"/>
+        </g>
+      </g>
+      <path class="ink" d="M120 380 L120 210 Q120 120 210 120 Q300 120 300 210 L300 380" fill="none" stroke="${G}" stroke-width="7" stroke-linejoin="round"/>
+    </svg>`},
+  star8:{keys:['نجمه','النجمه الثمانيه','نجمه ثمانيه','خاتم سليمان','هندسيه'],title:'النجمة الثمانية',
+    note:'من أشهر الزخارف الهندسية الإسلامية، تُبنى من مربعين متداخلين بزاوية ٤٥ درجة.',
+    svg:`<svg viewBox="0 0 400 400">
+      <g transform="translate(200,200)">
+        <g class="fillin">
+          <g><rect x="-110" y="-110" width="220" height="220" fill="${M}" opacity=".85"/>
+             <rect x="-110" y="-110" width="220" height="220" fill="${T}" opacity=".85" transform="rotate(45)"/>
+             <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="34s" repeatCount="indefinite"/></g>
+        </g>
+        <g class="fillin" fill="none" stroke="${G}" stroke-width="4">
+          <circle r="150"/><circle r="128"/><circle r="56"/>
+          <g><rect x="-80" y="-80" width="160" height="160"/><rect x="-80" y="-80" width="160" height="160" transform="rotate(45)"/>
+             <rect x="-46" y="-46" width="92" height="92"/><rect x="-46" y="-46" width="92" height="92" transform="rotate(45)"/>
+             <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="46s" repeatCount="indefinite"/></g>
+        </g>
+        <g class="fillin" fill="${G}">
+          <circle r="16"/>
+          ${Array.from({length:8},(_,i)=>`<circle cx="${Math.round(138*Math.cos(i*Math.PI/4))}" cy="${Math.round(138*Math.sin(i*Math.PI/4))}" r="8"/>`).join('')}
+        </g>
+      </g>
+    </svg>`},
+  arabesque:{keys:['زخرفه نباتيه','نباتيه','توريق','ارابيسك','زخرفه'],title:'الزخرفة النباتية (التوريق)',
+    note:'سيقان وأوراق متشابكة لا تنتهي، ترمز إلى الاستمرار ووحدة الخلق في الفن الإسلامي.',
+    svg:`<svg viewBox="0 0 520 300">
+      <g fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round">
+        <path class="ink" d="M30 230 C90 230 90 110 150 110 C210 110 210 230 270 230 C330 230 330 110 390 110 C450 110 450 230 500 230"/>
+        <path class="ink" d="M30 170 C90 170 90 250 150 250 C210 250 210 170 270 170 C330 170 330 250 390 250 C450 250 450 170 500 170" opacity=".65"/>
+      </g>
+      <g class="fillin" fill="${T}">
+        <g><path d="M150 110 C128 82 134 54 156 42 C172 62 170 90 150 110Z"/>
+           <path d="M150 110 C172 82 166 54 144 42 C128 62 130 90 150 110Z" fill="#2a9b8c"/></g>
+        <g transform="translate(240,0)"><path d="M150 110 C128 82 134 54 156 42 C172 62 170 90 150 110Z"/>
+           <path d="M150 110 C172 82 166 54 144 42 C128 62 130 90 150 110Z" fill="#2a9b8c"/></g>
+      </g>
+      <g class="fillin" fill="${M}">
+        <circle cx="270" cy="230" r="13"/><circle cx="30" cy="230" r="10"/><circle cx="500" cy="230" r="10"/>
+      </g>
+      <g class="fillin" fill="${G}" opacity=".9">
+        <circle cx="90" cy="168" r="7"/><circle cx="330" cy="168" r="7"/><circle cx="210" cy="172" r="7"/><circle cx="450" cy="172" r="7"/>
+      </g>
+    </svg>`},
+  sadu:{keys:['سدو','السدو','نسيج','حياكه'],title:'نسيج السَّدو',
+    note:'حرفة نسج بدوية بألوان الأحمر والأسود والأبيض والبني، وأشكالها هندسية مستوحاة من البيئة. مُدرجة في قائمة اليونسكو.',
+    svg:`<svg viewBox="0 0 520 300">
+      <g class="fillin">
+        <rect x="30" y="40" width="460" height="220" fill="${C}" stroke="${G}" stroke-width="5"/>
+        <rect x="30" y="40" width="460" height="30" fill="${M}"/>
+        <rect x="30" y="230" width="460" height="30" fill="${M}"/>
+        <rect x="30" y="76" width="460" height="16" fill="#111"/>
+        <rect x="30" y="208" width="460" height="16" fill="#111"/>
+        <g fill="${T}">
+          ${Array.from({length:10},(_,i)=>`<path d="M${52+i*46} 180 L${75+i*46} 118 L${98+i*46} 180 Z"/>`).join('')}
+        </g>
+        <g fill="${M}">
+          ${Array.from({length:9},(_,i)=>`<path d="M${75+i*46} 118 L${98+i*46} 180 L${121+i*46} 118 Z" opacity=".85"/>`).join('')}
+        </g>
+        <g fill="#111">${Array.from({length:10},(_,i)=>`<circle cx="${75+i*46}" cy="196" r="5"/>`).join('')}</g>
+      </g>
+      <g class="fillin" opacity=".9">
+        <rect x="16" y="30" width="12" height="240" rx="5" fill="${BR}"/>
+        <rect x="492" y="30" width="12" height="240" rx="5" fill="${BR}"/>
+      </g>
+    </svg>`},
+  mashrabiya:{keys:['مشربيه','مشربيات','شباك','نافذه'],title:'المشربية',
+    note:'نافذة خشبية مخرّمة تسمح بمرور الهواء والضوء وتحفظ الخصوصية.',
+    svg:`<svg viewBox="0 0 400 400">
+      <g class="fillin">
+        <rect x="40" y="40" width="320" height="320" rx="10" fill="#6b4a24"/>
+        <rect x="58" y="58" width="284" height="284" fill="#3a0f1e"/>
+        <g fill="none" stroke="${G}" stroke-width="3.5" opacity=".95">
+          ${Array.from({length:4},(_,r)=>Array.from({length:4},(_,c)=>{
+            const x=84+c*68, y=84+r*68;
+            return `<circle cx="${x}" cy="${y}" r="26"/><rect x="${x-18}" y="${y-18}" width="36" height="36"/><rect x="${x-18}" y="${y-18}" width="36" height="36" transform="rotate(45 ${x} ${y})"/>`;
+          }).join('')).join('')}
+        </g>
+      </g>
+      <rect class="ink" x="40" y="40" width="320" height="320" rx="10" fill="none" stroke="${G}" stroke-width="6"/>
+    </svg>`},
+  falcon:{keys:['صقر','طير','الصقاره'],title:'الصقر',
+    note:'رمز قطري أصيل للشجاعة والفروسية، والصقارة تراث معترف به عالمياً.',
+    svg:`<svg viewBox="0 0 420 400">
+      <g class="fillin">
+        <path d="M210 90 Q150 118 150 200 Q150 280 210 320 Q270 280 270 200 Q270 118 210 90Z" fill="#8a7054"/>
+        <path d="M210 110 Q176 136 176 200 Q176 258 210 292 Q244 258 244 200 Q244 136 210 110Z" fill="#c9b08c"/>
+        <g fill="#6b5540"><circle cx="196" cy="186" r="5"/><circle cx="224" cy="186" r="5"/>
+          <circle cx="196" cy="222" r="5"/><circle cx="224" cy="222" r="5"/><circle cx="210" cy="252" r="5"/></g>
+        <path d="M150 170 Q70 150 36 200 Q92 206 150 230Z" fill="#7a6248">
+          <animateTransform attributeName="transform" type="rotate" values="0 150 200;-9 150 200;0 150 200" dur="3s" repeatCount="indefinite"/></path>
+        <path d="M270 170 Q350 150 384 200 Q328 206 270 230Z" fill="#7a6248">
+          <animateTransform attributeName="transform" type="rotate" values="0 270 200;9 270 200;0 270 200" dur="3s" repeatCount="indefinite"/></path>
+        <circle cx="210" cy="112" r="44" fill="#d8c3a0"/>
+        <path d="M210 68 a44 44 0 0 1 36 68 L174 136 A44 44 0 0 1 210 68Z" fill="#8a7054" opacity=".35"/>
+        <circle cx="194" cy="104" r="9" fill="#1b1b1b"/><circle cx="197" cy="101" r="3" fill="#fff"/>
+        <path d="M244 112 Q268 118 252 134 Q242 126 240 118Z" fill="${G}"/>
+        <path d="M196 320 L188 356 M224 320 L232 356" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+        <path d="M176 356 L200 356 M216 356 L240 356" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+      </g>
+    </svg>`},
+  games:{keys:['العاب شعبيه','لعبه شعبيه','العاب','الدحروي','حالوسه','طاق طاق طاقيه','عظيم سرحان'],title:'الألعاب الشعبية القطرية',
+    note:'من أشهرها: الدحروي، طاق طاق طاقية، عظيم سرحان، الخشيشة، وأم الدرايس.',
+    svg:`<svg viewBox="0 0 520 300">
+      <g class="fillin">
+        <circle cx="110" cy="150" r="56" fill="${M}" stroke="${G}" stroke-width="5"/>
+        <g stroke="${C}" stroke-width="5" fill="none"><path d="M110 94 L110 206 M54 150 L166 150"/></g>
+        <circle cx="110" cy="150" r="14" fill="${G}">
+          <animateTransform attributeName="transform" type="rotate" from="0 110 150" to="360 110 150" dur="3s" repeatCount="indefinite"/></circle>
+        <g transform="translate(250,150)">
+          <circle r="52" fill="${T}" stroke="${G}" stroke-width="5"/>
+          <path d="M-30 6 Q0 -34 30 6 Z" fill="${C}"/>
+          <rect x="-34" y="6" width="68" height="12" rx="6" fill="${G}"/>
+          <animateTransform attributeName="transform" type="translate" values="250,150;250,134;250,150" dur="1.8s" repeatCount="indefinite" additive="sum"/>
+        </g>
+        <g transform="translate(400,150)">
+          <circle r="52" fill="${S}" stroke="${G}" stroke-width="5"/>
+          <g stroke="${M}" stroke-width="6" stroke-linecap="round" fill="none">
+            <path d="M-26 20 L0 -6 L26 20"/><path d="M0 -6 L0 -30"/></g>
+          <circle cy="-34" r="9" fill="${M}"/>
+        </g>
+      </g>
+      <g class="fillin" fill="${G}" font-family="Reem Kufi" font-size="19" text-anchor="middle">
+        <text x="110" y="238">الدحروي</text><text x="250" y="238">طاق طاقية</text><text x="400" y="238">الخشيشة</text>
+      </g>
+    </svg>`},
+  pearl:{keys:['لؤلؤ','لولو','المحار','صدف'],title:'اللؤلؤ والمحار',
+    note:'كان الغوص على اللؤلؤ المهنة الأولى في قطر، ويُستخرج من المحار في مواسم «الغوص الكبير».',
+    svg:`<svg viewBox="0 0 420 340">
+      <g class="fillin">
+        <path d="M60 220 Q210 90 360 220 Q210 270 60 220Z" fill="#b8a07e" stroke="${G}" stroke-width="5"/>
+        <path d="M60 220 Q210 350 360 220 Q210 268 60 220Z" fill="#8a7054" stroke="${G}" stroke-width="5"/>
+        <g stroke="#8a5e12" stroke-width="3" fill="none" opacity=".7">
+          <path d="M120 200 Q210 140 300 200"/><path d="M150 186 Q210 150 270 186"/>
+        </g>
+        <circle cx="210" cy="212" r="30" fill="#fff6e6"/>
+        <circle cx="200" cy="202" r="10" fill="#fff" opacity=".9"/>
+        <circle cx="210" cy="212" r="30" fill="none" stroke="${G}" stroke-width="3">
+          <animate attributeName="r" values="30;34;30" dur="2.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".9;.2;.9" dur="2.6s" repeatCount="indefinite"/></circle>
+      </g>
+      <g class="fillin" fill="#2a9b8c" opacity=".55">
+        <circle cx="90" cy="120" r="8"><animate attributeName="cy" values="140;40" dur="4s" repeatCount="indefinite"/></circle>
+        <circle cx="330" cy="100" r="6"><animate attributeName="cy" values="150;30" dur="5s" repeatCount="indefinite"/></circle>
+        <circle cx="260" cy="70" r="5"><animate attributeName="cy" values="130;20" dur="4.4s" repeatCount="indefinite"/></circle>
+      </g>
+    </svg>`}
+};
+
+const LESSONS={
+  zakhrafa:{keys:['الزخارف','زخرفه','زخارف','زخرفيه'],name:'الزخارف الإسلامية',qs:[
+    ['ما المقصود بالزخرفة الإسلامية؟','فن تزيين الأسطح بوحدات ونقوش متكررة ومتداخلة، ظهر في الحضارة الإسلامية.'],
+    ['ما أنواع الزخرفة الإسلامية؟','هندسية، ونباتية (التوريق)، وكتابية (الخط العربي).'],
+    ['ما هي الوحدة الزخرفية؟','أصغر شكل في الزخرفة يتكرر لتكوين التصميم كاملاً.'],
+    ['ما معنى التكرار في الزخرفة؟','إعادة الوحدة الزخرفية أكثر من مرة بنظام، وقد يكون عادياً أو متعاكساً أو متبادلاً.'],
+    ['لماذا اتجه الفنان المسلم للزخرفة الهندسية والنباتية؟','ابتعاداً عن تصوير الكائنات الحية، فأبدع في الأشكال المجردة والتجريد الزخرفي.'],
+    ['ما أشهر وحدة هندسية في الفن الإسلامي؟','النجمة الثمانية، وتُبنى من مربعين متداخلين بزاوية ٤٥ درجة.'],
+    ['ما هو التناظر (التماثل) في الزخرفة؟','تطابق نصفي التصميم حول محور، فيبدو متزناً ومتناسقاً.'],
+    ['أين نجد الزخارف الإسلامية في قطر؟','في المساجد وأبواب البيوت القديمة وسوق واقف ومتحف الفن الإسلامي.']
+  ]},
+  imara:{keys:['العماره','عماره','معماري','المباني'],name:'العمارة الإسلامية',qs:[
+    ['ما أبرز عناصر العمارة الإسلامية؟','القبة، والمئذنة، والأقواس، والمحراب، والصحن، والمشربية.'],
+    ['ما وظيفة القبة؟','تغطية المساحات الواسعة، وتعزيز انتشار الصوت والضوء، ولها رمز جمالي للسماء.'],
+    ['ما وظيفة المئذنة؟','يُرفع منها الأذان، وهي علامة مميزة للمسجد في المدينة.'],
+    ['ما هو المحراب؟','تجويف في جدار القبلة يحدد اتجاه الكعبة ويقف أمامه الإمام.'],
+    ['ما هي المشربية؟','نافذة خشبية مخرّمة تُدخل الهواء والضوء وتحفظ خصوصية البيت.'],
+    ['ما هو البَرجيل ولماذا استُخدم في قطر؟','ملقف هواء يُبرّد البيت طبيعياً بالتقاط الهواء من الأعلى، بسبب حرارة الجو.'],
+    ['من أشهر المباني التراثية في قطر؟','قلعة الزبارة، وقلعة الكوت (الدوحة)، وبرج برزان، وسوق واقف.'],
+    ['ما المواد التي بُنيت بها البيوت القطرية قديماً؟','الحجر البحري والجص (الصاروج) وجذوع النخيل والخشب (الدنچل).']
+  ]},
+  khat:{keys:['الخط','خط عربي','الخط العربي','خطوط','الكتابه'],name:'الخط العربي',qs:[
+    ['ما هو الخط العربي؟','فن كتابة الحروف العربية بقواعد وجمال، وهو من أرقى الفنون الإسلامية.'],
+    ['اذكر أشهر أنواع الخط العربي.','الكوفي، والنسخ، والثلث، والرقعة، والديواني، والفارسي، والإجازة.'],
+    ['ما الخط الأقدم؟','الخط الكوفي، ويمتاز بالزوايا والاستقامة، وكُتبت به المصاحف الأولى.'],
+    ['ما الخط المستخدم في طباعة الكتب والمصاحف؟','خط النسخ، لوضوحه وسهولة قراءته.'],
+    ['ما الخط الذي نكتب به عادةً بسرعة؟','خط الرقعة، وهو أسهل الخطوط وأسرعها في الكتابة اليومية.'],
+    ['ما أدوات الخطاط؟','القلم (القصبة أو البوص)، والحبر، والمِقطّة، والورق المصقول.'],
+    ['من أشهر الخطاطين في التاريخ الإسلامي؟','ابن مقلة، وابن البوّاب، وياقوت المستعصمي.'],
+    ['كيف يصبح الخط زخرفة؟','بتكرار الكلمات وتشابكها وتكوينها في أشكال هندسية، كما في الزخرفة الكتابية.']
+  ]},
+  fannanin:{keys:['الفنانين','فنان','فنانين','الفنانون','التشكيليين'],name:'الفنانون القطريون',qs:[
+    ['من هو جاسم زيني؟','من روّاد الفن التشكيلي في قطر، اهتم برسم البيئة المحلية والبحر والغوص والحياة الشعبية.'],
+    ['من هو يوسف أحمد؟','فنان قطري معروف بأعماله المستوحاة من الخط العربي وورق البردي والحروفية.'],
+    ['من هو علي حسن؟','فنان قطري بارز في الفن الحروفي، يوظّف الحرف العربي كعنصر تشكيلي.'],
+    ['ما هي الحروفية في الفن؟','اتجاه فني يستخدم الحرف العربي كعنصر جمالي في اللوحة لا كنص للقراءة فقط.'],
+    ['أين يمكن مشاهدة أعمال الفنانين القطريين؟','متحف: المتحف العربي للفن الحديث، ومتحف الفن الإسلامي، والصالات الفنية في كتارا.'],
+    ['ما الموضوعات التي رسمها الفنانون القطريون؟','البحر والغوص والصحراء والخيمة والعمارة الشعبية والتراث والخط العربي.'],
+    ['ما دور الفنان في حفظ التراث؟','يوثّق عناصر التراث في أعماله فيحفظها للأجيال ويعرّف العالم بهويته.']
+  ]},
+  alab:{keys:['الالعاب','العاب شعبيه','لعبه','الالعاب الشعبيه'],name:'الألعاب الشعبية القطرية',qs:[
+    ['ما هي الألعاب الشعبية؟','ألعاب توارثها الأبناء عن الآباء، تُلعب بأدوات بسيطة من البيئة وفي الأحياء والفرجان.'],
+    ['اذكر أشهر الألعاب الشعبية القطرية.','الدحروي، وطاق طاق طاقية، وعظيم سرحان، والخشيشة، وأم الدرايس، والصقلة.'],
+    ['ما فائدة الألعاب الشعبية؟','تقوّي الجسم وتنمّي التعاون والذكاء وتربط الأجيال بتراثهم.'],
+    ['كيف نستفيد من الألعاب الشعبية في الفن؟','نرسم مشاهدها ونصمّم منها وحدات زخرفية وملصقات تُعرّف بها.'],
+    ['بماذا تختلف ألعاب الأمس عن ألعاب اليوم؟','ألعاب الأمس حركية جماعية بأدوات بسيطة، وألعاب اليوم غالباً إلكترونية فردية.']
+  ]},
+  turath:{keys:['التراث','تراث','تراثنا','التراث القطري'],name:'التراث القطري',qs:[
+    ['ما المقصود بالتراث؟','كل ما ورثناه عن الآباء والأجداد من عادات وحرف وفنون ومبانٍ وقيم.'],
+    ['ما أنواع التراث؟','تراث مادي (مبانٍ وأدوات) وتراث غير مادي (عادات وحرف وأهازيج وألعاب).'],
+    ['ما هو السَّدو؟','حرفة نسيج بدوية من صوف الغنم ووبر الإبل بألوان الأحمر والأسود والأبيض والبني، وأشكالها هندسية.'],
+    ['ما أبرز رموز الكرم في التراث القطري؟','الدلة والفنجان والمجلس والخيمة والتمر.'],
+    ['بماذا اشتهر القطريون قديماً؟','الغوص على اللؤلؤ وصيد الأسماك والتجارة البحرية ورعي الإبل.'],
+    ['ما أهمية قلعة الزبارة؟','موقع أثري مُدرج في قائمة التراث العالمي لليونسكو، ويحكي تاريخ قطر التجاري.'],
+    ['كيف نحافظ على تراثنا؟','بزيارة المتاحف وتعلّم الحرف وتوثيقها بالرسم والتصوير وتعريف الآخرين بها.'],
+    ['ما دور الفن في خدمة التراث؟','يوثّق عناصره ويعيد توظيفها في تصاميم حديثة تُبرز الهوية القطرية.']
+  ]}
+};
+
+/* ============ أدوات ============ */
+const stage=document.getElementById('stage');
+const talkBox=document.getElementById('talkBox');
+const norm=s=>(s||'').replace(/[\u064B-\u0652\u0670\u0640]/g,'')
+  .replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه')
+  .replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/\s+/g,' ').trim();
+
+function setStage(html){stage.innerHTML=html;}
+
+function showWelcome(){
+  setStage(`<div class="welcome">
+    <div class="big">الفنون البصرية</div>
+    <div class="sub">الزخارف الإسلامية · العمارة الإسلامية · الخط العربي<br>الفنانون القطريون · الألعاب الشعبية · التراث القطري</div>
+    <div class="hint">قل مثلاً: «ارسم لي خيمة» أو «أعطني خمسة أسئلة عن التراث»</div>
+  </div>`);
+}
+
+function showArt(key){
+  const a=ART[key];if(!a)return;
+  setStage(`<div class="art-wrap">${a.svg}<div class="art-title">${a.title}</div><div class="art-note">${a.note}</div></div>`);
+  speak(a.title);
+}
+
+function showQuiz(lessonKey,count){
+  const L=LESSONS[lessonKey];if(!L)return;
+  const n=Math.min(count||5,L.qs.length);
+  const cards=L.qs.slice(0,n).map(([q,a],i)=>`
+    <div class="card" style="animation-delay:${i*0.09}s" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="face front"><span class="q-num">سؤال ${i+1}</span><div class="q-txt">${q}</div><span class="tap">اضغط لعرض الإجابة</span></div>
+        <div class="face back"><span class="a-lbl">الإجابة</span><div class="a-txt">${a}</div></div>
+      </div>
+    </div>`).join('');
+  setStage(`<div class="cards-wrap"><div class="cards-head"><h2>${L.name} — ${n} أسئلة</h2></div><div class="cards">${cards}</div></div>`);
+  speak(`تفضلوا ${n} أسئلة عن ${L.name}`);
+}
+
+function showCalli(word,style){
+  const names={thuluth:'خط الثلث',kufi:'الخط الكوفي',naskh:'خط النسخ'};
+  setStage(`<div class="calli"><div class="word k-${style}">${word}</div><div class="lbl">${names[style]}</div></div>`);
+  speak(`${word} بـ ${names[style]}`);
+}
+
+/* ============ النطق ============ */
+let speaking=false;
+function speak(text){
+  if(!('speechSynthesis'in window))return;
+  try{
+    speaking=true;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='ar-SA';u.rate=.95;
+    u.onend=u.onerror=()=>{setTimeout(()=>speaking=false,320);};
+    speechSynthesis.speak(u);
+    setTimeout(()=>speaking=false,6000);
+  }catch(e){speaking=false;}
+}
+
+/* ============ تفسير الأوامر ============ */
+const NUM={'وحد':1,'واحد':1,'سؤال واحد':1,'اثنين':2,'اثنان':2,'ثنين':2,'ثلاث':3,'ثلاثه':3,'اربع':4,'اربعه':4,
+  'خمس':5,'خمسه':5,'ست':6,'سته':6,'سبع':7,'سبعه':7,'ثمان':8,'ثمانيه':8};
+function getCount(t){
+  const d=t.match(/\d+/);if(d)return parseInt(d[0]);
+  for(const k in NUM)if(t.includes(k))return NUM[k];
+  return 5;
+}
+const CALLI_STYLE=t=>t.includes('كوفي')?'kufi':t.includes('نسخ')?'naskh':'thuluth';
+
+function handle(raw){
+  const t=norm(raw);
+  if(!t)return false;
+
+  if(/(امسح|نظف|شيل|الغي|فضي)/.test(t)){showWelcome();return true;}
+  if(/(الرئيسيه|البدايه|رجوع|العنوان)/.test(t)){showWelcome();return true;}
+
+  // الخط العربي: اكتب كلمة ...
+  if(/(اكتب|اخط)/.test(t)){
+    let m=t.match(/كلمه\s+(.+?)(?:\s+ب?خط|\s+بال?كوفي|\s+بال?نسخ|\s+بال?ثلث|$)/);
+    if(!m)m=t.match(/اكتب\s+(.+?)(?:\s+ب?خط|$)/);
+    let w=m?m[1].trim():'';
+    w=w.replace(/^(لي|لنا|على الشاشه)\s*/,'').trim();
+    if(w&&w.length<30){showCalli(w,CALLI_STYLE(t));return true;}
+  }
+
+  // أسئلة
+  if(/(اسئل|سؤال|سوال|اسال|اختبر|كروت|بطاقات|كارت|امتحن)/.test(t)){
+    for(const k in LESSONS)if(LESSONS[k].keys.some(x=>t.includes(norm(x)))){showQuiz(k,getCount(t));return true;}
+    showQuiz('turath',getCount(t));return true;
+  }
+
+  // رسم
+  for(const k in ART)if(ART[k].keys.some(x=>t.includes(norm(x)))){showArt(k);return true;}
+  for(const k in LESSONS)if(LESSONS[k].keys.some(x=>t.includes(norm(x)))){showQuiz(k,5);return true;}
+  return false;
+}
+
+/* ============ التعرف على الصوت ============ */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const dot=document.getElementById('micDot'),micTxt=document.getElementById('micTxt');
+let rec=null,wantListen=false,idleTimer=null;
+
+function setMic(state,label){dot.className='dot'+(state?' '+state:'');micTxt.textContent=label;}
+
+function initRec(){
+  if(!SR){setMic('err','المتصفح لا يدعم');talkBox.textContent='المتصفح لا يدعم التعرف على الصوت — استخدم Chrome، أو استخدم الأزرار ☰';return;}
+  rec=new SR();
+  rec.lang='ar-SA';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
+
+  rec.onstart=()=>setMic('live','يسمعك');
+  rec.onresult=e=>{
+    if(speaking)return;
+    let interim='',fin='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const r=e.results[i];
+      if(r.isFinal)fin+=r[0].transcript;else interim+=r[0].transcript;
+    }
+    const shown=(fin||interim).trim();
+    if(shown){talkBox.classList.remove('idle');talkBox.textContent=shown;}
+    if(fin.trim()){
+      handle(fin);
+      clearTimeout(idleTimer);
+      idleTimer=setTimeout(()=>{talkBox.classList.add('idle');talkBox.textContent='… تفضل، تكلّم وأنا أسمعك';},7000);
+    }
+  };
+  rec.onerror=e=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      wantListen=false;setMic('err','المايك مرفوض');
+      talkBox.classList.remove('idle');
+      talkBox.textContent='اسمح للمتصفح باستخدام الميكروفون من القفل بجانب العنوان، ثم اضغط «إعادة تشغيل المايك»';
+    }else setMic('','يعيد المحاولة…');
+  };
+  rec.onend=()=>{if(wantListen)setTimeout(()=>{try{rec.start()}catch(e){}},260);else setMic('','متوقف');};
+}
+
+function startListen(){
+  wantListen=true;
+  if(!rec)initRec();
+  if(!rec)return;
+  try{rec.start()}catch(e){}
+}
+
+// حارس: يتأكد كل 5 ثوانٍ أن المايك شغّال
+setInterval(()=>{if(wantListen&&dot.className.indexOf('live')===-1){try{rec&&rec.start()}catch(e){}}},5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&wantListen){try{rec&&rec.start()}catch(e){}}});
+
+/* ============ اللوحة والأزرار ============ */
+const panel=document.getElementById('panel');
+document.getElementById('panelBtn').onclick=()=>panel.classList.toggle('open');
+document.getElementById('closePanel').onclick=()=>panel.classList.remove('open');
+document.getElementById('clearBtn').onclick=()=>{showWelcome();panel.classList.remove('open');};
+document.getElementById('restartMic').onclick=()=>{wantListen=true;try{rec?rec.start():startListen()}catch(e){}};
+document.getElementById('fsBtn').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+
+const dB=document.getElementById('drawBtns');
+for(const k in ART){
+  const b=document.createElement('button');b.className='btn';b.textContent=ART[k].title;
+  b.onclick=()=>{showArt(k);panel.classList.remove('open');};dB.appendChild(b);
+}
+const qB=document.getElementById('quizBtns');
+for(const k in LESSONS){
+  const b=document.createElement('button');b.className='btn';b.textContent=LESSONS[k].name;
+  b.onclick=()=>{showQuiz(k,5);panel.classList.remove('open');};qB.appendChild(b);
+}
+const cB=document.getElementById('calliBtns');
+[['قطر','thuluth','قطر — ثلث'],['التراث','kufi','التراث — كوفي'],['الفن','naskh','الفن — نسخ']].forEach(([w,s,l])=>{
+  const b=document.createElement('button');b.className='btn';b.textContent=l;
+  b.onclick=()=>{showCalli(w,s);panel.classList.remove('open');};cB.appendChild(b);
+});
+
+/* ============ البدء ============ */
+document.getElementById('startBtn').onclick=async()=>{
+  document.getElementById('gate').classList.add('hidden');
+  showWelcome();
+  try{
+    const st=await navigator.mediaDevices.getUserMedia({audio:true});
+    st.getTracks().forEach(t=>t.stop());
+  }catch(e){}
+  startListen();
+};
+showWelcome();
+</script>
+</body>
+</html>
