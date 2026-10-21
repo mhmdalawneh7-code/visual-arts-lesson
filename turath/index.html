@@ -177,6 +177,30 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
   cursor:pointer;box-shadow:0 10px 26px rgba(240,196,90,.3);transition:.2s}
 #startBtn:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(240,196,90,.45)}
 .hidden{display:none!important}
+/* ====== الذكاء الاصطناعي ====== */
+.loader{text-align:center;animation:fadeUp .4s ease both}
+.loader svg{width:min(32vw,165px);height:auto}
+.loader .lmsg{margin-top:18px;font-family:'Reem Kufi',serif;color:var(--gold);
+  font-size:clamp(18px,2.4vw,30px);text-shadow:0 3px 12px rgba(0,0,0,.6)}
+.loader .lsub{margin-top:8px;font-size:clamp(13px,1.6vw,18px);opacity:.7}
+.spin{animation:spin 2.6s linear infinite;transform-origin:50% 50%}
+.spin-r{animation:spin 3.8s linear infinite reverse;transform-origin:50% 50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-badge{margin-top:8px;font-size:clamp(12px,1.3vw,16px);color:var(--gold);opacity:.75}
+#setModal{position:fixed;inset:0;z-index:60;background:rgba(6,2,6,.93);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+#setModal .box{max-width:560px;width:100%;background:rgba(22,7,15,.92);border:3px solid var(--gold);
+  border-radius:22px;padding:24px 22px;text-align:center}
+#setModal h2{font-family:'Reem Kufi',serif;color:var(--gold);font-size:clamp(20px,3vw,32px);margin-bottom:10px}
+#setModal p{font-size:15px;line-height:1.95;opacity:.85}
+#setModal label{display:block;text-align:right;font-weight:700;margin:14px 0 6px;
+  color:var(--gold-soft);font-size:15px}
+#setModal select,#setModal input{width:100%;padding:12px 14px;border-radius:12px;
+  border:2px solid rgba(240,196,90,.45);background:rgba(0,0,0,.45);color:var(--cream);
+  font-family:'Cairo',sans-serif;font-size:16px}
+#setModal input{direction:ltr;text-align:left}
+#setModal .row{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
+#setModal .row .btn{flex:1;min-width:110px}
 ::-webkit-scrollbar{width:9px}
 ::-webkit-scrollbar-thumb{background:rgba(240,196,90,.45);border-radius:9px}
 </style>
@@ -201,6 +225,7 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
     <h1>التراث القطري والفن الإسلامي</h1>
     <div class="spacer"></div>
     <div class="pill" id="micPill"><span class="dot" id="micDot"></span><span id="micTxt">المايك</span></div>
+    <button class="pill" id="setBtn" title="إعدادات الذكاء الاصطناعي">⚙︎</button>
     <button class="pill" id="panelBtn">☰ الأوامر</button>
   </header>
 
@@ -222,11 +247,34 @@ main{flex:1;position:relative;display:flex;align-items:center;justify-content:ce
     <button class="btn" id="clearBtn">مسح الشاشة</button>
     <button class="btn" id="restartMic">إعادة تشغيل المايك</button>
     <button class="btn" id="fsBtn">ملء الشاشة</button>
+    <button class="btn" id="aiBtn">⚙︎ الذكاء الاصطناعي</button>
   </div>
   <p class="note">
     هذه الأزرار احتياط لو ضعف الإنترنت أو المايك داخل الصف.<br>
     أمثلة للكلام: «ارسم لي خيمة» · «أعطني خمسة أسئلة عن الزخارف الإسلامية» · «اكتب كلمة قطر بخط الثلث» · «امسح الشاشة».
   </p>
+</div>
+
+<div id="setModal" class="hidden">
+  <div class="box">
+    <h2>⚙︎ إعدادات الذكاء الاصطناعي</h2>
+    <p>الصق المفتاح مرة واحدة ليرسم ويصنع أسئلة عن أي موضوع تطلبه.<br>
+       <span style="color:var(--gold-soft)">يُحفظ في متصفح جهازك فقط، ولا يُرفع إلى GitHub.</span></p>
+    <label>المزوّد</label>
+    <select id="provSel">
+      <option value="anthropic">Anthropic (Claude)</option>
+      <option value="openai">OpenAI</option>
+    </select>
+    <label>مفتاح API</label>
+    <input id="keyInp" type="password" placeholder="الصق المفتاح هنا" autocomplete="off" spellcheck="false">
+    <label>الموديل (اختياري — اتركه فارغاً للأسرع)</label>
+    <input id="modelInp" type="text" placeholder="claude-haiku-5-5" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button class="btn" id="saveSet">حفظ</button>
+      <button class="btn" id="clearKey">حذف المفتاح</button>
+      <button class="btn" id="closeSet">إغلاق</button>
+    </div>
+  </div>
 </div>
 
 <div id="gate">
@@ -532,24 +580,61 @@ const ART={
       </g>
       <rect class="ink" x="40" y="40" width="320" height="320" rx="10" fill="none" stroke="${G}" stroke-width="6"/>
     </svg>`},
-  falcon:{keys:['صقر','طير','الصقاره'],title:'الصقر',
+  falcon:{keys:['صقر','الصقر','طير','الصقاره','صقور'],title:'الصقر',
     note:'رمز قطري أصيل للشجاعة والفروسية، والصقارة تراث معترف به عالمياً.',
-    svg:`<svg viewBox="0 0 420 400">
+    svg:`<svg viewBox="0 0 440 420">
+      <ellipse cx="228" cy="398" rx="130" ry="13" fill="#a87f4e" opacity=".4"/>
       <g class="fillin">
-        <path d="M210 90 Q150 118 150 200 Q150 280 210 320 Q270 280 270 200 Q270 118 210 90Z" fill="#8a7054"/>
-        <path d="M210 110 Q176 136 176 200 Q176 258 210 292 Q244 258 244 200 Q244 136 210 110Z" fill="#c9b08c"/>
-        <g fill="#6b5540"><circle cx="196" cy="186" r="5"/><circle cx="224" cy="186" r="5"/>
-          <circle cx="196" cy="222" r="5"/><circle cx="224" cy="222" r="5"/><circle cx="210" cy="252" r="5"/></g>
-        <path d="M150 170 Q70 150 36 200 Q92 206 150 230Z" fill="#7a6248">
-          <animateTransform attributeName="transform" type="rotate" values="0 150 200;-9 150 200;0 150 200" dur="3s" repeatCount="indefinite"/></path>
-        <path d="M270 170 Q350 150 384 200 Q328 206 270 230Z" fill="#7a6248">
-          <animateTransform attributeName="transform" type="rotate" values="0 270 200;9 270 200;0 270 200" dur="3s" repeatCount="indefinite"/></path>
-        <circle cx="210" cy="112" r="44" fill="#d8c3a0"/>
-        <path d="M210 68 a44 44 0 0 1 36 68 L174 136 A44 44 0 0 1 210 68Z" fill="#8a7054" opacity=".35"/>
-        <circle cx="194" cy="104" r="9" fill="#1b1b1b"/><circle cx="197" cy="101" r="3" fill="#fff"/>
-        <path d="M244 112 Q268 118 252 134 Q242 126 240 118Z" fill="${G}"/>
-        <path d="M196 320 L188 356 M224 320 L232 356" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
-        <path d="M176 356 L200 356 M216 356 L240 356" stroke="${G}" stroke-width="7" stroke-linecap="round"/>
+        <rect x="92" y="340" width="272" height="22" rx="11" fill="#6b4a24"/>
+        <rect x="92" y="340" width="272" height="8" rx="4" fill="#8a6230"/>
+        <rect x="214" y="362" width="26" height="28" fill="#5c3a1e"/>
+        <rect x="184" y="386" width="86" height="13" rx="6" fill="#6b4a24"/>
+      </g>
+      <g class="fillin">
+        <g>
+          <path d="M206 262 L138 346 L188 356 L236 296 Z" fill="#6b5842"/>
+          <g stroke="#43372a" stroke-width="3.5" fill="none" opacity=".85">
+            <path d="M182 296 L222 310"/><path d="M168 316 L210 330"/><path d="M154 336 L196 350"/>
+          </g>
+          <animateTransform attributeName="transform" type="rotate" values="0 224 278;2.6 224 278;0 224 278" dur="4.4s" repeatCount="indefinite"/>
+        </g>
+        <path d="M252 148 C296 164 304 214 290 258 C278 300 246 318 218 304 C192 290 190 238 202 196 C212 162 230 142 252 148 Z" fill="#8a7054"/>
+        <path d="M240 162 C266 176 272 216 262 252 C254 284 234 298 218 288 C200 274 202 232 212 198 C220 172 228 158 240 162 Z" fill="#ece0c8"/>
+        <g fill="#9c8364">
+          <ellipse cx="228" cy="198" rx="5" ry="7"/><ellipse cx="247" cy="208" rx="5" ry="7"/>
+          <ellipse cx="222" cy="224" rx="5" ry="7"/><ellipse cx="243" cy="236" rx="5" ry="7"/>
+          <ellipse cx="226" cy="253" rx="5" ry="7"/><ellipse cx="248" cy="263" rx="5" ry="7"/>
+          <ellipse cx="232" cy="279" rx="5" ry="7"/>
+        </g>
+        <path d="M262 152 C298 170 306 216 292 258 C282 290 262 304 250 296 C268 262 274 204 262 152 Z" fill="#6b5842"/>
+        <g stroke="#43372a" stroke-width="3" fill="none" opacity=".75">
+          <path d="M268 184 C286 196 292 226 288 252"/>
+          <path d="M264 214 C280 226 284 248 282 268"/>
+          <path d="M260 246 C272 258 276 272 274 284"/>
+        </g>
+        <path d="M252 148 C296 164 304 214 290 258" fill="none" stroke="#f0c45a" stroke-width="3" opacity=".55"/>
+      </g>
+      <g class="fillin">
+        <path d="M242 300 L246 334" stroke="#e0ab3d" stroke-width="11" stroke-linecap="round"/>
+        <path d="M268 294 L274 334" stroke="#d1991f" stroke-width="10" stroke-linecap="round"/>
+        <g stroke="#e0ab3d" stroke-width="7" stroke-linecap="round" fill="none">
+          <path d="M228 342 L248 333 L266 342"/><path d="M256 344 L276 333 L292 342"/>
+        </g>
+      </g>
+      <g class="fillin">
+        <g>
+          <circle cx="248" cy="116" r="45" fill="#ece0c8"/>
+          <path d="M248 71 C280 71 292 96 290 118 C284 92 272 78 248 76 Z" fill="#6b5842"/>
+          <path d="M209 102 C213 79 229 71 248 71 C228 78 215 90 209 106 Z" fill="#7a6248"/>
+          <path d="M268 126 C264 152 256 167 246 173 C256 149 258 134 258 124 Z" fill="#43372a"/>
+          <circle cx="266" cy="110" r="11" fill="#17140f"/>
+          <circle cx="269.5" cy="106" r="4" fill="#ffffff" opacity=".95"/>
+          <circle cx="266" cy="110" r="14.5" fill="none" stroke="#e0ab3d" stroke-width="3"/>
+          <path d="M282 100 C300 100 306 110 303 118 L283 120 Z" fill="#e0ab3d"/>
+          <path d="M290 110 C308 114 313 130 298 143 C297 128 290 119 281 116 Z" fill="#d8c3a0"/>
+          <path d="M298 143 C306 135 310 124 305 115 C310 126 307 137 298 143 Z" fill="#43372a"/>
+          <animateTransform attributeName="transform" type="rotate" values="0 240 152;-3 240 152;0 240 152;2.2 240 152;0 240 152" dur="6.5s" repeatCount="indefinite"/>
+        </g>
       </g>
     </svg>`},
   games:{keys:['العاب شعبيه','لعبه شعبيه','العاب','الدحروي','حالوسه','طاق طاق طاقيه','عظيم سرحان'],title:'الألعاب الشعبية القطرية',
@@ -672,7 +757,8 @@ function showWelcome(){
   setStage(`<div class="welcome">
     <div class="big">الفنون البصرية</div>
     <div class="sub">الزخارف الإسلامية · العمارة الإسلامية · الخط العربي<br>الفنانون القطريون · الألعاب الشعبية · التراث القطري</div>
-    <div class="hint">قل مثلاً: «ارسم لي خيمة» أو «أعطني خمسة أسئلة عن التراث»</div>
+    <div class="hint">قل مثلاً: «ارسم لي خيمة» أو «أعطني خمسة أسئلة عن التراث»<br>
+    ومع تفعيل ⚙︎ يرسم ويسأل عن أي موضوع تطلبه</div>
   </div>`);
 }
 
@@ -778,7 +864,7 @@ function initRec(){
     const shown=(fin||interim).trim();
     if(shown){talkBox.classList.remove('idle');talkBox.textContent=shown;}
     if(fin.trim()){
-      handle(fin);
+      if(!handle(fin))aiFallback(fin);
       clearTimeout(idleTimer);
       idleTimer=setTimeout(()=>{talkBox.classList.add('idle');talkBox.textContent='… تفضل، تكلّم وأنا أسمعك';},7000);
     }
@@ -827,6 +913,195 @@ const cB=document.getElementById('calliBtns');
   const b=document.createElement('button');b.className='btn';b.textContent=l;
   b.onclick=()=>{showCalli(w,s);panel.classList.remove('open');};cB.appendChild(b);
 });
+
+/* ============ الذكاء الاصطناعي ============ */
+const AI_CFG='turath_ai_cfg_v1', AI_CACHE='turath_ai_cache_v1';
+let aiCfg={provider:'anthropic',key:'',model:''};
+try{Object.assign(aiCfg,JSON.parse(localStorage.getItem(AI_CFG)||'{}'));}catch(e){}
+const DEFAULT_MODEL={anthropic:'claude-haiku-5-5',openai:'gpt-4o-mini'};
+const esc=x=>String(x==null?'':x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function cacheGet(k){try{return (JSON.parse(localStorage.getItem(AI_CACHE)||'{}'))[k]||null}catch(e){return null}}
+function cacheSet(k,v){try{const o=JSON.parse(localStorage.getItem(AI_CACHE)||'{}');o[k]=v;
+  const ks=Object.keys(o);if(ks.length>60)delete o[ks[0]];
+  localStorage.setItem(AI_CACHE,JSON.stringify(o));}catch(e){}}
+
+function showLoader(msg){
+  setStage(`<div class="loader">
+    <svg viewBox="0 0 200 200">
+      <g transform="translate(100,100)" fill="none" stroke="${G}" stroke-width="4">
+        <g class="spin"><rect x="-62" y="-62" width="124" height="124"/>
+          <rect x="-62" y="-62" width="124" height="124" transform="rotate(45)"/></g>
+        <g class="spin-r"><circle r="40"/><rect x="-28" y="-28" width="56" height="56"/></g>
+        <circle r="11" fill="${G}"/>
+      </g>
+    </svg>
+    <div class="lmsg">${esc(msg)}</div>
+    <div class="lsub">لحظة من فضلك…</div>
+  </div>`);
+}
+function showMsg(title,sub,hint){
+  setStage(`<div class="welcome"><div class="big">${esc(title)}</div>
+    <div class="sub">${sub}</div>${hint?`<div class="hint">${esc(hint)}</div>`:''}</div>`);
+}
+
+async function callAI(system,user,maxTokens){
+  const p=aiCfg.provider||'anthropic', key=(aiCfg.key||'').trim();
+  const model=(aiCfg.model||'').trim()||DEFAULT_MODEL[p];
+  if(!key)throw new Error('nokey');
+  let r,j;
+  if(p==='anthropic'){
+    r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+      'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model,max_tokens:maxTokens,system,messages:[{role:'user',content:user}]})});
+    if(!r.ok)throw new Error('HTTP '+r.status+' — '+(await r.text()).slice(0,160));
+    j=await r.json();
+    return (j.content||[]).map(c=>c.text||'').join('');
+  }
+  r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{
+    'content-type':'application/json','authorization':'Bearer '+key},
+    body:JSON.stringify({model,max_tokens:maxTokens,
+      messages:[{role:'system',content:system},{role:'user',content:user}]})});
+  if(!r.ok)throw new Error('HTTP '+r.status+' — '+(await r.text()).slice(0,160));
+  j=await r.json();
+  return (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+}
+
+function cleanSVG(txt){
+  const m=txt&&txt.match(/<svg[\s\S]*<\/svg>/i);
+  if(!m)return null;
+  return m[0].replace(/<script[\s\S]*?<\/script>/gi,'')
+             .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi,'')
+             .replace(/\son\w+\s*=\s*"[^"]*"/gi,'').replace(/\son\w+\s*=\s*'[^']*'/gi,'')
+             .replace(/javascript:/gi,'').replace(/<image\b[^>]*>/gi,'');
+}
+
+const DRAW_SYS=`أنت رسّام SVG لحصة فنون بصرية. أعِد رسمة SVG واحدة فقط، بدون أي شرح وبدون علامات كود.
+قواعد إلزامية:
+- ابدأ بـ <svg viewBox="0 0 500 360" xmlns="http://www.w3.org/2000/svg"> وانتهِ بـ </svg>
+- أسلوب فلات فكتور بسيط وجذاب لطلاب الصف الخامس والسادس: أشكال كبيرة واضحة، لا تفاصيل دقيقة.
+- استخدم هذه الألوان فقط: #f0c45a ذهبي، #fff6e6 كريمي، #8b1538 عنابي، #1f7a6f فيروزي، #2a9b8c فيروزي فاتح، #c9a46d رملي، #e6c89a رمل فاتح، #5c3a1e بني، #43372a بني غامق.
+- ضع حدوداً ذهبية #f0c45a بسمك 4 إلى 6 على العناصر الرئيسية.
+- أضف حركة بسيطة بوسم <animate> أو <animateTransform> على عنصر أو عنصرين فقط.
+- ممنوع: أي نص أو حروف داخل الرسمة، أي صورة خارجية، أي script.
+- راعِ الطابع الإسلامي والتراث الخليجي حين يناسب الموضوع.`;
+
+const QUIZ_SYS=`أنت معلم فنون بصرية في قطر لصفي الخامس والسادس. أعِد JSON فقط بدون أي شرح:
+مصفوفة من كائنات بالشكل {"q":"السؤال","a":"الإجابة"}.
+- بعربية فصحى مبسطة ومناسبة لأعمارهم.
+- السؤال قصير وواضح، والإجابة جملة إلى جملتين، ومعلوماتها صحيحة ودقيقة.
+- اربط الموضوع بالفن والتراث حين يناسب.`;
+
+function renderAIArt(svg,topic){
+  setStage(`<div class="art-wrap">${svg}<div class="art-title">${esc(topic)}</div>
+    <div class="ai-badge">✦ رُسمت بالذكاء الاصطناعي</div></div>`);
+  speak(topic);
+}
+function renderAIQuiz(arr,topic){
+  const cards=arr.map((o,i)=>`
+    <div class="card" style="animation-delay:${i*0.09}s" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="face front"><span class="q-num">سؤال ${i+1}</span>
+          <div class="q-txt">${esc(o.q)}</div><span class="tap">اضغط لعرض الإجابة</span></div>
+        <div class="face back"><span class="a-lbl">الإجابة</span>
+          <div class="a-txt">${esc(o.a)}</div></div>
+      </div>
+    </div>`).join('');
+  setStage(`<div class="cards-wrap"><div class="cards-head">
+    <h2>${esc(topic)} — ${arr.length} أسئلة</h2></div><div class="cards">${cards}</div></div>`);
+  speak(`تفضلوا ${arr.length} أسئلة عن ${topic}`);
+}
+
+async function aiDraw(topic){
+  const ck='d:'+topic, hit=cacheGet(ck);
+  if(hit){renderAIArt(hit,topic);return;}
+  showLoader('يرسم: '+topic);
+  const svg=cleanSVG(await callAI(DRAW_SYS,'ارسم: '+topic,2600));
+  if(!svg)throw new Error('bad-svg');
+  cacheSet(ck,svg);renderAIArt(svg,topic);
+}
+async function aiQuiz(topic,n){
+  const ck='q:'+n+':'+topic, hit=cacheGet(ck);
+  if(hit){renderAIQuiz(JSON.parse(hit),topic);return;}
+  showLoader('يجهّز أسئلة عن: '+topic);
+  const out=await callAI(QUIZ_SYS,`اكتب ${n} أسئلة عن: ${topic}`,1800);
+  const m=out.match(/\[[\s\S]*\]/);
+  if(!m)throw new Error('bad-json');
+  const arr=JSON.parse(m[0]).filter(o=>o&&o.q&&o.a).slice(0,n);
+  if(!arr.length)throw new Error('bad-json');
+  cacheSet(ck,JSON.stringify(arr));renderAIQuiz(arr,topic);
+}
+
+function stripCmd(t){
+  return t.replace(/(من فضلك|لو سمحت|يا كلود|كلود)/g,'')
+    .replace(/^(ممكن|بدي|اريد|عايز|ابي|ابغى)\s*/,'')
+    .replace(/(ارسم|ارسملي|اعرض|وريني|اظهر|صمم|صور)\s*(لي|لنا|النا)?\s*/,'')
+    .replace(/^(صوره|صوره عن|شكل|رسمه|رسمه عن)\s*/,'')
+    .replace(/^(ال)?(موضوع|درس)\s*/,'').trim();
+}
+function topicAfter(t){
+  const i=t.indexOf(' عن ');
+  return i>=0?t.slice(i+4).trim():'';
+}
+
+async function aiFallback(raw){
+  const t=norm(raw);
+  if(t.length<5)return;
+  const isQ=/(اسئل|سؤال|سوال|اسال|اختبر|كروت|بطاقات|كارت|امتحن)/.test(t);
+  const isD=/(ارسم|ارسملي|اعرض|وريني|اظهر|صمم|رسمه|صوره)/.test(t);
+  if(!isQ&&!isD)return;
+  if(!(aiCfg.key||'').trim()){
+    showMsg('الذكاء الاصطناعي غير مفعّل',
+      'افتح الإعدادات ⚙︎ في الأعلى والصق مفتاح الـ API مرة واحدة.<br>يُحفظ على جهازك فقط.',
+      'الرسومات والأسئلة الجاهزة تعمل بدون مفتاح');
+    return;
+  }
+  try{
+    if(isQ){
+      const topic=topicAfter(t)||stripCmd(t)||'التراث القطري';
+      await aiQuiz(topic,getCount(t));
+    }else{
+      const topic=stripCmd(t);
+      if(!topic)return;
+      await aiDraw(topic);
+    }
+  }catch(e){
+    const msg=String((e&&e.message)||e);
+    showMsg('تعذّر التنفيذ',
+      esc(msg==='nokey'?'أضف مفتاح الـ API من الإعدادات ⚙︎'
+        :(msg.indexOf('bad')===0?'لم تصل نتيجة صالحة، أعد المحاولة'
+        :'تحقق من الإنترنت ومن صحة المفتاح<br><span style="font-size:.75em;opacity:.7">'+msg+'</span>')),
+      'الأزرار ☰ تعمل دائماً بدون إنترنت');
+  }
+}
+
+/* ===== نافذة الإعدادات ===== */
+const setModal=document.getElementById('setModal');
+const provSel=document.getElementById('provSel'),keyInp=document.getElementById('keyInp'),
+      modelInp=document.getElementById('modelInp');
+function openSet(){
+  provSel.value=aiCfg.provider||'anthropic';
+  keyInp.value=aiCfg.key||'';modelInp.value=aiCfg.model||'';
+  modelInp.placeholder=DEFAULT_MODEL[provSel.value];
+  setModal.classList.remove('hidden');panel.classList.remove('open');
+}
+document.getElementById('setBtn').onclick=openSet;
+document.getElementById('aiBtn').onclick=openSet;
+document.getElementById('closeSet').onclick=()=>setModal.classList.add('hidden');
+provSel.onchange=()=>modelInp.placeholder=DEFAULT_MODEL[provSel.value];
+document.getElementById('saveSet').onclick=()=>{
+  aiCfg={provider:provSel.value,key:keyInp.value.trim(),model:modelInp.value.trim()};
+  try{localStorage.setItem(AI_CFG,JSON.stringify(aiCfg));}catch(e){}
+  setModal.classList.add('hidden');
+  showMsg('تم الحفظ ✓','الآن قل مثلاً: «ارسم لي سوق واقف» أو «أعطني خمسة أسئلة عن متحف الفن الإسلامي»');
+};
+document.getElementById('clearKey').onclick=()=>{
+  aiCfg={provider:provSel.value,key:'',model:''};
+  try{localStorage.removeItem(AI_CFG);}catch(e){}
+  keyInp.value='';modelInp.value='';
+  setModal.classList.add('hidden');showWelcome();
+};
 
 /* ============ البدء ============ */
 document.getElementById('startBtn').onclick=async()=>{
