@@ -418,6 +418,11 @@ function handle(raw,interim){
   }
   if(/نظف|امسح|مسح/.test(t)){ clearAll(); return; }
   if(/مره ثانيه|اعد|كرر|مثال جديد|من جديد/.test(t) && currentKey){ show(currentKey); return; }
+  /* linked ChatGPT: every finished sentence that is not a command or a question becomes a drawing */
+  const isCmd=/^(?:تخيل|تخيّل|اعرض|أعرض|اظهر|أظهر|وريني|ورني|ارسم|سؤال|الاجابه|امسح|نظف|مسح)/.test(t);
+  if(GPT.key && !interim && !cw && !isCmd && t.split(' ').length>=2 && !/مثال جديد|اعد|كرر/.test(t)){
+    showGeneric(raw.trim().slice(0,40)); aiDraw(raw.trim()); return;
+  }
   const cmdAI=raw.trim().match(/^(?:تخيل|تخيّل|اعرض|أعرض|اظهر|أظهر|وريني|ورني|ارسم)\s*(.+)$/);
   if(cmdAI && GPT.key && !interim && !cw){ showGeneric(cmdAI[1]); aiDraw(cmdAI[1]); return; }
   const hit=keys.find(([re])=>re.test(t));
