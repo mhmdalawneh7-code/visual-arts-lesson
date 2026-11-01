@@ -1,0 +1,23 @@
+{
+  "_note": "Times in seconds on the voiceover timeline. align.py rewrites this file from the real voiceover; you can also fine-tune any value by hand and re-render.",
+  "audio": "voiceover.mp3",
+  "l1": 0.0,
+  "pause": 8.0,
+  "l2": 10.0,
+  "red": 15.0,
+  "yellow": 16.4,
+  "blue": 17.8,
+  "l3": 20.0,
+  "base": 25.0,
+  "l4": 28.0,
+  "merge": 30.6,
+  "l5": 33.0,
+  "mix1": 33.0,
+  "mix2": 38.7,
+  "mix3": 44.4,
+  "l6": 50.0,
+  "smile": 54.5,
+  "l7": 58.0,
+  "wf": 61.2,
+  "end": 65.0
+}
