@@ -90,6 +90,29 @@
   .hint{font-size:12px;opacity:.75}
   .toggle{background:transparent;border:2px solid var(--gold);color:var(--gold);box-shadow:none}
 
+  /* ============ Full-screen presentation mode ============ */
+  .stage-wrap{padding:0}
+  .stage{width:100vw!important;height:100vh;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none}
+  .controls{position:fixed;left:0;right:0;bottom:0;z-index:30;transform:translateY(110%);transition:transform .35s}
+  body.show-controls .controls{transform:none}
+  #caption{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);z-index:20;max-width:80%;
+    background:rgba(10,25,35,.72);color:#fff;font-size:clamp(22px,3.2vw,46px);font-weight:700;line-height:1.5;
+    padding:12px 30px;border-radius:22px;text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;
+    border:3px solid rgba(244,196,48,.7)}
+  #caption.on{opacity:1}
+  #caption .interim{color:#ffe9a3}
+  #caption.ok{border-color:#5fd38a}
+  #mic-dot{position:absolute;top:18px;left:18px;z-index:20;width:22px;height:22px;border-radius:50%;background:#888;opacity:.8;box-shadow:0 0 0 4px rgba(255,255,255,.35)}
+  #mic-dot.live{background:#e53935;animation:pulse 1.2s infinite}
+  #menu-btn{position:absolute;top:10px;left:52px;z-index:20;background:rgba(0,0,0,.25);color:#fff;border:none;border-radius:10px;font-size:20px;padding:4px 10px;cursor:pointer;opacity:.35}
+  #menu-btn:hover{opacity:1}
+  #start{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    background:radial-gradient(circle,#0b5d7aee,#042c3bf5);color:#fff8e7;cursor:pointer;text-align:center}
+  #start h1{font-size:clamp(34px,5.5vw,80px);margin:0;color:var(--gold);text-shadow:0 4px 0 #3b2310}
+  #start p{font-size:clamp(18px,2.4vw,32px);margin:0}
+  #start .go{font-size:clamp(20px,2.6vw,34px);background:var(--gold);color:#3b2310;padding:14px 40px;border-radius:999px;font-weight:800;animation:pulse 1.4s infinite}
+  #start.hide{display:none}
+
   /* ============ Chapters ============ */
   .chapter{position:absolute;inset:0;display:none}
   .chapter.active{display:block}
@@ -126,6 +149,12 @@
 </style>
 </head>
 <body>
+<div id="start">
+  <h1>رحلة المحامل التقليدية في قطر</h1>
+  <p>مدرسة الزبير بن العوام الابتدائية للبنين — الفنون البصرية، الصف الخامس</p>
+  <div class="go">🎤 اضغط لبدء الدرس</div>
+  <p style="font-size:clamp(14px,1.6vw,20px);opacity:.8">تحدّث وسيظهر كلامك على الشاشة ويتفاعل العرض معه</p>
+</div>
 <div class="app">
   <div class="stage-wrap">
     <div class="stage" id="stage">
@@ -383,6 +412,9 @@
       <div class="bubble" id="bubble">مرحبًا بكم في رحلة المحامل! قولوا: <strong>«عرّف المحمل»</strong></div>
 
       <div class="particles" id="particles"></div>
+      <div id="caption"></div>
+      <div id="mic-dot" title="الميكروفون"></div>
+      <button id="menu-btn" title="إظهار الأزرار (M)">☰</button>
 
       <!-- Info / quiz panel -->
       <div class="panel" id="panel">
@@ -425,7 +457,7 @@
   const statusEl = $('#status'), micBtn = $('#mic'), labels = $('#label-layer');
   const particles = $('#particles'), stage = $('#stage');
   let sailUp = true, sailing = false, windOn = false, score = 0, qIndex = 0;
-  let soundOn = true, speechOn = true;
+  let soundOn = true, speechOn = true, voiceAnswer = null, lastSpeakEnd = 0;
 
   /* ---------- Arabic narration ---------- */
   function say(text){
@@ -436,6 +468,7 @@
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[«»]/g,''));
       u.lang = 'ar-SA'; u.rate = 0.9; u.pitch = 1.05;
+      u.onend = () => { lastSpeakEnd = Date.now(); };
       speechSynthesis.speak(u);
     }
   }
@@ -570,7 +603,7 @@
       <div style="margin-top:14px;text-align:left"><button class="btn" id="close-card">إغلاق</button></div>`);
   }
   function openCard(html){ card.innerHTML = html; panel.classList.add('open'); card.querySelector('#close-card')?.addEventListener('click', closeCard); }
-  function closeCard(){ panel.classList.remove('open'); }
+  function closeCard(){ panel.classList.remove('open'); voiceAnswer = null; }
   panel.addEventListener('click', e => { if(e.target === panel) closeCard(); });
 
   // tapping a part names it
@@ -607,7 +640,15 @@
     openCard(`<h2>السؤال ${qIndex+1} من ${QUESTIONS.length}</h2><p>${item.q}</p>
       <div class="quiz-opts">${item.a.map((t,i)=>`<button class="opt" data-i="${i}">${t}</button>`).join('')}</div>
       <p class="score" style="margin-top:12px">النقاط: ${score}</p>`);
+    const ORD = [['الاول','اولا','واحد','رقم ١','رقم 1'],['الثاني','ثانيا','اثنين','رقم ٢','رقم 2'],['الثالث','ثالثا','ثلاثه','رقم ٣','رقم 3'],['الرابع','رابعا','اربعه','رقم ٤','رقم 4']];
+    voiceAnswer = t => {
+      let idx = item.a.findIndex(a => t.includes(normalize(a)));
+      if(idx < 0) idx = ORD.findIndex(list => list.some(w => t.includes(normalize(w))));
+      if(idx < 0) return false;
+      card.querySelectorAll('.opt')[idx].click(); return true;
+    };
     card.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+      voiceAnswer = null;
       const i = +b.dataset.i;
       card.querySelectorAll('.opt').forEach(x => x.disabled = true);
       if(i === item.c){ b.classList.add('right'); score++; chime([660,880]); say('إجابة صحيحة! أحسنت.'); cheer(); }
@@ -634,6 +675,7 @@
   }
   function route(text){
     const t = normalize(text);
+    if(voiceAnswer && voiceAnswer(t)) return true;
     for(const c of COMMANDS){
       if(c.words.some(w => t.includes(normalize(w)))){ c.run(); return true; }
     }
@@ -660,8 +702,13 @@
         const r = e.results[i];
         if(r.isFinal) finalTxt += r[0].transcript; else interim += r[0].transcript;
       }
-      if(interim) statusEl.innerHTML = `أسمع: <span class="heard">${interim}</span>`;
-      if(finalTxt){ statusEl.innerHTML = `سمعت: <span class="heard">${finalTxt}</span>`; route(finalTxt); }
+      if(interim && !('speechSynthesis' in window && speechSynthesis.speaking)){ statusEl.innerHTML = `أسمع: <span class="heard">${interim}</span>`; showCaption('', interim, false); }
+      if(finalTxt){
+        statusEl.innerHTML = `سمعت: <span class="heard">${finalTxt}</span>`;
+        if(('speechSynthesis' in window && speechSynthesis.speaking) || Date.now() - lastSpeakEnd < 700) return; // ignore the guide's own voice
+        const ok = route(finalTxt);
+        showCaption(finalTxt, '', ok);
+      }
     };
     rec.onerror = e => {
       if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ statusEl.textContent = 'لم يُسمح بالميكروفون. استخدموا الأزرار.'; listening = false; updateMic(); }
@@ -676,6 +723,7 @@
   function updateMic(){
     micBtn.textContent = listening ? '⏹ إيقاف الصوت' : '🎤 تشغيل الصوت';
     micBtn.classList.toggle('listening', listening);
+    document.getElementById('mic-dot')?.classList.toggle('live', listening);
   }
   micBtn.addEventListener('click', () => { audio(); listening ? stopListening() : startListening(); });
   $('#sound-toggle').addEventListener('click', e => {
@@ -823,8 +871,28 @@
     {words:['اصنع الشبك','صناعة الشبك','الشباك','الشبابيك'], run: startNet},
     {words:['الدرس الأول','ابدأ الدرس','المحمل ومكوناته'], run: START.ship},
     {words:['الدرس التالي','التالي'], run: nextChapter},
-    {words:['ملخص الدرس','الخلاصة'], run: summary}
+    {words:['ملخص الدرس','الخلاصة'], run: summary},
+    {words:['أغلق','اغلق','إغلاق','اغلاق','سكر','اخف البطاقه'], run: () => { closeCard(); say('تفضّلوا، الشاشة جاهزة.'); }}
   );
+
+  /* ---------- Live caption ---------- */
+  const caption = $('#caption'), micDot = $('#mic-dot');
+  let capTimer = null;
+  function showCaption(finalTxt, interim, ok){
+    caption.innerHTML = (finalTxt ? finalTxt : '') + (interim ? ` <span class="interim">${interim}</span>` : '');
+    caption.classList.add('on'); caption.classList.toggle('ok', !!ok);
+    clearTimeout(capTimer); capTimer = setTimeout(() => caption.classList.remove('on'), 4500);
+  }
+  function toggleControls(){ document.body.classList.toggle('show-controls'); }
+  $('#menu-btn').addEventListener('click', toggleControls);
+  document.addEventListener('keydown', e => { if(e.key === 'm' || e.key === 'M' || e.key === 'ة') toggleControls(); if(e.key === 'f' || e.key === 'F'){ document.documentElement.requestFullscreen?.(); } });
+  $('#start').addEventListener('click', () => {
+    $('#start').classList.add('hide');
+    audio(); startAmbient();
+    document.documentElement.requestFullscreen?.().catch(()=>{});
+    if(!listening) startListening();
+    say('أهلًا يا أبطال البحر! تكلّم وسأتبعك. قل مثلًا: <strong>«عرّف المحمل»</strong> أو <strong>«ابدأ الغوص»</strong>.');
+  });
 
   QUESTIONS.push(
     {q:'ماذا نسمي السلة التي يجمع فيها الغواص المحار؟', a:['الزنبيل','الصاري','الفطام','الشراع'], c:0},
