@@ -173,9 +173,12 @@ async function openMicrophone(){
  desired=true;setMicUI('waiting','طلب إذن الميكروفون…');setStatus('اختر «سماح» عندما يطلب المتصفح استخدام الميكروفون.');getAudio();
  try{
   if(!navigator.mediaDevices?.getUserMedia)throw new Error('المتصفح لا يوفر صلاحية الميكروفون في هذه الصفحة.');
-  micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
-  if(!desired){micStream.getTracks().forEach(t=>t.stop());micStream=null;return}
-  const ctx=getAudio();if(ctx){const source=ctx.createMediaStreamSource(micStream);analyser=ctx.createAnalyser();analyser.fftSize=1024;source.connect(analyser);monitorLevel()}
+  // Ask for permission once, then release the stream: keeping a second microphone stream open
+  // alongside SpeechRecognition makes Chrome abort recognition while the teacher is speaking.
+  const permStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+  permStream.getTracks().forEach(t=>t.stop());
+  micStream=null;
+  if(!desired)return;
   setLive('🎤 الميكروفون متصل… تحدث الآن باللغة العربية');startRecognition();
  }catch(e){disableMic(false);let msg=e.name==='NotAllowedError'?'تم منع الميكروفون. اضغط 🔒 بجانب العنوان ← الميكروفون ← سماح، ثم أعد تحميل الصفحة. وإن لم يعمل، اكتب الأمر في المربع أسفل الشاشة.':e.name==='NotFoundError'?'لا يوجد ميكروفون متصل بالجهاز.':e.name==='NotReadableError'?'الميكروفون مشغول بتطبيق آخر أو يتعذر الوصول إليه.':e.message;setStatus('❌ '+msg,true);setLive('لم يتم تشغيل الميكروفون — راجع التعليمات أسفل الصفحة')}
 }
