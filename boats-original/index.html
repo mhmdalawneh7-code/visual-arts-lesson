@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08233d"><title>المحامل التقليدية | شاشة مباشرة بالصوت العربي</title>
+<style>
+:root { --deep:#061d32;--mid:#103e58;--gold:#ffd891;--aqua:#60e6df;--txt:#f8fcff;--outline:rgba(180,220,236,.27) }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 8% 4%,#144761 0,#08263f 35%,#061d32 80%);color:var(--txt);font-family:Tahoma,"Segoe UI",Arial,sans-serif}
+button,select{font:inherit}button{cursor:pointer;border:1px solid transparent;border-radius:13px;padding:11px 17px;font-weight:bold;color:#082c41;background:#ffe0a2;transition:transform .14s,background .14s}button:hover{transform:translateY(-2px);background:#fff0c9}button:focus-visible,select:focus-visible{outline:3px solid #51f6ed;outline-offset:3px}button:disabled{opacity:.55;cursor:not-allowed}button.primary{color:#062b3c;background:#53e1d7}button.danger{background:#ffb5b0}button.ghost{background:#123c52;color:#fff;border-color:#4f7087}button.ghost:hover{background:#235a74}
+header{max-width:1600px;margin:0 auto;padding:15px 25px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+h1{font-size:clamp(22px,2.4vw,39px);margin:0;color:var(--gold)}header p{margin:6px 0 0;color:#c4e8ee;font-size:clamp(12px,1.2vw,18px)}.tag{border:1px solid #dcb978;border-radius:40px;padding:9px 16px;color:#ffe6b5;font-weight:bold}
+main{max-width:1600px;margin:auto;padding:0 15px 26px}.stage{position:relative;overflow:hidden;border-radius:22px;border:3px solid #c79d61;background:#75bdd8;box-shadow:0 20px 65px #0009;isolation:isolate}.scene{display:block;width:100%;height:auto;aspect-ratio:1200/630}
+.sky{fill:url(#sky)}.sea{fill:url(#sea)}.sun{fill:#fff3b3}.wave{animation:wave 3s ease-in-out infinite alternate;transform-origin:center}.wave.two{animation-delay:-1.4s}.cloud{animation:cloud 19s linear infinite}.cloud.two{animation-duration:25s;animation-delay:-7s}.boat{transform-origin:50% 72%;animation:bob 3s ease-in-out infinite}.sail{transform-origin:54% 42%;transition:transform 1.1s ease}.flag{animation:flag .9s ease-in-out infinite alternate;transform-origin:left}.birds{animation:fly 9s linear infinite}.fish{animation:fish 8s linear infinite}.fish.two{animation-delay:-4s}.shell{animation:pulse 2s infinite alternate}.wind .boat{animation-duration:1.5s}.storm .wave{animation-duration:.7s}.storm .sky{filter:brightness(.6)}.storm .sea{filter:brightness(.7)}.moving .boat{animation:travel 8s linear infinite,bob 2s ease-in-out infinite}.sail-up .sail{transform:scaleY(1)}.sail-down .sail{transform:scaleY(.07)}
+@keyframes bob{50%{transform:translateY(10px) rotate(1.4deg)}}@keyframes wave{to{transform:translateX(-32px) translateY(5px)}}@keyframes cloud{to{transform:translateX(180px)}}@keyframes flag{to{transform:skewY(-12deg)}}@keyframes fly{to{transform:translateX(160px)}}@keyframes fish{50%{transform:translateX(150px)}}@keyframes pulse{to{opacity:.6}}@keyframes travel{0%{translate:-130px 0}50%{translate:100px 0}100%{translate:-130px 0}}
+.top-overlay{position:absolute;top:2.5%;right:2%;max-width:57%;padding:12px 17px;border-radius:15px;background:rgba(5,34,55,.78);border:1px solid #e3d0ad;box-shadow:0 4px 18px #0003;backdrop-filter:blur(5px)}.top-overlay b{display:block;color:#ffe8a8;font-size:clamp(15px,2vw,30px)}.top-overlay small{display:block;font-size:clamp(10px,1.18vw,17px);margin-top:4px;line-height:1.5}
+.stage-top-left{position:absolute;left:2%;top:2.5%;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.stage-top-left button{font-size:clamp(11px,1.06vw,16px);padding:9px 11px;background:#0e3c53;color:#fff;border-color:#7bafbd}.stage-top-left button:hover{background:#1c627b}
+.transcript{position:absolute;left:2%;right:2%;bottom:2%;background:linear-gradient(120deg,rgba(5,24,45,.94),rgba(8,57,75,.94));border:2px solid rgba(161,243,230,.9);border-radius:21px;padding:13px 19px 16px;box-shadow:0 7px 38px #0017;backdrop-filter:blur(7px)}.transcript-head{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;color:#b8f8f0;font-size:clamp(11px,1.12vw,16px);font-weight:bold}.mic-label{display:flex;align-items:center;gap:9px}.led{display:inline-block;width:12px;height:12px;background:#fa8b87;border-radius:50%;box-shadow:0 0 0 3px #ffffff22}.listening .led{background:#53eccb;box-shadow:0 0 11px #31ffba;animation:pulse-led 1.5s infinite}.thinking .led{background:#ffe178}@keyframes pulse-led{50%{opacity:.35}}.meter{display:inline-block;vertical-align:middle;width:120px;height:9px;border-radius:30px;background:#28576a;overflow:hidden}.meter>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#57f1cc,#fae17c,#ff9376);transition:width .07s}.transcript-text{font-size:clamp(22px,3.5vw,56px);font-weight:900;line-height:1.35;min-height:1.5em;margin:7px 0 10px;color:#fff;text-shadow:0 2px 7px #0009;overflow-wrap:anywhere}.transcript-text.interim{color:#fff2ba}.stage-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.stage-actions button{font-size:clamp(12px,1.2vw,18px);padding:10px 15px}
+.panels{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-top:16px}.panel{background:rgba(6,39,61,.91);border:1px solid var(--outline);border-radius:19px;padding:19px}.panel h2{margin:0 0 12px;font-size:clamp(18px,1.6vw,25px);color:#ffe0a0}.panel p{line-height:1.85;margin:8px 0;color:#d2eaf1}.controls{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}.controls button{font-size:clamp(13px,1vw,16px)}.diagnostic{display:block;padding:12px 14px;border-radius:13px;background:rgba(19,72,89,.62);border:1px solid #477c90;line-height:1.85;min-height:46px}.diagnostic.warn{border-color:#f0ac80;background:#5c382e;color:#fff3dd}.caption{font-size:14px;color:#b3d9e1}.settings{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:12px 0}.settings label{display:flex;align-items:center;gap:7px;cursor:pointer}.settings select{background:#17465d;border:1px solid #6fabb2;color:#fff;padding:9px 11px;border-radius:10px;max-width:190px}.settings input{accent-color:#5aecd5;width:18px;height:18px}.chip-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}.chip{border:1px solid #60869b;background:#17465d;border-radius:22px;color:#f6fcff;padding:7px 10px;font-size:14px}.chip:before{content:'🎤 ';color:#fff}.quiz{line-height:1.8}.quiz #question{font-size:19px;color:#fff}.quiz #answers button{margin:4px 3px}.quiz #score{color:#ffe19b}.log{margin-top:14px;border-top:1px solid #416479;padding-top:10px}.log ol{margin:6px 0;padding-right:23px;color:#c8e6ec;max-height:130px;overflow-y:auto}.log li{margin:3px 0}.spark{position:absolute;z-index:4;pointer-events:none;animation:burst 1.15s ease-out forwards;font-size:clamp(25px,3vw,44px)}@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(.4) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1.8) rotate(190deg)}}
+footer{padding:14px;text-align:center;color:#b4d3db}
+.stage:fullscreen{border:0;border-radius:0;display:flex;align-items:center;justify-content:center;background:#051b2b}.stage:fullscreen .scene{height:100%;width:100%;object-fit:fill;aspect-ratio:auto}.stage:fullscreen .transcript{bottom:2%;}.stage:fullscreen .transcript-text{font-size:clamp(30px,4vw,80px)}
+@media(max-width:950px){.panels{grid-template-columns:1fr}.top-overlay{max-width:64%}}@media(max-width:600px){header{padding:12px}.tag{display:none}main{padding:0 7px 15px}.stage{border-radius:14px}.top-overlay{padding:6px 8px;max-width:67%}.stage-top-left{left:1%;top:1%}.stage-top-left button{padding:5px 7px}.transcript{padding:7px 9px;bottom:1%;border-radius:11px}.transcript-head{font-size:10px}.meter{width:50px;height:6px}.transcript-text{font-size:clamp(17px,4vw,25px);margin:2px 0 4px}.stage-actions{gap:4px}.stage-actions button{padding:5px 7px;font-size:10px}.panel{padding:14px}}
+@media(prefers-reduced-motion:reduce){.cloud,.birds,.fish{animation:none}}
+</style></head>
+<body>
+<header><div><h1>⛵ المحامل التقليدية في قطر</h1><p>درس الفنون البصرية – الصف الخامس | تفاعل صوتي مباشر مع عرض كلام المعلم بالعربية</p></div><span class="tag">تراثنا هويتنا 🇶🇦</span></header>
+<main>
+<section class="stage sail-up" id="stage" aria-label="مشهد المحمل التفاعلي">
+<svg class="scene" viewBox="0 0 1200 630" role="img" aria-label="مشهد كرتوني لخليج قطر ومحمل شراعي تقليدي متحرك"><defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#4fa5da"/><stop offset="1" stop-color="#c9ecf8"/></linearGradient><linearGradient id="sea" x2="0" y2="1"><stop stop-color="#1588aa"/><stop offset="1" stop-color="#064764"/></linearGradient><linearGradient id="wood" x2="0" y2="1"><stop stop-color="#ad6632"/><stop offset="1" stop-color="#5b321e"/></linearGradient><linearGradient id="sailfill" x2="0" y2="1"><stop stop-color="#fff9e8"/><stop offset="1" stop-color="#eed8ac"/></linearGradient></defs><rect class="sky" width="1200" height="630"/><circle class="sun" cx="1000" cy="110" r="59"/><g class="cloud" fill="#fff" opacity=".87"><ellipse cx="190" cy="111" rx="72" ry="26"/><ellipse cx="145" cy="103" rx="39" ry="30"/><ellipse cx="238" cy="99" rx="40" ry="30"/></g><g class="cloud two" fill="#fff" opacity=".75"><ellipse cx="690" cy="75" rx="70" ry="24"/><ellipse cx="657" cy="63" rx="38" ry="29"/></g><g fill="#baae96"><path d="M0 355L65 310 114 330 167 285 222 340 310 315 350 370Z" opacity=".5"/><path d="M800 370L840 300 895 320 940 280 1010 328 1090 305 1200 360Z" opacity=".55"/></g><path d="M0 375Q200 355 380 372T790 368T1200 370V630H0Z" class="sea"/><g class="wave" fill="none" stroke="#a9eef0" stroke-width="5" opacity=".6"><path d="M-20 430Q30 411 80 430T180 430T280 430T380 430T480 430T580 430T680 430T780 430T880 430T980 430T1080 430T1280 430"/><path d="M-30 545Q20 526 70 545T170 545T270 545T370 545T470 545T570 545T670 545T770 545T870 545T970 545T1070 545T1270 545"/></g><g class="wave two" fill="none" stroke="#d1f6e9" stroke-width="3" opacity=".4"><path d="M-30 480Q70 456 170 480T370 480T570 480T770 480T970 480T1270 480"/><path d="M-30 600Q50 580 130 600T290 600T450 600T610 600T770 600T930 600T1090 600T1250 600"/></g><g class="birds" fill="none" stroke="#143e53" stroke-width="4" stroke-linecap="round"><path d="M570 136q15 -16 30 0q15 -16 30 0M660 164q10 -12 21 0q10 -12 21 0"/></g><g class="fish" transform="translate(150 540)"><path d="M0 0q33 -17 60 0q-27 17 -60 0L-15 -17V17Z" fill="#86dadd"/><circle cx="38" cy="-3" r="3" fill="#133d4a"/></g><g class="fish two" transform="translate(910 565)"><path d="M0 0q27 -12 50 0q-23 12 -50 0L-13 -13V13Z" fill="#e6d0a2"/></g><g class="boat" id="boat"><ellipse cx="608" cy="465" rx="260" ry="22" fill="#d2f7f0" opacity=".34"/><path d="M374 397L850 397 804 467Q612 508 420 459Z" fill="url(#wood)" stroke="#492818" stroke-width="7"/><path d="M388 407Q612 448 837 409" fill="none" stroke="#e4ab6e" stroke-width="12"/><path d="M415 440Q610 478 811 438" fill="none" stroke="#8c452a" stroke-width="7"/><path d="M439 389L792 389" stroke="#5b311c" stroke-width="14"/><path d="M510 390V196" stroke="#633b25" stroke-width="12"/><path d="M641 403V128" stroke="#5d3925" stroke-width="13"/><path d="M641 128L645 400" stroke="#4b3323" stroke-width="6"/><g class="sail"><path d="M627 140Q525 188 518 369L625 378Z" fill="url(#sailfill)" stroke="#c3a478" stroke-width="4"/><path d="M649 145Q784 190 799 378L653 386Z" fill="url(#sailfill)" stroke="#c3a478" stroke-width="4"/><path d="M647 147Q743 222 785 369" stroke="#e3cba3" stroke-width="4" fill="none"/><path d="M620 145Q561 230 535 364" stroke="#e3cba3" stroke-width="4" fill="none"/></g><path d="M641 127L641 86" stroke="#633b25" stroke-width="7"/><g class="flag"><path d="M642 84L704 91 690 120 642 116Z" fill="#8d153a"/><path d="M642 84L654 90 642 95 654 100 642 105 654 111 642 116Z" fill="white"/></g><rect x="467" y="363" width="41" height="28" rx="5" fill="#9b5c30" stroke="#512f20" stroke-width="4"/><rect x="736" y="363" width="40" height="28" rx="5" fill="#9b5c30" stroke="#512f20" stroke-width="4"/><path d="M433 421L789 421" stroke="#f1c37d" stroke-dasharray="12 12" stroke-width="3"/></g><g class="shell" transform="translate(1070 555)"><path d="M0 23Q-35 -27 0 -39Q35 -27 0 23Z" fill="#f8dfb0" stroke="#e9b77e" stroke-width="4"/><path d="M0 -36V20M-18 -21L-4 19M18 -21L4 19" stroke="#e9b77e" stroke-width="3"/></g></svg>
+<div class="top-overlay"><b id="headline">أنت قائد المحمل!</b><small id="subtitle">شغّل الميكروفون وتحدث بالعربية لتحريك العناصر أمام الطلاب.</small></div>
+<div class="stage-top-left"><button id="fullScreen" title="عرض الدرس بملء الشاشة">⛶ ملء الشاشة</button></div>
+<div class="transcript" aria-label="عرض صوت المعلم كنص عربي مباشر">
+  <div class="transcript-head"><span class="mic-label"><span class="led" aria-hidden="true"></span><span id="micState">الميكروفون متوقف</span></span><span><span class="meter" aria-label="مستوى الصوت"><span id="meterFill"></span></span> <span id="levelText">0%</span></span></div>
+  <div class="transcript-text" id="liveText" role="status" aria-live="polite">اضغط «تشغيل الميكروفون» ثم تحدث بالعربية 🎤</div>
+  <div class="stage-actions"><button class="primary mic-toggle" type="button">🎙️ تشغيل الميكروفون</button><button class="ghost" onclick="act('raise')">ارفع الشراع ⛵</button><button class="ghost" onclick="act('move')">أبحر 🌊</button><button class="ghost" onclick="act('stop')">توقف ⚓</button></div>
+</div>
+</section>
+<div class="panels">
+<section class="panel" aria-label="التحكم والتشخيص">
+<h2>🎙️ تفاعل صوتي مباشر</h2>
+<div class="diagnostic" id="status" role="status" aria-live="polite">جاهز. اضغط زر الميكروفون مرة واحدة واسمح للمتصفح باستخدامه.</div>
+<div class="settings"><label>لغة التعرف:
+<select id="dialect"><option value="ar-SA">العربية – الأكثر توافقًا</option><option value="ar-QA">العربية – قطر</option><option value="ar-EG">العربية – مصر</option></select></label>
+<label><input type="checkbox" id="narration" checked> ردود صوتية مشجعة</label><label><input type="checkbox" id="effects" checked> مؤثرات صوتية</label></div>
+<div class="controls"><button class="primary mic-toggle">🎙️ تشغيل الميكروفون</button><button onclick="act('raise')">⛵ ارفع الشراع</button><button onclick="act('lower')">⬇️ أنزل الشراع</button><button onclick="act('move')">🌊 أبحر</button><button onclick="act('stop')">⚓ توقف</button><button onclick="act('wind')">💨 هبّت الرياح</button><button onclick="act('calm')">☀️ بحر هادئ</button><button onclick="act('info')">📖 ما المحمل؟</button><button onclick="act('parts')">🔍 الأجزاء</button><button onclick="act('uses')">🐚 الاستخدامات</button><button onclick="act('cheer')">🏅 شجّع الطلاب</button><button onclick="act('quiz')">🏆 ابدأ التحدي</button><button onclick="act('sound')">🔉 صوت الأمواج</button></div>
+<div class="chip-row"><span class="chip">ارفع الشراع</span><span class="chip">أبحر</span><span class="chip">توقف</span><span class="chip">هبّت الرياح</span><span class="chip">ابدأ التحدي</span><span class="chip">أحسنت</span></div>
+<p class="caption">يظهر كلامك فور التقاطه كنص كبير فوق المشهد. تُنفّذ الأوامر بعد اكتمال التعرف على العبارة. يمكنك التحدث بحرية لعرض كلامك حتى لو لم يكن أمرًا.</p>
+<div class="log"><strong>📝 آخر العبارات المنطوقة</strong><ol id="history"><li>لم تبدأ المحادثة بعد.</li></ol></div>
+</section>
+<section class="panel quiz" id="quizPanel">
+<h2>🏆 تحدي البحّار الصغير</h2><p id="question">السؤال الأول: ما الشكل الهندسي الذي يشبه الشراع؟</p><div id="answers"></div><p id="feedback" aria-live="polite">يمكنك الإجابة بالضغط على الخيار أو بقول «الإجابة الأولى» مثلًا.</p><strong id="score">⭐ النجوم: 0</strong>
+<div class="controls"><button onclick="nextQuestion()">السؤال التالي</button><button onclick="resetQuiz()">إعادة التحدي</button></div>
+<h2 style="margin-top:25px">📘 المعلومة الفنية</h2><p>المحمل سفينة خشبية تقليدية استخدمها أهل قطر في الصيد والغوص على اللؤلؤ والتجارة. تأمّل <b>الخطوط المنحنية</b> في الهيكل، و<b>الأشكال المثلثة</b> للأشرعة، و<b>ملمس الخشب</b>.</p>
+<p class="caption">الموقع يعمل دون تثبيت برنامج. التعرف على الصوت يتطلب متصفحًا داعمًا، وإذن الميكروفون، واتصالًا بخدمة التعرف، ويفضل فتح الصفحة عبر HTTPS أو localhost. عند تعذّر الاتصال ستظل الأزرار والرسوم تعمل.</p>
+</section>
+</div>
+</main><footer>قسم الفنون البصرية – مدرسة الزبير بن العوام الابتدائية للبنين – قطر</footer>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const stage=$('stage'),statusEl=$('status'),headline=$('headline'),subtitle=$('subtitle'),liveText=$('liveText');
+const micState=$('micState'),meterFill=$('meterFill'),levelText=$('levelText');
+const btns=[...document.querySelectorAll('.mic-toggle')],narration=$('narration'),effects=$('effects');
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let recognition=null,desired=false,recognizing=false,starting=false,pausingForTTS=false;
+let audioContext=null,micStream=null,analyser=null,meterAnim=0;
+let ttsTimer=0,ttsWatchdog=0,restartTimer=0,restartAttempts=0,lastFinal='',lastTime=0;
+let score=0,qi=0,answered=false,allowVoiceResponses=true;
+
+function setStatus(msg,warning=false){statusEl.textContent=msg;statusEl.classList.toggle('warn',warning)}
+function setMicUI(state,message){
+ stage.classList.toggle('listening',state==='listening'); stage.classList.toggle('thinking',state==='waiting');
+ micState.textContent=message||({listening:'الميكروفون يستمع الآن',waiting:'جارٍ الاتصال بالصوت…',off:'الميكروفون متوقف'}[state]);
+ btns.forEach(b=>{b.textContent=desired?'⏹️ إيقاف الميكروفون':'🎙️ تشغيل الميكروفون';b.classList.toggle('danger',desired);b.classList.toggle('primary',!desired);});
+}
+function setLive(text,isInterim=false){liveText.textContent=text;liveText.classList.toggle('interim',isInterim)}
+function addHistory(text){const ol=$('history');if(ol.firstElementChild?.textContent==='لم تبدأ المحادثة بعد.')ol.replaceChildren();const item=document.createElement('li');item.textContent=text;ol.insertBefore(item,ol.firstChild);while(ol.children.length>8)ol.removeChild(ol.lastChild)}
+function getAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;audioContext ||= new C();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});return audioContext}catch{return null}}
+function beep(freq=780,length=.13,delay=0){if(!effects.checked)return;const a=getAudio();if(!a)return;const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.10,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+length);o.connect(g).connect(a.destination);o.start(t);o.stop(t+length+.01)}
+function seaSound(){if(!effects.checked)return;const a=getAudio();if(!a)return;const n=Math.floor(a.sampleRate*1.7),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/n);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();f.type='lowpass';f.frequency.value=490;g.gain.value=.18;s.buffer=b;s.connect(f).connect(g).connect(a.destination);s.start()}
+function cheerSparks(){for(let i=0;i<13;i++){let sp=document.createElement('span');sp.textContent=['⭐','✨','🌟'][i%3];sp.className='spark';sp.style.left=(25+Math.random()*50)+'%';sp.style.top=(25+Math.random()*50)+'%';sp.style.setProperty('--x',(Math.random()*600-300)+'px');sp.style.setProperty('--y',(Math.random()*400-200)+'px');stage.appendChild(sp);setTimeout(()=>sp.remove(),1300)}}
+function canSpeak(){return narration.checked&&('speechSynthesis'in window)&&allowVoiceResponses}
+function speak(text){
+ if(!canSpeak())return;
+ clearTimeout(ttsTimer);
+ try{speechSynthesis.cancel()}catch{}
+ let u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.92;u.pitch=1.04;u.volume=1;
+ const voices=speechSynthesis.getVoices();let v=voices.find(x=>x.lang.toLowerCase().startsWith('ar'));if(v)u.voice=v;
+ if(desired && recognizing){pausingForTTS=true;try{recognition.stop()}catch{pausingForTTS=false}}
+ else if(desired){pausingForTTS=true}
+ u.onend=()=>resumeAfterTTS();u.onerror=()=>resumeAfterTTS();
+ ttsTimer=setTimeout(()=>{try{speechSynthesis.speak(u);clearTimeout(ttsWatchdog);ttsWatchdog=setTimeout(()=>{if(pausingForTTS){try{speechSynthesis.cancel()}catch{}resumeAfterTTS()}},12000)}catch{resumeAfterTTS()}},desired?320:0);
+}
+function resumeAfterTTS(){clearTimeout(ttsWatchdog);pausingForTTS=false;if(desired)scheduleRestart(350)}
+function display(h,t,spoken=true){headline.textContent=h;subtitle.textContent=t;setStatus(t);if(spoken)speak(h+'، '+t)}
+function act(command){getAudio();stage.classList.remove('storm');switch(command){
+ case 'raise':stage.classList.remove('sail-down');stage.classList.add('sail-up');beep(870);display('ارتفع الشراع! ⛵','أحسنت! الشراع يلتقط الرياح ليساعد المحمل على الإبحار.');break;
+ case 'lower':stage.classList.remove('sail-up');stage.classList.add('sail-down');beep(520);display('انخفض الشراع!','رائع! لاحظ تغير شكل الشراع وحجمه.');break;
+ case 'move':stage.classList.add('moving','sail-up');stage.classList.remove('sail-down');seaSound();display('انطلق المحمل! 🌊','المحمل يبحر على مياه الخليج العربي.');break;
+ case 'stop':stage.classList.remove('moving','wind');beep(420);display('توقف المحمل ⚓','تحكم ممتاز يا قائد المحمل!');break;
+ case 'wind':stage.classList.add('wind','storm');seaSound();display('اشتدت الرياح! 💨','راقب كيف تتحرك الأمواج والمحمل.');break;
+ case 'calm':stage.classList.remove('wind','storm');display('عاد البحر هادئًا ☀️','ما أجمل مياه الخليج!');break;
+ case 'info':display('ما المحمل التقليدي؟','سفينة خشبية استخدمها أهل قطر للصيد والغوص على اللؤلؤ والتجارة.');break;
+ case 'parts':display('أجزاء المحمل 🔍','من أجزائه الهيكل الخشبي، والصاري، والشراع، والدفة.');break;
+ case 'uses':display('لماذا استخدموا المحامل؟ 🐚','في صيد الأسماك والغوص على اللؤلؤ والتجارة ونقل البضائع.');break;
+ case 'cheer':beep(950,.15);beep(1190,.22,.19);cheerSparks();display('أبطال الصف الخامس! ⭐','أحسنتم يا أبناء الزبير بن العوام، أنتم مبدعون!');break;
+ case 'sound':seaSound();display('صوت أمواج الخليج 🔉','تخيل أنك على متن محمل قطري قديم.');break;
+ case 'quiz':display('هيا إلى تحدي البحّار! 🏆','أجب عن السؤال واجمع النجوم.');$('quizPanel').scrollIntoView({behavior:'smooth',block:'center'});break;
+ case 'next':nextQuestion();display('السؤال التالي','استمع إلى السؤال ثم اختر الإجابة الصحيحة.');break;
+ default:display('هل نعيد المحاولة؟','قل مثلًا: ارفع الشراع أو أبحر أو ابدأ التحدي.',false);
+}}
+function norm(s){return s.toLowerCase().normalize('NFKC').replace(/[ًٌٍَُِّْـ]/g,'').replace(/[إأٱآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[.,،؟!؛:]/g,' ').replace(/\s+/g,' ').trim()}
+function voiceChoice(t){if(/(?:الاجابه|جوابي|اختار|الخيار|رقم|اختيار)\s*(الاول|اول|1|واحد)/.test(t))return 0;if(/(?:الاجابه|جوابي|اختار|الخيار|رقم|اختيار)\s*(الثاني|ثاني|2|اثنين)/.test(t))return 1;if(/(?:الاجابه|جوابي|اختار|الخيار|رقم|اختيار)\s*(الثالث|ثالث|3|ثلاثه)/.test(t))return 2;return -1}
+function parseCommand(raw){const t=norm(raw);
+ const choice=voiceChoice(t);if(choice>=0){chooseAnswer(choice);return true}
+ let cmd=null;
+ if(/(انزل|نزل|اخفض|اطو|اغلق|سكر)/.test(t)&&/(الشراع|الاشرعه)/.test(t))cmd='lower';
+ else if(/(ارفع|رفع|افتح)/.test(t)&&/(الشراع|الاشرعه)/.test(t))cmd='raise';
+ else if(/(توقف|قف|اثبت|ارسي|ثبت)/.test(t))cmd='stop';
+ else if(/(ابحر|ابدا الابحار|تحرك|انطلق|سير|امش)/.test(t))cmd='move';
+ else if(/(هب|هبت|قويه|اشتدت|الرياح|ريح|عاصفه)/.test(t))cmd='wind';
+ else if(/(هدوء|هادئ|هدات|اهدا|الجو هادئ)/.test(t))cmd='calm';
+ else if(/(اجزاء|مكونات|الصاري|الدفة|الدفه)/.test(t))cmd='parts';
+ else if(/(استخدامات|استخدام|لماذا|اللؤلؤ|الصيد)/.test(t))cmd='uses';
+ else if(/(السؤال التالي|التالي)/.test(t))cmd='next';
+ else if(/(تحدي|اسئله|اسئله|مسابقه|سؤال)/.test(t))cmd='quiz';
+ else if(/(احسنت|برافو|شجع|تصفيق|ممتاز)/.test(t))cmd='cheer';
+ else if(/(صوت البحر|صوت الموج|امواج)/.test(t))cmd='sound';
+ else if(/(عرف المحمل|ما المحمل|ما هو المحمل|اشرح المحمل)/.test(t))cmd='info';
+ if(cmd){act(cmd);return true}return false;
+}
+function showErr(code){const msg={
+ 'not-allowed':'المتصفح رفض إذن الميكروفون. اضغط رمز القفل بجانب عنوان الموقع، واسمح باستخدام الميكروفون ثم أعد المحاولة.',
+ 'service-not-allowed':'تم منع خدمة التعرف الصوتي. تحقق من صلاحيات المتصفح أو استخدم Chrome مع اتصال إنترنت.',
+ 'audio-capture':'لم يعثر المتصفح على ميكروفون صالح. تحقق من توصيله وإعدادات الصوت في Windows.',
+ 'network':'الاتصال بخدمة التعرف الصوتي غير متاح. جرب الإنترنت أو شبكة أخرى؛ الأزرار تظل متاحة.',
+ 'language-not-supported':'لغة التعرف المختارة غير مدعومة؛ جرّب «العربية – الأكثر توافقًا».',
+ 'no-speech':'لم يصل كلام واضح؛ تحدث بالقرب من الميكروفون.'
+ }[code]||('تعذر التعرف الصوتي: '+code);setStatus(msg,true)}
+function stopRecognitionOnly(){clearTimeout(restartTimer);if(recognition){try{recognition.stop()}catch{}}}
+function scheduleRestart(delay=650){if(!desired||pausingForTTS||recognizing||starting)return;clearTimeout(restartTimer);restartTimer=setTimeout(()=>startRecognition(),delay)}
+function initSpeech(){if(!SR)return;recognition=new SR();recognition.lang=$('dialect').value;recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;
+ recognition.onstart=()=>{starting=false;recognizing=true;restartAttempts=0;setMicUI('listening','الميكروفون يستمع لك الآن 🎤');setStatus('✅ الميكروفون يعمل. تحدث الآن، وستظهر كلماتك بالعربية مباشرة على الشاشة.')};
+ recognition.onaudiostart=()=>{if(desired)setMicUI('listening','يتم استقبال الصوت الآن 🎤')};
+ recognition.onspeechstart=()=>{if(desired)micState.textContent='جاري التعرف على كلامك… 🎤'};
+ recognition.onspeechend=()=>{if(desired)micState.textContent='أكمل حديثك… 🎤'};
+ recognition.onresult=(e)=>{
+ let interim='', finals=[];
+ for(let i=e.resultIndex;i<e.results.length;i++){
+  let r=e.results[i],txt=(r[0]?.transcript||'').trim();if(r.isFinal){if(txt)finals.push(txt)}else if(txt)interim+=' '+txt;
+ }
+ if(interim.trim())setLive(interim.trim(),true);
+ for(let txt of finals){let now=Date.now();if(txt===lastFinal&&now-lastTime<1400)continue;lastFinal=txt;lastTime=now;setLive(txt,false);addHistory(txt);const accepted=parseCommand(txt);if(!accepted)setStatus('✅ فهمت كلامك وعرضته. جرّب أيضًا أوامر مثل «ارفع الشراع» أو «أبحر».');}
+ };
+ recognition.onerror=e=>{starting=false;recognizing=false;const code=e.error;showErr(code);
+ if(['not-allowed','service-not-allowed','audio-capture','language-not-supported'].includes(code))disableMic(false);
+ else if(code==='network'){restartAttempts++;if(restartAttempts>=2)disableMic(false)}
+ };
+ recognition.onend=()=>{starting=false;recognizing=false;if(desired&&!pausingForTTS){setMicUI('waiting','إعادة وصل التعرف الصوتي…');scheduleRestart(600)}else if(!desired)setMicUI('off');};
+}
+function startRecognition(){if(!desired||!recognition||pausingForTTS||recognizing||starting)return;starting=true;
+ try{recognition.lang=$('dialect').value;recognition.start();setMicUI('waiting','جارٍ بدء التعرف الصوتي…')}catch(err){starting=false;setStatus('لم يبدأ التعرف الصوتي: '+err.message,true);scheduleRestart(1300)}
+}
+async function openMicrophone(){
+ if(desired)return;
+ if(!SR){setStatus('هذا المتصفح لا يدعم تحويل الكلام العربي إلى نص. افتح الملف في Google Chrome، ويفضل عبر HTTPS.',true);setLive('التعرف الصوتي غير مدعوم في هذا المتصفح');return}
+ if(!window.isSecureContext){setStatus('يحتاج الميكروفون إلى صفحة آمنة: افتح الصفحة عبر HTTPS أو localhost؛ لا يمكن ضمان تشغيله من جميع الملفات المحلية.',true);setLive('افتح الصفحة عبر HTTPS أو localhost');return}
+ desired=true;setMicUI('waiting','طلب إذن الميكروفون…');setStatus('اختر «سماح» عندما يطلب المتصفح استخدام الميكروفون.');getAudio();
+ try{
+  if(!navigator.mediaDevices?.getUserMedia)throw new Error('المتصفح لا يوفر صلاحية الميكروفون في هذه الصفحة.');
+  micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+  if(!desired){micStream.getTracks().forEach(t=>t.stop());micStream=null;return}
+  const ctx=getAudio();if(ctx){const source=ctx.createMediaStreamSource(micStream);analyser=ctx.createAnalyser();analyser.fftSize=1024;source.connect(analyser);monitorLevel()}
+  setLive('🎤 الميكروفون متصل… تحدث الآن باللغة العربية');startRecognition();
+ }catch(e){disableMic(false);let msg=e.name==='NotAllowedError'?'تم منع الميكروفون. اسمح بالوصول من إعدادات الموقع أو Windows ثم أعد تشغيله.':e.name==='NotFoundError'?'لا يوجد ميكروفون متصل بالجهاز.':e.name==='NotReadableError'?'الميكروفون مشغول بتطبيق آخر أو يتعذر الوصول إليه.':e.message;setStatus('❌ '+msg,true);setLive('لم يتم تشغيل الميكروفون — راجع التعليمات أسفل الصفحة')}
+}
+function monitorLevel(){if(!analyser||!desired)return;let arr=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(arr);let sum=0;for(const b of arr){const v=(b-128)/128;sum+=v*v}const rms=Math.sqrt(sum/arr.length);const level=Math.min(100,Math.round(rms*480));meterFill.style.width=level+'%';levelText.textContent=level+'%';meterAnim=requestAnimationFrame(monitorLevel)}
+function disableMic(manual=true){desired=false;pausingForTTS=false;clearTimeout(restartTimer);clearTimeout(ttsTimer);clearTimeout(ttsWatchdog);if('speechSynthesis'in window){try{speechSynthesis.cancel()}catch{}}
+ stopRecognitionOnly();if(meterAnim)cancelAnimationFrame(meterAnim);meterAnim=0;analyser=null;
+ if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}
+ meterFill.style.width='0';levelText.textContent='0%';setMicUI('off');if(manual){setStatus('الميكروفون متوقف. يمكنك تشغيله مجددًا بضغطة واحدة.');setLive('تم إيقاف الاستماع. اضغط لتشغيل الميكروفون.')}
+}
+for(const b of btns)b.addEventListener('click',()=>desired?disableMic():openMicrophone());
+$('dialect').addEventListener('change',()=>{if(desired){stopRecognitionOnly();setStatus('جارٍ تطبيق لغة التعرف الجديدة.')} });
+$('fullScreen').addEventListener('click',async()=>{try{if(document.fullscreenElement){await document.exitFullscreen()}else{await stage.requestFullscreen()}}catch{setStatus('تعذر ملء الشاشة. اضغط F11 في الكمبيوتر.',true)}});
+
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&desired)setStatus('الصفحة ليست ظاهرة. أبقها مفتوحة أثناء الدرس حتى يظل التعرف الصوتي فعالًا.');});
+const questions=[
+ ['ما الشكل الهندسي الذي يشبه الشراع؟',['المثلث','المربع','الدائرة'],0],
+ ['في ماذا استخدم أهل قطر المحامل قديمًا؟',['سباق السيارات','الغوص على اللؤلؤ والصيد والتجارة','الطيران'],1],
+ ['ما المادة الأساسية لصناعة المحمل التقليدي؟',['الخشب','البلاستيك','الزجاج'],0],
+ ['ما الجزء الذي يحمل الشراع؟',['الدفة','الصاري','المرساة'],1],
+ ['ما نوع الخط المستخدم في رسم هيكل المحمل؟',['الخط المنحني','الخط المنقط فقط','الخط المتعرج فقط'],0]
+];
+function renderQuiz(){answered=false;const q=questions[qi];$('question').textContent='السؤال '+(qi+1)+': '+q[0];const div=$('answers');div.replaceChildren();q[1].forEach((val,i)=>{let b=document.createElement('button');b.textContent=(i+1)+'. '+val;b.addEventListener('click',()=>chooseAnswer(i));div.appendChild(b)});$('feedback').textContent='اختر الإجابة أو قل: الإجابة الأولى، الثانية، أو الثالثة.'}
+function chooseAnswer(i){if(answered||i>2||i<0)return;answered=true;const q=questions[qi],yes=(i===q[2]);if(yes){score++;beep(880);beep(1120,.20,.21);cheerSparks()}else beep(290,.3);$('feedback').textContent=yes?'🌟 إجابة صحيحة! أحسنت!':'💡 الإجابة الصحيحة: '+q[1][q[2]];$('score').textContent='⭐ النجوم: '+score;[...$('answers').children].forEach(b=>b.disabled=true);speak(yes?'أحسنت يا بطل! إجابة صحيحة.':'الإجابة الصحيحة هي '+q[1][q[2]])}
+function nextQuestion(){qi=(qi+1)%questions.length;renderQuiz()}
+function resetQuiz(){qi=0;score=0;$('score').textContent='⭐ النجوم: 0';renderQuiz()}
+renderQuiz();initSpeech();if(!SR)setStatus('⚠️ لا يوجد دعم للتعرف الصوتي بهذا المتصفح. استخدم Google Chrome على الكمبيوتر عبر HTTPS أو localhost.',true);
+window.addEventListener('beforeunload',()=>{if(micStream)micStream.getTracks().forEach(t=>t.stop())});
+</script>
+</body></html>
