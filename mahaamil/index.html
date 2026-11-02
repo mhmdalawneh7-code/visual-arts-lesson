@@ -95,9 +95,11 @@
   .stage{width:100vw!important;height:100vh;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none}
   .controls{position:fixed;left:0;right:0;bottom:0;z-index:30;transform:translateY(110%);transition:transform .35s}
   body.show-controls .controls{transform:none}
+  .controls{display:none!important}
+  #menu-btn{display:none!important}
   #caption{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);z-index:20;max-width:80%;
     background:rgba(10,25,35,.72);color:#fff;font-size:clamp(22px,3.2vw,46px);font-weight:700;line-height:1.5;
-    padding:12px 30px;border-radius:22px;text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;
+    padding:14px 34px;border-radius:22px;text-align:center;opacity:0;min-width:40%;transition:opacity .4s;pointer-events:none;
     border:3px solid rgba(244,196,48,.7)}
   #caption.on{opacity:1}
   #caption .interim{color:#ffe9a3}
@@ -691,11 +693,13 @@
 
   /* ---------- Speech recognition (Arabic) ---------- */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec = null, listening = false, restartTimer = null;
+  let rec = null, listening = false, restartTimer = null, running = false;
+  setInterval(() => { if(listening && !running && rec){ try{ rec.start(); }catch(e){} } }, 3000);
   function startListening(){
-    if(!SR){ statusEl.textContent = 'المتصفح لا يدعم التعرف الصوتي. استخدموا الأزرار.'; return; }
+    if(!SR){ showCaption('⚠️ هذا المتصفح لا يدعم التعرف الصوتي. افتح الرابط في Google Chrome', '', false); return; }
+    if(!window.isSecureContext){ showCaption('⚠️ افتح التطبيق من رابط https حتى يعمل الميكروفون', '', false); return; }
     rec = new SR();
-    rec.lang = 'ar-QA'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+    rec.lang = 'ar-SA'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
     rec.onresult = e => {
       let interim = '', finalTxt = '';
       for(let i=e.resultIndex;i<e.results.length;i++){
@@ -711,9 +715,18 @@
       }
     };
     rec.onerror = e => {
-      if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ statusEl.textContent = 'لم يُسمح بالميكروفون. استخدموا الأزرار.'; listening = false; updateMic(); }
+      const msgs = {
+        'not-allowed':'⚠️ الميكروفون غير مسموح. اضغط على رمز القفل بجانب الرابط واسمح بالميكروفون ثم أعد تحميل الصفحة',
+        'service-not-allowed':'⚠️ خدمة التعرف الصوتي غير متاحة. افتح الرابط في متصفح Google Chrome',
+        'audio-capture':'⚠️ لا يوجد ميكروفون متصل بالجهاز',
+        'network':'⚠️ التعرف الصوتي يحتاج إلى اتصال بالإنترنت',
+        'language-not-supported':'⚠️ اللغة العربية غير مدعومة في هذا المتصفح، استخدم Chrome'
+      };
+      if(msgs[e.error]){ showCaption(msgs[e.error], '', false); }
+      if(e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'audio-capture'){ listening = false; updateMic(); }
     };
-    rec.onend = () => { // keep it alive during class
+    rec.onstart = () => { running = true; };
+    rec.onend = () => { running = false; // keep it alive during class
       if(listening){ clearTimeout(restartTimer); restartTimer = setTimeout(() => { try{ rec.start(); }catch(e){} }, 300); }
     };
     try{ rec.start(); listening = true; }catch(e){ listening = false; }
@@ -881,7 +894,7 @@
   function showCaption(finalTxt, interim, ok){
     caption.innerHTML = (finalTxt ? finalTxt : '') + (interim ? ` <span class="interim">${interim}</span>` : '');
     caption.classList.add('on'); caption.classList.toggle('ok', !!ok);
-    clearTimeout(capTimer); capTimer = setTimeout(() => caption.classList.remove('on'), 4500);
+    clearTimeout(capTimer);
   }
   function toggleControls(){ document.body.classList.toggle('show-controls'); }
   $('#menu-btn').addEventListener('click', toggleControls);
@@ -890,7 +903,12 @@
     $('#start').classList.add('hide');
     audio(); startAmbient();
     document.documentElement.requestFullscreen?.().catch(()=>{});
-    if(!listening) startListening();
+    const go = () => { if(!listening) startListening(); };
+    if(navigator.mediaDevices?.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true})
+        .then(st => { st.getTracks().forEach(t => t.stop()); go(); showCaption('🎤 الميكروفون يعمل… تحدّث الآن', '', true); })
+        .catch(() => showCaption('⚠️ لم يُسمح بالميكروفون. اضغط على رمز القفل بجانب الرابط واختر «السماح» ثم أعد تحميل الصفحة', '', false));
+    } else go();
     say('أهلًا يا أبطال البحر! تكلّم وسأتبعك. قل مثلًا: <strong>«عرّف المحمل»</strong> أو <strong>«ابدأ الغوص»</strong>.');
   });
 
