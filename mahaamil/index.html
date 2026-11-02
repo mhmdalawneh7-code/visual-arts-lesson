@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رحلة المحامل التقليدية في قطر</title>
+<style>
+  :root{
+    --sea-1:#0b5d7a; --sea-2:#1a8fa8; --sand:#e9d7a7; --wood:#8b5a2b; --wood-2:#c48a4a;
+    --maroon:#7a1f3d; --gold:#f4c430; --ink:#fff8e7; --card:rgba(255,248,231,.96);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:"Tajawal","Cairo","Segoe UI",Tahoma,sans-serif;background:#062f40;color:#1b1b1b;overflow:hidden}
+  .app{position:relative;width:100vw;height:100vh;min-height:520px;display:flex;flex-direction:column}
+  /* ============ Stage 16:9 ============ */
+  .stage-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;min-height:0}
+  .stage{position:relative;width:min(100%, calc((100vh - 170px) * 16 / 9));aspect-ratio:16/9;max-height:100%;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45);background:linear-gradient(#7fd3e6 0%,#bfeaf2 45%,#1a8fa8 46%,#0b5d7a 100%)}
+  .stage svg.scene{position:absolute;inset:0;width:100%;height:100%}
+  .sun{transform-origin:center;animation:spin 40s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .wave{animation:bob 3.2s ease-in-out infinite}
+  .wave.b{animation-duration:4.1s;animation-delay:-1.2s}
+  @keyframes bob{0%,100%{transform:translateX(0)}50%{transform:translateX(-14px)}}
+  .bird{animation:fly 14s linear infinite}
+  .bird.b{animation-duration:18s;animation-delay:-6s}
+  @keyframes fly{from{transform:translateX(-120px)}to{transform:translateX(1100px)}}
+  .fish{animation:swim 7s ease-in-out infinite}
+  @keyframes swim{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-8px)}}
+
+  /* ship */
+  #ship{transition:transform 2.4s ease-in-out;transform-origin:50% 90%}
+  #ship.sailing{animation:sail 4s ease-in-out infinite}
+  #ship.stopped{animation:none}
+  @keyframes sail{0%,100%{transform:translate(0,0) rotate(-1deg)}50%{transform:translate(10px,-6px) rotate(1.2deg)}}
+  #ship.gone-right{transform:translateX(60%)}
+  #sailgroup{transition:transform 1.6s cubic-bezier(.3,.7,.3,1);transform-origin:50% 100%}
+  #sailgroup.down{transform:scaleY(.08)}
+  #sailgroup.billow path{animation:billow .9s ease-in-out infinite alternate}
+  @keyframes billow{to{transform:scaleX(1.06)}}
+  .part{cursor:pointer;transition:filter .3s, stroke .3s}
+  .part.hl{filter:drop-shadow(0 0 8px var(--gold)) drop-shadow(0 0 4px var(--gold));stroke:var(--gold);stroke-width:3}
+  #label-layer text{font-family:inherit;font-weight:700}
+  #label-layer .lbl{opacity:0;transition:opacity .5s}
+  #label-layer.show .lbl{opacity:1}
+
+  /* particles */
+  .particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .spark{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--gold);animation:pop 1s ease-out forwards}
+  @keyframes pop{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+  .streak{position:absolute;height:2px;width:90px;background:linear-gradient(90deg,transparent,#fff,transparent);opacity:0}
+  .streak.on{animation:streak 1.4s linear infinite}
+  @keyframes streak{0%{transform:translateX(-120px);opacity:0}30%{opacity:.8}100%{transform:translateX(1200px);opacity:0}}
+
+  /* guide */
+  #guide{position:absolute;left:2%;bottom:8%;width:18%;max-width:220px;min-width:120px;transition:transform .4s}
+  #guide.talk .mouth{animation:talk .3s ease-in-out infinite alternate}
+  @keyframes talk{to{transform:scaleY(.2)}}
+  #guide.cheer{animation:cheer .6s ease 3}
+  @keyframes cheer{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+  /* speech bubble + info card */
+  .bubble{position:absolute;right:3%;top:5%;max-width:46%;background:var(--card);border-radius:18px;padding:12px 16px;font-size:clamp(14px,1.7vw,22px);line-height:1.7;box-shadow:0 8px 24px rgba(0,0,0,.25);border:3px solid var(--maroon)}
+  .bubble strong{color:var(--maroon)}
+  .panel{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(20,10,5,.55);z-index:5}
+  .panel.open{display:flex}
+  .card{background:var(--card);width:min(86%,820px);max-height:86%;overflow:auto;border-radius:22px;padding:22px 26px;box-shadow:0 20px 50px rgba(0,0,0,.4);border-top:10px solid var(--maroon)}
+  .card h2{margin:0 0 10px;color:var(--maroon);font-size:clamp(20px,2.6vw,34px)}
+  .card p,.card li{font-size:clamp(15px,1.8vw,22px);line-height:1.9}
+  .card ul{padding-right:22px;margin:0}
+  .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .opt{font-size:clamp(15px,1.7vw,20px);padding:12px;border-radius:14px;border:2px solid var(--wood);background:#fff;cursor:pointer;font-family:inherit}
+  .opt:hover{background:#fbeccc}
+  .opt.right{background:#b8f0c0;border-color:#2e8b57}
+  .opt.wrong{background:#f6c3c3;border-color:#b22222}
+  .score{font-weight:700;color:var(--wood)}
+
+  /* ============ Control bar ============ */
+  .controls{background:linear-gradient(#5a3519,#3b2310);color:var(--ink);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;box-shadow:0 -6px 18px rgba(0,0,0,.35)}
+  .btn{font-family:inherit;font-size:clamp(13px,1.5vw,18px);font-weight:700;color:#fff;background:var(--sea-2);border:none;border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 4px 0 #0a5366;transition:transform .08s, box-shadow .08s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0a5366}
+  .btn.gold{background:var(--gold);color:#3b2310;box-shadow:0 4px 0 #b88c10}
+  .btn.maroon{background:var(--maroon);box-shadow:0 4px 0 #4c1024}
+  .btn.wood{background:var(--wood-2);box-shadow:0 4px 0 #7a4f22}
+  #mic{min-width:150px}
+  #mic.listening{background:#d9342b;box-shadow:0 4px 0 #8a1f19;animation:pulse 1.2s infinite}
+  @keyframes pulse{50%{filter:brightness(1.25)}}
+  .status{width:100%;text-align:center;font-size:14px;opacity:.9;min-height:20px}
+  .heard{display:inline-block;background:rgba(255,255,255,.12);padding:4px 12px;border-radius:10px;margin-top:4px}
+  .hint{font-size:12px;opacity:.75}
+  .toggle{background:transparent;border:2px solid var(--gold);color:var(--gold);box-shadow:none}
+
+  /* ============ Chapters ============ */
+  .chapter{position:absolute;inset:0;display:none}
+  .chapter.active{display:block}
+  .chapter > svg{position:absolute;inset:0;width:100%;height:100%}
+  .chtab{background:#6b4423;box-shadow:0 4px 0 #3b2310}
+  .chtab.active{background:var(--gold);color:#3b2310;box-shadow:0 4px 0 #b88c10}
+  .diver{transition:transform 3.5s ease-in-out}
+  .diver.down{transform:translateY(300px)}
+  .bub{animation:rise 3.2s linear infinite}
+  @keyframes rise{0%{transform:translateY(0);opacity:.9}100%{transform:translateY(-420px);opacity:0}}
+  .oyster{cursor:pointer;transition:transform .3s}
+  .oyster:hover{transform:scale(1.06)}
+  .oyster.open{cursor:default}
+  .oyster .shell-top{transform-box:fill-box;transform-origin:50% 100%;transition:transform .8s ease}
+  .oyster.open .shell-top{transform:translateY(-60px) rotate(-18deg)}
+  .oyster .pearl{opacity:0;transition:opacity .8s .3s}
+  .oyster.open .pearl{opacity:1}
+  #castnet{transform-box:fill-box;transform-origin:50% 50%;transform:scale(.05);opacity:0;transition:transform 1.6s ease-out,opacity 1.2s}
+  #castnet.thrown{transform:scale(1);opacity:.9}
+  .fishc{cursor:pointer;transition:opacity .6s}
+  .fishc.gone{opacity:0}
+  .knot{fill:#fffdf5;stroke:#8b5a2b;stroke-width:4;cursor:pointer;transition:fill .3s}
+  .knot:hover{fill:#fff3c4}
+  .knot.tied{fill:var(--gold);stroke:#8a6d1a}
+  #needle{transition:transform .45s ease}
+  .counter{font-size:30px;font-weight:700;fill:#fff8e7;stroke:#3b2310;stroke-width:5;paint-order:stroke}
+
+  @media (max-width:700px){
+    .bubble{max-width:60%;font-size:13px}
+    #guide{width:26%}
+    .quiz-opts{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+
+      <!-- SCENE -->
+      <svg id="ch-ship" class="scene chapter active" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#7fd3e6"/><stop offset="1" stop-color="#d9f3f7"/>
+          </linearGradient>
+          <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a8fa8"/><stop offset="1" stop-color="#0b4d66"/>
+          </linearGradient>
+          <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#c48a4a"/><stop offset="1" stop-color="#7a4a1f"/>
+          </linearGradient>
+          <linearGradient id="sailg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef3f5"/>
+          </linearGradient>
+          <radialGradient id="sunG"><stop offset="0" stop-color="#fff6b0"/><stop offset=".6" stop-color="#f4c430"/><stop offset="1" stop-color="#f4c43000"/></radialGradient>
+        </defs>
+
+        <rect width="1600" height="900" fill="url(#sky)"/>
+        <!-- sun -->
+        <g class="sun" style="transform-origin:1320px 170px">
+          <circle cx="1320" cy="170" r="150" fill="url(#sunG)"/>
+          <circle cx="1320" cy="170" r="78" fill="#f7d24a"/>
+        </g>
+        <!-- clouds -->
+        <g fill="#ffffffcc"><ellipse cx="300" cy="150" rx="110" ry="30"/><ellipse cx="370" cy="130" rx="70" ry="34"/><ellipse cx="900" cy="110" rx="90" ry="24"/></g>
+        <!-- birds -->
+        <g class="bird" stroke="#2d4a55" stroke-width="4" fill="none" stroke-linecap="round">
+          <path d="M0 220 q12 -14 24 0 q12 -14 24 0"/><path d="M50 260 q10 -12 20 0 q10 -12 20 0"/>
+        </g>
+        <g class="bird b" stroke="#2d4a55" stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M0 300 q10 -12 20 0 q10 -12 20 0"/>
+        </g>
+
+        <!-- sea -->
+        <rect y="400" width="1600" height="500" fill="url(#sea)"/>
+        <g fill="none" stroke="#ffffff88" stroke-width="5" stroke-linecap="round">
+          <path class="wave" d="M0 470 q40 -22 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0"/>
+          <path class="wave b" d="M0 560 q40 -22 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0"/>
+          <path class="wave" d="M0 680 q40 -22 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0"/>
+        </g>
+        <!-- fish -->
+        <g class="fish" fill="#f08a3e">
+          <ellipse cx="300" cy="640" rx="26" ry="14"/><path d="M324 640 l16 -12 v24z"/>
+        </g>
+        <g class="fish" style="animation-delay:-3s" fill="#ffd166">
+          <ellipse cx="1200" cy="740" rx="22" ry="12"/><path d="M1220 740 l14 -10 v20z"/>
+        </g>
+        <!-- dolphin-ish splash -->
+        <path d="M1100 520 q30 -60 60 0" stroke="#ffffffaa" stroke-width="6" fill="none"/>
+
+        <!-- Arabic dhow (المحمل) -->
+        <g id="ship">
+          <!-- hull -->
+          <g class="part" data-part="hull">
+            <path d="M420 560 L1160 560 Q1120 680 980 690 L600 690 Q470 670 420 560Z" fill="url(#wood)" stroke="#4a2a10" stroke-width="4"/>
+            <path d="M440 600 L1140 600" stroke="#5b3516" stroke-width="5" opacity=".6"/>
+            <path d="M470 640 L1100 640" stroke="#5b3516" stroke-width="4" opacity=".5"/>
+          </g>
+          <!-- deck -->
+          <g class="part" data-part="deck">
+            <rect x="470" y="540" width="640" height="22" rx="6" fill="#d9a766" stroke="#4a2a10" stroke-width="3"/>
+            <rect x="590" y="520" width="20" height="24" fill="#6b3f1a"/>
+            <rect x="950" y="520" width="20" height="24" fill="#6b3f1a"/>
+          </g>
+          <!-- cabin -->
+          <g class="part" data-part="cabin">
+            <rect x="1000" y="440" width="130" height="100" rx="8" fill="#e9d7a7" stroke="#4a2a10" stroke-width="3"/>
+            <rect x="1030" y="470" width="30" height="34" fill="#7a1f3d"/>
+            <path d="M990 440 L1140 440 L1120 420 L1010 420Z" fill="#8b5a2b"/>
+          </g>
+          <!-- mast -->
+          <g class="part" data-part="mast">
+            <rect x="760" y="130" width="14" height="420" fill="#5b3516"/>
+          </g>
+          <!-- sail group -->
+          <g id="sailgroup" class="billow">
+            <g class="part" data-part="sail">
+              <path d="M774 150 Q1000 230 1000 540 L774 540 Z" fill="url(#sailg)" stroke="#8b7b5a" stroke-width="3"/>
+              <path d="M774 260 Q880 300 1000 300" stroke="#c9b98a" stroke-width="3" fill="none"/>
+              <path d="M774 400 Q880 430 1000 420" stroke="#c9b98a" stroke-width="3" fill="none"/>
+            </g>
+          </g>
+          <!-- flag of Qatar -->
+          <g class="part" data-part="flag">
+            <line x1="767" y1="130" x2="767" y2="60" stroke="#3b2310" stroke-width="3"/>
+            <path d="M767 62 L860 72 L850 90 L860 108 L767 118 Z" fill="#8a1538"/>
+            <path d="M767 62 L800 67 L800 113 L767 118 Z" fill="#ffffff" opacity=".9"/>
+          </g>
+          <!-- oars -->
+          <g class="part" data-part="oars" stroke="#5b3516" stroke-width="6">
+            <line x1="540" y1="600" x2="470" y2="700"/><line x1="620" y1="600" x2="580" y2="710"/>
+          </g>
+          <!-- Arabic label -->
+          <text x="800" y="630" font-size="34" fill="#f4c430" text-anchor="middle" font-weight="700">محمل قطري</text>
+        </g>
+
+        <!-- label layer -->
+        <g id="label-layer">
+          <g class="lbl"><line x1="540" y1="520" x2="420" y2="330" stroke="#fff" stroke-width="3"/><text x="260" y="320" font-size="30" fill="#fff8e7" stroke="#3b2310" stroke-width="5" paint-order="stroke">الهيكل (البدن)</text></g>
+          <g class="lbl"><line x1="767" y1="210" x2="560" y2="210" stroke="#fff" stroke-width="3"/><text x="300" y="220" font-size="30" fill="#fff8e7" stroke="#3b2310" stroke-width="5" paint-order="stroke">الصاري</text></g>
+          <g class="lbl"><line x1="880" y1="300" x2="1260" y2="250" stroke="#fff" stroke-width="3"/><text x="1000" y="240" font-size="30" fill="#fff8e7" stroke="#3b2310" stroke-width="5" paint-order="stroke">الشراع الأبيض</text></g>
+          <g class="lbl"><line x1="1065" y1="440" x2="1270" y2="380" stroke="#fff" stroke-width="3"/><text x="1200" y="370" font-size="30" fill="#fff8e7" stroke="#3b2310" stroke-width="5" paint-order="stroke">المقصورة</text></g>
+          <g class="lbl"><line x1="767" y1="62" x2="980" y2="30" stroke="#fff" stroke-width="3"/><text x="990" y="50" font-size="30" fill="#fff8e7" stroke="#3b2310" stroke-width="5" paint-order="stroke">علم قطر</text></g>
+        </g>
+      </svg>
+
+      <!-- CH: DIVE -->
+      <div class="chapter" id="ch-dive">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="deepG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3fb3c9"/><stop offset=".45" stop-color="#0b5d7a"/><stop offset="1" stop-color="#042c3b"/>
+            </linearGradient>
+          </defs>
+          <rect width="1600" height="900" fill="url(#deepG)"/>
+          <g fill="#ffffff12"><polygon points="250,0 340,0 180,900 60,900"/><polygon points="900,0 980,0 1120,900 1000,900"/></g>
+          <path d="M0 760 Q400 720 800 765 T1600 750 L1600 900 L0 900Z" fill="#c9a66b"/>
+          <path d="M700 30 L900 30 L870 60 L730 60Z" fill="#8b5a2b"/>
+          <g transform="translate(800 300)">
+            <g id="diver" class="diver">
+              <line x1="0" y1="-700" x2="0" y2="-66" stroke="#f1e3b8" stroke-width="5"/>
+              <circle class="bub" cx="48" cy="-60" r="6" fill="#ffffffaa"/>
+              <circle class="bub" cx="60" cy="-80" r="4" fill="#ffffffaa" style="animation-delay:-1.1s"/>
+              <circle class="bub" cx="40" cy="-100" r="5" fill="#ffffffaa" style="animation-delay:-2.2s"/>
+              <path d="M-26 -14 Q0 -22 26 -14 L22 50 Q0 60 -22 50Z" fill="#b5764a"/>
+              <path d="M-24 -6 Q-50 20 -40 40" stroke="#b5764a" stroke-width="12" fill="none" stroke-linecap="round"/>
+              <path d="M24 -6 Q46 -40 14 -58" stroke="#b5764a" stroke-width="12" fill="none" stroke-linecap="round"/>
+              <path d="M-10 58 L-14 110" stroke="#b5764a" stroke-width="14" stroke-linecap="round"/>
+              <path d="M10 58 L16 110" stroke="#b5764a" stroke-width="14" stroke-linecap="round"/>
+              <path d="M-22 40 Q0 52 22 40 L20 62 Q0 70 -20 62Z" fill="#ffffff"/>
+              <circle cx="0" cy="-40" r="24" fill="#b5764a"/>
+              <path d="M-24 -44 Q0 -80 24 -44Z" fill="#ffffff"/>
+              <rect x="-4" y="-34" width="8" height="10" rx="3" fill="#e8e0c8" stroke="#6b5a3a" stroke-width="1.5"/>
+              <circle cx="-8" cy="-44" r="3" fill="#2b1d12"/><circle cx="8" cy="-44" r="3" fill="#2b1d12"/>
+              <path d="M-30 -10 Q-40 0 -50 12" stroke="#6b3f1a" stroke-width="3" fill="none"/>
+              <ellipse cx="-60" cy="30" rx="30" ry="22" fill="#b9783e" stroke="#6b3f1a" stroke-width="3"/>
+              <path d="M-84 26 Q-60 42 -36 26" stroke="#6b3f1a" stroke-width="2" fill="none"/>
+              <circle cx="-68" cy="26" r="7" fill="#d8cbb0"/><circle cx="-52" cy="34" r="7" fill="#d8cbb0"/>
+              <line x1="14" y1="110" x2="14" y2="134" stroke="#6b5a3a" stroke-width="3"/>
+              <ellipse cx="14" cy="146" rx="20" ry="13" fill="#4a4a4a"/>
+            </g>
+          </g>
+          <rect x="30" y="110" width="470" height="300" rx="16" fill="#fff8e7ee" stroke="#7a1f3d" stroke-width="4"/>
+          <text x="265" y="165" font-size="30" font-weight="700" fill="#7a1f3d" text-anchor="middle">عُدّة الغوص</text>
+          <text x="485" y="215" font-size="22" fill="#3b2310" text-anchor="start">١. الحبل: ينزل به الغواص ويصعد</text>
+          <text x="485" y="260" font-size="22" fill="#3b2310" text-anchor="start">٢. الحجر: يُثقل الغواص ليهبط بسرعة</text>
+          <text x="485" y="305" font-size="22" fill="#3b2310" text-anchor="start">٣. الفطام: مشبك يسدّ الأنف</text>
+          <text x="485" y="350" font-size="22" fill="#3b2310" text-anchor="start">٤. الزنبيل: سلة يجمع فيها المحار</text>
+        </svg>
+      </div>
+
+      <!-- CH: OYSTER -->
+      <div class="chapter" id="ch-oyster">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="pearlG" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#e6ecf7"/><stop offset="1" stop-color="#b9c6dc"/></radialGradient>
+          </defs>
+          <rect width="1600" height="900" fill="#1a7f96"/>
+          <path d="M0 0 L1600 0 L1600 90 Q800 40 0 90Z" fill="#8fe0ee" opacity=".4"/>
+          <path d="M0 690 Q400 650 800 695 T1600 680 L1600 900 L0 900Z" fill="#d8b77a"/>
+          <text id="pearl-count" class="counter" x="800" y="140" text-anchor="middle">اللآلئ: 0 من 2</text>
+          <text x="800" y="205" font-size="28" fill="#fff8e7" text-anchor="middle" stroke="#3b2310" stroke-width="5" paint-order="stroke" font-weight="700">اضغطوا على المحارة لتفتحوها</text>
+          <g transform="translate(260 640)"><g class="oyster" data-pearl="0"><ellipse cx="0" cy="10" rx="80" ry="34" fill="#d8cbb0" stroke="#6e5f44" stroke-width="4"/><circle class="pearl" cx="0" cy="-4" r="22" fill="url(#pearlG)"/><path class="shell-top" d="M-82 8 Q-70 -70 0 -66 Q70 -70 82 8 Q0 26 -82 8Z" fill="#c2a878" stroke="#6e5f44" stroke-width="4"/></g></g>
+          <g transform="translate(620 600)"><g class="oyster" data-pearl="1"><ellipse cx="0" cy="10" rx="80" ry="34" fill="#d8cbb0" stroke="#6e5f44" stroke-width="4"/><circle class="pearl" cx="0" cy="-4" r="22" fill="url(#pearlG)"/><path class="shell-top" d="M-82 8 Q-70 -70 0 -66 Q70 -70 82 8 Q0 26 -82 8Z" fill="#c2a878" stroke="#6e5f44" stroke-width="4"/></g></g>
+          <g transform="translate(980 650)"><g class="oyster" data-pearl="0"><ellipse cx="0" cy="10" rx="80" ry="34" fill="#d8cbb0" stroke="#6e5f44" stroke-width="4"/><circle class="pearl" cx="0" cy="-4" r="22" fill="url(#pearlG)"/><path class="shell-top" d="M-82 8 Q-70 -70 0 -66 Q70 -70 82 8 Q0 26 -82 8Z" fill="#c2a878" stroke="#6e5f44" stroke-width="4"/></g></g>
+          <g transform="translate(1300 610)"><g class="oyster" data-pearl="1"><ellipse cx="0" cy="10" rx="80" ry="34" fill="#d8cbb0" stroke="#6e5f44" stroke-width="4"/><circle class="pearl" cx="0" cy="-4" r="22" fill="url(#pearlG)"/><path class="shell-top" d="M-82 8 Q-70 -70 0 -66 Q70 -70 82 8 Q0 26 -82 8Z" fill="#c2a878" stroke="#6e5f44" stroke-width="4"/></g></g>
+        </svg>
+      </div>
+
+      <!-- CH: FISH -->
+      <div class="chapter" id="ch-fish">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="1600" height="400" fill="url(#sky)"/>
+          <rect y="380" width="1600" height="520" fill="url(#sea)"/>
+          <g fill="none" stroke="#ffffff66" stroke-width="5" stroke-linecap="round">
+            <path class="wave" d="M0 400 q40 -22 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0"/>
+          </g>
+          <g transform="translate(330 360)">
+            <path d="M-160 0 L160 0 Q120 60 40 64 L-100 64 Q-140 50 -160 0Z" fill="url(#wood)" stroke="#4a2a10" stroke-width="4"/>
+            <rect x="-6" y="-200" width="12" height="200" fill="#5b3516"/>
+            <path d="M6 -190 Q90 -120 80 -10 L6 -10Z" fill="url(#sailg)" stroke="#8b7b5a" stroke-width="3"/>
+          </g>
+          <text class="counter" id="fish-count" x="800" y="110" text-anchor="middle">السمك المصطاد: 0</text>
+          <text x="800" y="170" font-size="26" fill="#3b2310" text-anchor="middle" font-weight="700">اضغطوا على السمكة لتصطادوها</text>
+          <g transform="translate(900 540)">
+            <g id="castnet">
+              <circle r="150" fill="#ffffff14" stroke="#ffffffcc" stroke-width="3" stroke-dasharray="8 6"/>
+              <path d="M0 0 L150 0 M0 0 L106 106 M0 0 L0 150 M0 0 L-106 106 M0 0 L-150 0 M0 0 L-106 -106 M0 0 L0 -150 M0 0 L106 -106" stroke="#ffffffaa" stroke-width="2" fill="none"/>
+            </g>
+          </g>
+          <g transform="translate(1150 610)"><g class="fishc"><g class="fish"><ellipse rx="40" ry="20" fill="#f08a3e"/><path d="M36 0 L62 -18 V18Z" fill="#f08a3e"/><circle cx="-18" cy="-4" r="4" fill="#2b1d12"/></g></g></g>
+          <g transform="translate(1300 710)"><g class="fishc"><g class="fish" style="animation-delay:-2s"><ellipse rx="36" ry="18" fill="#ffd166"/><path d="M32 0 L56 -16 V16Z" fill="#ffd166"/><circle cx="-16" cy="-4" r="4" fill="#2b1d12"/></g></g></g>
+          <g transform="translate(700 720)"><g class="fishc"><g class="fish" style="animation-delay:-4s"><ellipse rx="42" ry="20" fill="#f08a3e"/><path d="M38 0 L64 -18 V18Z" fill="#f08a3e"/><circle cx="-20" cy="-4" r="4" fill="#2b1d12"/></g></g></g>
+          <g transform="translate(1080 790)"><g class="fishc"><g class="fish" style="animation-delay:-1s"><ellipse rx="34" ry="17" fill="#ffd166"/><path d="M30 0 L52 -15 V15Z" fill="#ffd166"/><circle cx="-14" cy="-4" r="4" fill="#2b1d12"/></g></g></g>
+          <g transform="translate(480 660)"><g class="fishc"><g class="fish" style="animation-delay:-5s"><ellipse rx="38" ry="19" fill="#f08a3e"/><path d="M34 0 L58 -17 V17Z" fill="#f08a3e"/><circle cx="-17" cy="-4" r="4" fill="#2b1d12"/></g></g></g>
+          <g transform="translate(1400 520)"><g class="fishc"><g class="fish" style="animation-delay:-3s"><ellipse rx="32" ry="16" fill="#ffd166"/><path d="M28 0 L50 -14 V14Z" fill="#ffd166"/><circle cx="-14" cy="-4" r="4" fill="#2b1d12"/></g></g></g>
+        </svg>
+      </div>
+
+      <!-- CH: NET MAKING -->
+      <div class="chapter" id="ch-net">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="1600" height="900" fill="#f5e6c8"/>
+          <text id="knot-count" x="800" y="130" font-size="30" font-weight="700" fill="#3b2310" stroke="#fff8e7" stroke-width="5" paint-order="stroke" text-anchor="middle">العقد: 0 من 20</text>
+          <text x="800" y="190" font-size="26" fill="#7a1f3d" text-anchor="middle" font-weight="700">اضغطوا على كل عقدة لتعقدوا الشبك بالإبرة</text>
+          <rect x="440" y="240" width="700" height="460" rx="12" fill="none" stroke="#8b5a2b" stroke-width="22"/>
+          <g stroke="#8b5a2b" stroke-width="4" fill="none">
+            <path d="M520 300 H1080 M520 410 H1080 M520 520 H1080 M520 630 H1080"/>
+            <path d="M520 300 V630 M660 300 V630 M800 300 V630 M940 300 V630 M1080 300 V630"/>
+          </g>
+          <g>
+            <circle class="knot" cx="520" cy="300" r="14"/><circle class="knot" cx="660" cy="300" r="14"/><circle class="knot" cx="800" cy="300" r="14"/><circle class="knot" cx="940" cy="300" r="14"/><circle class="knot" cx="1080" cy="300" r="14"/>
+            <circle class="knot" cx="520" cy="410" r="14"/><circle class="knot" cx="660" cy="410" r="14"/><circle class="knot" cx="800" cy="410" r="14"/><circle class="knot" cx="940" cy="410" r="14"/><circle class="knot" cx="1080" cy="410" r="14"/>
+            <circle class="knot" cx="520" cy="520" r="14"/><circle class="knot" cx="660" cy="520" r="14"/><circle class="knot" cx="800" cy="520" r="14"/><circle class="knot" cx="940" cy="520" r="14"/><circle class="knot" cx="1080" cy="520" r="14"/>
+            <circle class="knot" cx="520" cy="630" r="14"/><circle class="knot" cx="660" cy="630" r="14"/><circle class="knot" cx="800" cy="630" r="14"/><circle class="knot" cx="940" cy="630" r="14"/><circle class="knot" cx="1080" cy="630" r="14"/>
+          </g>
+          <g id="needle-wrap"><g id="needle" style="transform:translate(440px,240px)">
+            <line x1="-60" y1="-40" x2="0" y2="0" stroke="#8b5a2b" stroke-width="7" stroke-linecap="round"/><circle r="5" fill="#9a9a9a"/>
+          </g></g>
+        </svg>
+      </div>
+
+      <!-- Guide (SVG character) -->
+      <svg id="guide" viewBox="0 0 200 260" aria-label="المرشد البحري">
+        <!-- body (dishdasha) -->
+        <path d="M60 120 Q100 105 140 120 L150 250 L50 250 Z" fill="#ffffff" stroke="#8a8a8a" stroke-width="3"/>
+        <rect x="92" y="120" width="16" height="22" fill="#e0c9a0"/>
+        <!-- arms -->
+        <path d="M62 130 Q40 180 48 210" stroke="#ffffff" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <path d="M138 130 Q160 170 150 200" stroke="#ffffff" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <!-- head -->
+        <circle cx="100" cy="88" r="34" fill="#c68b59"/>
+        <!-- ghutra -->
+        <path d="M62 84 Q100 30 138 84 L140 96 Q100 62 60 96 Z" fill="#ffffff" stroke="#8a8a8a" stroke-width="2"/>
+        <!-- agal -->
+        <rect x="64" y="66" width="72" height="12" rx="5" fill="#2b2b2b"/>
+        <path d="M66 96 Q100 110 134 96" stroke="#ffffff" stroke-width="10" fill="none"/>
+        <!-- eyes & smile -->
+        <circle cx="88" cy="90" r="4" fill="#2b1d12"/><circle cx="112" cy="90" r="4" fill="#2b1d12"/>
+        <path d="M86 84 q2 -3 4 0" stroke="#2b1d12" stroke-width="2" fill="none"/>
+        <path d="M110 84 q2 -3 4 0" stroke="#2b1d12" stroke-width="2" fill="none"/>
+        <ellipse class="mouth" cx="100" cy="104" rx="10" ry="6" fill="#7a1f3d" style="transform-origin:100px 104px"/>
+        <!-- mustache -->
+        <path d="M90 100 Q100 97 110 100" stroke="#3b2310" stroke-width="3" fill="none"/>
+        <!-- lanyard badge -->
+        <circle cx="100" cy="160" r="12" fill="#f4c430" stroke="#8a6d1a" stroke-width="2"/>
+      </svg>
+
+      <!-- Speech bubble -->
+      <div class="bubble" id="bubble">مرحبًا بكم في رحلة المحامل! قولوا: <strong>«عرّف المحمل»</strong></div>
+
+      <div class="particles" id="particles"></div>
+
+      <!-- Info / quiz panel -->
+      <div class="panel" id="panel">
+        <div class="card" id="card"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="btn gold" id="mic">🎤 تشغيل الصوت</button>
+    <button class="btn" data-cmd="ارفع الشراع">ارفع الشراع</button>
+    <button class="btn" data-cmd="أنزل الشراع">أنزل الشراع</button>
+    <button class="btn" data-cmd="أبحر">أبحر</button>
+    <button class="btn" data-cmd="توقف">توقف</button>
+    <button class="btn" data-cmd="هبّت الرياح">هبّت الرياح</button>
+    <button class="btn" data-cmd="البحر هادئ">البحر هادئ</button>
+    <button class="btn wood" data-cmd="عرّف المحمل">عرّف المحمل</button>
+    <button class="btn wood" data-cmd="أجزاء المحمل">أجزاء المحمل</button>
+    <button class="btn maroon" data-cmd="ابدأ التحدي">ابدأ التحدي</button>
+    <button class="btn chtab active" data-chapter="ship">المحمل</button>
+    <button class="btn chtab" data-chapter="dive">الغوص على اللؤلؤ</button>
+    <button class="btn chtab" data-chapter="oyster">فتح المحار</button>
+    <button class="btn chtab" data-chapter="fish">صيد السمك</button>
+    <button class="btn chtab" data-chapter="net">صناعة الشبك</button>
+    <button class="btn" data-cmd="اصعد">اصعد</button>
+    <button class="btn" data-cmd="الدرس التالي">الدرس التالي</button>
+    <button class="btn" data-cmd="ملخص الدرس">ملخص الدرس</button>
+    <button class="btn toggle" id="sound-toggle">🔊 الأصوات: تشغيل</button>
+    <div class="status" id="status">اضغط «تشغيل الصوت» أو استخدم الأزرار</div>
+    <div class="hint">الأوامر الصوتية تعمل عبر HTTPS أو localhost، ويُفضّل متصفح Chrome</div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const ship = $('#ship'), sail = $('#sailgroup'), guide = $('#guide');
+  const bubble = $('#bubble'), panel = $('#panel'), card = $('#card');
+  const statusEl = $('#status'), micBtn = $('#mic'), labels = $('#label-layer');
+  const particles = $('#particles'), stage = $('#stage');
+  let sailUp = true, sailing = false, windOn = false, score = 0, qIndex = 0;
+  let soundOn = true, speechOn = true;
+
+  /* ---------- Arabic narration ---------- */
+  function say(text){
+    bubble.innerHTML = text;
+    guide.classList.add('talk');
+    setTimeout(() => guide.classList.remove('talk'), Math.min(4000, 800 + text.length * 40));
+    if (speechOn && 'speechSynthesis' in window){
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,'').replace(/[«»]/g,''));
+      u.lang = 'ar-SA'; u.rate = 0.9; u.pitch = 1.05;
+      speechSynthesis.speak(u);
+    }
+  }
+
+  /* ---------- Sound effects (WebAudio) ---------- */
+  let ac = null, waveNode = null, windNode = null;
+  function audio(){ if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); return ac; }
+  function noiseBuffer(ctx){
+    const b = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate), d = b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+    return b;
+  }
+  function startAmbient(){
+    if(!soundOn) return; const ctx = audio();
+    if(!waveNode){
+      const src = ctx.createBufferSource(); src.buffer = noiseBuffer(ctx); src.loop = true;
+      const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value = 500;
+      const g = ctx.createGain(); g.gain.value = 0.0;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.18;
+      const lfoG = ctx.createGain(); lfoG.gain.value = 0.12;
+      lfo.connect(lfoG); lfoG.connect(g.gain); g.gain.value = 0.15;
+      src.connect(lp); lp.connect(g); g.connect(ctx.destination);
+      src.start(); lfo.start();
+      waveNode = {src, g};
+    }
+  }
+  function setWind(on){
+    if(!soundOn) return; const ctx = audio();
+    if(on && !windNode){
+      const src = ctx.createBufferSource(); src.buffer = noiseBuffer(ctx); src.loop = true;
+      const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value = 900; bp.Q.value = 0.6;
+      const g = ctx.createGain(); g.gain.value = 0;
+      g.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.2);
+      src.connect(bp); bp.connect(g); g.connect(ctx.destination); src.start();
+      windNode = {src, g};
+    } else if(!on && windNode){
+      windNode.g.gain.linearRampToValueAtTime(0, ac.currentTime + 1);
+      const n = windNode; windNode = null; setTimeout(() => { try{n.src.stop();}catch(e){} }, 1100);
+    }
+  }
+  function chime(freqs){
+    if(!soundOn) return; const ctx = audio();
+    freqs.forEach((f,i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      const t = ctx.currentTime + i*0.13;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.25, t+0.02); g.gain.exponentialRampToValueAtTime(0.001, t+0.5);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.55);
+    });
+  }
+  function ropeSound(){ chime([420, 310]); }
+
+  /* ---------- Particles & celebration ---------- */
+  function burst(n = 26){
+    const rect = stage.getBoundingClientRect();
+    for(let i=0;i<n;i++){
+      const s = document.createElement('div'); s.className = 'spark';
+      const a = Math.random()*Math.PI*2, d = 120 + Math.random()*220;
+      s.style.left = (rect.width/2) + 'px'; s.style.top = (rect.height*0.35) + 'px';
+      s.style.setProperty('--dx', Math.cos(a)*d + 'px'); s.style.setProperty('--dy', Math.sin(a)*d + 'px');
+      s.style.background = ['#f4c430','#ffffff','#1a8fa8','#c1443a','#7fd3e6'][i%5];
+      particles.appendChild(s); setTimeout(() => s.remove(), 1100);
+    }
+  }
+  function streaks(on){
+    particles.querySelectorAll('.streak').forEach(e => e.remove());
+    if(!on) return;
+    for(let i=0;i<6;i++){
+      const s = document.createElement('div'); s.className = 'streak on';
+      s.style.top = (10 + Math.random()*60) + '%'; s.style.animationDelay = (-Math.random()*1.4) + 's';
+      particles.appendChild(s);
+    }
+  }
+  function cheer(){ guide.classList.remove('cheer'); void guide.offsetWidth; guide.classList.add('cheer'); burst(); chime([523,659,784,1046]); }
+
+  /* ---------- Ship actions ---------- */
+  function raiseSail(){ sailUp = true; sail.classList.remove('down'); ropeSound(); say('رفعنا <strong>الشراع</strong> الأبيض، والريح تملأه.'); }
+  function lowerSail(){ sailUp = false; sail.classList.add('down'); ropeSound(); say('أنزلنا <strong>الشراع</strong> لنرسو بأمان.'); }
+  function sailAway(){
+    if(!sailUp){ say('ارفع الشراع أولًا حتى نبحر!'); return; }
+    sailing = true; ship.classList.remove('stopped'); ship.classList.add('sailing'); ship.classList.add('gone-right');
+    say('أبحرنا في <strong>الخليج العربي</strong>، والمحمل ينساب على الماء.');
+  }
+  function stopShip(){ sailing = false; ship.classList.remove('sailing','gone-right'); ship.classList.add('stopped'); say('توقفنا، والمحمل يطفو بهدوء.'); }
+  function windBlows(){
+    windOn = true; setWind(true); streaks(true); sail.classList.add('billow');
+    say('<strong>هبّت الرياح!</strong> الشراع ينتفخ والأمواج تعلو.');
+    ship.classList.add('sailing');
+  }
+  function calmSea(){
+    windOn = false; setWind(false); streaks(false); sail.classList.remove('billow');
+    say('<strong>البحر هادئ</strong>، والأمواج لطيفة.');
+  }
+  function reset(){ ship.classList.remove('gone-right'); }
+
+  /* ---------- Info & parts ---------- */
+  const PARTS = {
+    hull:'الهيكل (البدن)', deck:'سطح المحمل', cabin:'المقصورة', mast:'الصاري', sail:'الشراع الأبيض', flag:'علم قطر', oars:'المجاديف'
+  };
+  function highlightPart(key){
+    document.querySelectorAll('.part').forEach(p => p.classList.remove('hl'));
+    const el = document.querySelector(`.part[data-part="${key}"]`);
+    if(el) el.classList.add('hl');
+  }
+  function showLabels(on){ labels.classList.toggle('show', on); }
+  function defineShip(){
+    showLabels(true);
+    say('المحمل مركب شراعي خشبي من أهم مراكب الغوص على <strong>اللؤلؤ</strong> والصيد والتجارة في قطر. تابعوا التسميات على الصورة.');
+    openCard(`
+      <h2>ما هو المحمل؟</h2>
+      <p>المحمل مركب شراعي تقليدي صُنع من <strong>الخشب</strong> وكان يُستخدم في الغوص على اللؤلؤ وصيد الأسماك ونقل البضائع بين موانئ الخليج العربي.</p>
+      <ul>
+        <li>يتميز بـ<strong>شراع أبيض</strong> كبير يُرفع على صاري خشبي.</li>
+        <li>له <strong>مقصورة</strong> صغيرة للراحة وحفظ الأغراض.</li>
+        <li>يحمل <strong>علم قطر</strong> ويُعد رمزًا من رموز تراث البحر.</li>
+      </ul>
+      <div style="margin-top:14px;text-align:left"><button class="btn" id="close-card">إغلاق</button></div>`);
+  }
+  function showParts(){
+    showLabels(true);
+    say('هذه أجزاء المحمل: البدن، السطح، المقصورة، الصاري، والشراع. <strong>اضغطوا</strong> على أي جزء لمعرفة اسمه.');
+    openCard(`
+      <h2>أجزاء المحمل</h2>
+      <ul>
+        <li><strong>البدن (الهيكل):</strong> الجزء الخشبي الذي يطفو على الماء.</li>
+        <li><strong>السطح:</strong> الأرضية التي يقف عليها البحارة.</li>
+        <li><strong>المقصورة:</strong> غرفة صغيرة للراحة والحماية.</li>
+        <li><strong>الصاري:</strong> العمود الذي يحمل الشراع.</li>
+        <li><strong>الشراع:</strong> القماش الأبيض الذي تدفعه الريح.</li>
+      </ul>
+      <p>اضغطوا على الأجزاء في الصورة لتتعرفوا عليها.</p>
+      <div style="margin-top:14px;text-align:left"><button class="btn" id="close-card">إغلاق</button></div>`);
+  }
+  function openCard(html){ card.innerHTML = html; panel.classList.add('open'); card.querySelector('#close-card')?.addEventListener('click', closeCard); }
+  function closeCard(){ panel.classList.remove('open'); }
+  panel.addEventListener('click', e => { if(e.target === panel) closeCard(); });
+
+  // tapping a part names it
+  document.querySelectorAll('.part').forEach(p => p.addEventListener('click', () => {
+    const k = p.dataset.part; highlightPart(k); showLabels(true);
+    say(`هذا هو <strong>${PARTS[k]}</strong>.`);
+  }));
+
+  /* ---------- Challenge (quiz) ---------- */
+  const QUESTIONS = [
+    {q:'ما اسم المركب الشراعي الخشبي التقليدي في قطر؟', a:['المحمل','الزورق','الجالبوت','السفينة'], c:0},
+    {q:'ماذا كان المحمل يُستخدم فيه أساسًا؟', a:['الغوص على اللؤلؤ والصيد','صناعة الفخار','بناء القلاع','زراعة النخيل'], c:0},
+    {q:'ما الجزء الذي يحمل الشراع؟', a:['المقصورة','الصاري','البدن','المجداف'], c:1},
+    {q:'أي لون يغلب على شراع المحمل التقليدي؟', a:['الأبيض','الأحمر','الأزرق','الأخضر'], c:0},
+    {q:'ماذا نسمي أداة الدفع في المحمل إذا لم تكن الريح؟', a:['المجاديف','الصاري','الشراع','المرساة'], c:0},
+    {q:'أي مما يلي يُعد من تراث البحر في قطر؟', a:['المحمل','القطار','الطائرة','الحافلة'], c:0}
+  ];
+  function startChallenge(){
+    score = 0; qIndex = 0;
+    say('<strong>ابدأ التحدي!</strong> أجيبوا عن الأسئلة الستة وكونوا بحارة ماهرين.');
+    nextQuestion();
+  }
+  function nextQuestion(){
+    if(qIndex >= QUESTIONS.length){
+      const msg = score >= 5 ? 'ممتاز! أنتم بحارة محترفون' : 'أحسنتم! راجعوا الدرس وحاولوا مرة أخرى';
+      if(score >= 5) cheer();
+      openCard(`<h2>نهاية التحدي</h2><p>${msg}</p><p class="score">نقاطكم: ${score} من ${QUESTIONS.length}</p>
+        <div style="margin-top:14px;text-align:left"><button class="btn gold" id="again">إعادة التحدي</button> <button class="btn" id="close-card">إغلاق</button></div>`);
+      card.querySelector('#again').addEventListener('click', startChallenge);
+      card.querySelector('#close-card').addEventListener('click', closeCard);
+      return;
+    }
+    const item = QUESTIONS[qIndex];
+    openCard(`<h2>السؤال ${qIndex+1} من ${QUESTIONS.length}</h2><p>${item.q}</p>
+      <div class="quiz-opts">${item.a.map((t,i)=>`<button class="opt" data-i="${i}">${t}</button>`).join('')}</div>
+      <p class="score" style="margin-top:12px">النقاط: ${score}</p>`);
+    card.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i;
+      card.querySelectorAll('.opt').forEach(x => x.disabled = true);
+      if(i === item.c){ b.classList.add('right'); score++; chime([660,880]); say('إجابة صحيحة! أحسنت.'); cheer(); }
+      else { b.classList.add('wrong'); card.querySelectorAll('.opt')[item.c].classList.add('right'); chime([200,160]); say('ليست الإجابة الصحيحة، لكن لا بأس. حاول في السؤال القادم.'); }
+      qIndex++;
+      setTimeout(nextQuestion, 1900);
+    }));
+  }
+
+  /* ---------- Command router ---------- */
+  const COMMANDS = [
+    {words:['ارفع الشراع','ارفعي الشراع','ارفع الشرع'], run: raiseSail},
+    {words:['أنزل الشراع','انزل الشراع','نزل الشراع'], run: lowerSail},
+    {words:['أبحر','ابحر','أبحرْ','انطلق'], run: sailAway},
+    {words:['توقف','قف','أوقف'], run: stopShip},
+    {words:['هبت الرياح','هبّت الرياح','هبّت الرياح','هبت الرياح','الرياح'], run: windBlows},
+    {words:['البحر هادئ','البحر هادي','البحر هادئًا','هدوء'], run: calmSea},
+    {words:['عرف المحمل','عرّف المحمل','عرّف المحمل','تعريف المحمل'], run: defineShip},
+    {words:['أجزاء المحمل','اجزاء المحمل','أجزاء المركب'], run: showParts},
+    {words:['ابدأ التحدي','ابدا التحدي','ابدأ التحدّي','التحدي'], run: startChallenge}
+  ];
+  function normalize(s){
+    return s.replace(/[ً-ْـ]/g,'').replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim();
+  }
+  function route(text){
+    const t = normalize(text);
+    for(const c of COMMANDS){
+      if(c.words.some(w => t.includes(normalize(w)))){ c.run(); return true; }
+    }
+    return false;
+  }
+  function run(cmd){
+    audio();
+    const ok = route(cmd);
+    statusEl.innerHTML = ok ? `تم تنفيذ: <span class="heard">${cmd}</span>` : `لم أفهم: <span class="heard">${cmd}</span>`;
+    if(!ok) say('لم أفهم الأمر، جربوا: «ارفع الشراع» أو «عرّف المحمل».');
+  }
+  document.querySelectorAll('[data-cmd]').forEach(b => b.addEventListener('click', () => run(b.dataset.cmd)));
+
+  /* ---------- Speech recognition (Arabic) ---------- */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, listening = false, restartTimer = null;
+  function startListening(){
+    if(!SR){ statusEl.textContent = 'المتصفح لا يدعم التعرف الصوتي. استخدموا الأزرار.'; return; }
+    rec = new SR();
+    rec.lang = 'ar-QA'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+    rec.onresult = e => {
+      let interim = '', finalTxt = '';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const r = e.results[i];
+        if(r.isFinal) finalTxt += r[0].transcript; else interim += r[0].transcript;
+      }
+      if(interim) statusEl.innerHTML = `أسمع: <span class="heard">${interim}</span>`;
+      if(finalTxt){ statusEl.innerHTML = `سمعت: <span class="heard">${finalTxt}</span>`; route(finalTxt); }
+    };
+    rec.onerror = e => {
+      if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ statusEl.textContent = 'لم يُسمح بالميكروفون. استخدموا الأزرار.'; listening = false; updateMic(); }
+    };
+    rec.onend = () => { // keep it alive during class
+      if(listening){ clearTimeout(restartTimer); restartTimer = setTimeout(() => { try{ rec.start(); }catch(e){} }, 300); }
+    };
+    try{ rec.start(); listening = true; }catch(e){ listening = false; }
+    updateMic();
+  }
+  function stopListening(){ listening = false; try{ rec && rec.stop(); }catch(e){} updateMic(); statusEl.textContent = 'توقف الاستماع. استخدموا الأزرار.'; }
+  function updateMic(){
+    micBtn.textContent = listening ? '⏹ إيقاف الصوت' : '🎤 تشغيل الصوت';
+    micBtn.classList.toggle('listening', listening);
+  }
+  micBtn.addEventListener('click', () => { audio(); listening ? stopListening() : startListening(); });
+  $('#sound-toggle').addEventListener('click', e => {
+    soundOn = !soundOn;
+    e.currentTarget.textContent = soundOn ? '🔊 الأصوات: تشغيل' : '🔇 الأصوات: إيقاف';
+    if(!soundOn){ setWind(false); if(waveNode){ waveNode.g.gain.value = 0; } } else { startAmbient(); }
+  });
+
+  /* ---------- Chapters ---------- */
+  const ORDER = ['ship','dive','oyster','fish','net'];
+  const CH_IDS = {ship:'ch-ship', dive:'ch-dive', oyster:'ch-oyster', fish:'ch-fish', net:'ch-net'};
+  let current = 'ship';
+  const closeBtnHtml = '<div style="margin-top:14px;text-align:left"><button class="btn" id="close-card">إغلاق</button></div>';
+  function showChapter(key){
+    current = key;
+    Object.entries(CH_IDS).forEach(([k,id]) => document.getElementById(id).classList.toggle('active', k === key));
+    document.querySelectorAll('.chtab').forEach(b => b.classList.toggle('active', b.dataset.chapter === key));
+    labels.classList.remove('show'); closeCard();
+  }
+
+  /* --- Diving --- */
+  const diverEl = () => document.getElementById('diver');
+  function startDive(){
+    showChapter('dive');
+    const d = diverEl(); d.classList.remove('down');
+    say('نبدأ <strong>الغوص على اللؤلؤ</strong>. الغواص يربط الحجر بقدمه، ويضع الفطام على أنفه، ثم ينزل بالحبل.');
+    setTimeout(() => { if(current === 'dive') d.classList.add('down'); }, 900);
+    setTimeout(() => { if(current === 'dive') say('وصل الغواص إلى القاع، ويملأ <strong>الزنبيل</strong> بالمحار، ثم يشدّ الحبل ليُعلم من في المحمل.'); }, 4800);
+    setTimeout(() => { if(current === 'dive') openCard(`
+      <h2>كيف يغوص الغواصون على اللؤلؤ؟</h2>
+      <ul>
+        <li><strong>الحجر:</strong> يُربط بقدم الغواص ليساعده على الهبوط بسرعة إلى القاع.</li>
+        <li><strong>الفطام:</strong> مشبك صغير يسدّ الأنف فيحبس الغواص نَفَسه.</li>
+        <li><strong>الحبل:</strong> ينزل به الغواص ويصعد، ويمسكه رفيقه فوق المحمل.</li>
+        <li><strong>الزنبيل:</strong> سلة يجمع فيها المحار بسرعة قبل أن يصعد.</li>
+        <li>يبقى الغواص تحت الماء مدة قصيرة، ثم يصعد ليرتاح ويعيد المحاولة.</li>
+      </ul>${closeBtnHtml}`); }, 9200);
+  }
+  function riseDiver(){ diverEl().classList.remove('down'); say('صعد الغواص بالحبل إلى سطح الماء سالمًا.'); }
+
+  /* --- Oysters --- */
+  let pearls = 0; const TOTAL_PEARLS = 2;
+  const updateOysterCount = () => { document.getElementById('pearl-count').textContent = `اللآلئ: ${pearls} من ${TOTAL_PEARLS}`; };
+  function startOysters(){
+    showChapter('oyster');
+    document.querySelectorAll('.oyster').forEach(o => o.classList.remove('open'));
+    pearls = 0; updateOysterCount();
+    say('اضغطوا على المحار لنفتحه. <strong>بعض المحار فيه لؤلؤ</strong> وبعضه فارغ!');
+    openCard(`
+      <h2>فتح المحار واستخراج اللؤلؤ</h2>
+      <ul>
+        <li>يُخرج الغواص المحار من القاع، ثم يُفتح بسكين صغيرة بعناية.</li>
+        <li>يبحث العاملون عن <strong>اللؤلؤة</strong> داخل المحارة، وليست كل محارة فيها لؤلؤة.</li>
+        <li>يُنظَّف اللؤلؤ ويُفرز حسب <strong>الحجم واللمعان والشكل</strong> ثم يُباع للتجار.</li>
+      </ul>
+      <p>اضغطوا على المحارات لتكتشفوا ما بداخلها.</p>${closeBtnHtml}`);
+  }
+  document.querySelectorAll('.oyster').forEach(o => o.addEventListener('click', () => {
+    if(current !== 'oyster' || o.classList.contains('open')) return;
+    audio(); o.classList.add('open');
+    if(o.dataset.pearl === '1'){ pearls++; burst(30); chime([880,1046,1318]); say('وجدنا <strong>لؤلؤة</strong>! تُنظَّف وتُفرز حسب الحجم واللمعان.'); }
+    else { chime([240]); say('المحارة فارغة، جرّبوا محارة أخرى.'); }
+    updateOysterCount();
+    if(pearls === TOTAL_PEARLS) setTimeout(cheer, 600);
+  }));
+
+  /* --- Fishing --- */
+  let caught = 0;
+  const updateFishCount = () => { document.getElementById('fish-count').textContent = `السمك المصطاد: ${caught}`; };
+  function startFishing(){
+    showChapter('fish');
+    caught = 0; updateFishCount();
+    document.querySelectorAll('.fishc').forEach(f => f.classList.remove('gone'));
+    const cn = document.getElementById('castnet'); cn.classList.remove('thrown'); void cn.getBoundingClientRect();
+    setTimeout(() => cn.classList.add('thrown'), 50);
+    say('نرمي <strong>الشبك</strong> في الماء ثم نسحبه ببطء. اضغطوا على السمكة لتصطادوها!');
+    openCard(`
+      <h2>صيد السمك</h2>
+      <ul>
+        <li><strong>الشبك:</strong> يُرمى في الماء ثم يُسحب ممتلئًا بالسمك.</li>
+        <li><strong>الصنارة:</strong> خيط وخطّاف يُعلَّق به الطُّعم لصيد الأسماك الكبيرة.</li>
+        <li>يخرج الصيادون بالمحامل وقوارب صغيرة إلى البحر ويعودون بالسمك للأسرة والسوق.</li>
+        <li>يحافظ الصياد على البحر فلا يأخذ إلا ما يحتاج.</li>
+      </ul>${closeBtnHtml}`);
+  }
+  document.querySelectorAll('.fishc').forEach(f => f.addEventListener('click', () => {
+    if(current !== 'fish' || f.classList.contains('gone')) return;
+    f.classList.add('gone'); caught++; updateFishCount(); chime([740,988]); burst(14);
+    say(`صيد موفّق! عدد الأسماك: <strong>${caught}</strong>`);
+    if(caught === 6){ setTimeout(cheer, 500); }
+  }));
+
+  /* --- Net making --- */
+  const KNOTS = document.querySelectorAll('.knot');
+  let knotsTied = 0;
+  const updateKnotCount = () => { document.getElementById('knot-count').textContent = `العقد: ${knotsTied} من ${KNOTS.length}`; };
+  function startNet(){
+    showChapter('net');
+    KNOTS.forEach(k => k.classList.remove('tied')); knotsTied = 0; updateKnotCount();
+    document.getElementById('needle').style.transform = 'translate(440px,240px)';
+    say('نصنع <strong>الشبك</strong> بالإبرة الخشبية. اضغطوا على العقد!');
+    openCard(`
+      <h2>صناعة الشبك</h2>
+      <ul>
+        <li>يُصنع الشبك من خيوط قوية تُعقد عقدة بعد عقدة.</li>
+        <li>يستعمل الصانع <strong>الإبرة الخشبية</strong> ليمرّر الخيط ويعقده.</li>
+        <li>يجب أن تتساوى فتحات الشبك، فتكون العقد متباعدة بانتظام.</li>
+        <li>تحتاج صناعة الشبك إلى صبر ودقة وعمل جماعي.</li>
+      </ul>
+      <p>اضغطوا على العقد في الصورة لتعقدوا الشبك.</p>${closeBtnHtml}`);
+  }
+  KNOTS.forEach(k => k.addEventListener('click', () => {
+    if(current !== 'net' || k.classList.contains('tied')) return;
+    k.classList.add('tied'); knotsTied++;
+    document.getElementById('needle').style.transform = `translate(${k.getAttribute('cx')}px, ${k.getAttribute('cy')}px)`;
+    chime([520]); updateKnotCount();
+    if(knotsTied === KNOTS.length){ cheer(); say('أحسنتم! اكتمل الشبك بإتقان.'); }
+  }));
+
+  /* --- Navigation & summary --- */
+  const START = {
+    ship: () => { showChapter('ship'); say('مرحبًا بكم في درس <strong>المحامل</strong>. جرّبوا قول: «عرّف المحمل».'); },
+    dive: startDive, oyster: startOysters, fish: startFishing, net: startNet
+  };
+  function nextChapter(){ START[ORDER[(ORDER.indexOf(current) + 1) % ORDER.length]](); }
+  function summary(){
+    say('هذا ملخص درسنا. أحسنتم يا أبطال البحر!');
+    openCard(`
+      <h2>ملخص الدرس</h2>
+      <ul>
+        <li><strong>المحمل:</strong> مركب شراعي خشبي للغوص والصيد والتجارة.</li>
+        <li><strong>الغوص:</strong> ينزل الغواص بالحجر والفطام والزنبيل ويجمع المحار.</li>
+        <li><strong>المحار:</strong> يُفتح بالسكين وقد يحتوي على لؤلؤة ثمينة.</li>
+        <li><strong>الصيد:</strong> يُرمى الشبك ويُسحب، وتُستخدم الصنارة أيضًا.</li>
+        <li><strong>الشبك:</strong> يُعقد بالإبرة الخشبية حتى تتساوى فتحاته.</li>
+      </ul>${closeBtnHtml}`);
+  }
+  document.querySelectorAll('.chtab').forEach(b => b.addEventListener('click', () => { audio(); START[b.dataset.chapter](); }));
+
+  COMMANDS.unshift(
+    {words:['ابدأ الغوص','الغوص على اللؤلؤ','الغوص','اللؤلؤ'], run: startDive},
+    {words:['اصعد','ارتفع'], run: riseDiver},
+    {words:['افتح المحار','فتح المحار','المحار'], run: startOysters},
+    {words:['اصطد السمك','صيد السمك','الصيد'], run: startFishing},
+    {words:['اصنع الشبك','صناعة الشبك','الشباك','الشبابيك'], run: startNet},
+    {words:['الدرس الأول','ابدأ الدرس','المحمل ومكوناته'], run: START.ship},
+    {words:['الدرس التالي','التالي'], run: nextChapter},
+    {words:['ملخص الدرس','الخلاصة'], run: summary}
+  );
+
+  QUESTIONS.push(
+    {q:'ماذا نسمي السلة التي يجمع فيها الغواص المحار؟', a:['الزنبيل','الصاري','الفطام','الشراع'], c:0},
+    {q:'لماذا يربط الغواص الحجر بقدمه؟', a:['ليهبط إلى القاع بسرعة','ليطفو على الماء','ليخيف السمك','ليتزين'], c:0},
+    {q:'بماذا يُفتح المحار للبحث عن اللؤلؤة؟', a:['بسكين صغيرة','بالمطرقة','بالمنشار','بالفرشاة'], c:0},
+    {q:'ما الأداة التي تُعقد بها خيوط الشبك؟', a:['الإبرة الخشبية','المنشار','الفرشاة','المطرقة'], c:0}
+  );
+
+  /* ---------- Start ---------- */
+  ship.classList.add('stopped');
+  document.addEventListener('pointerdown', () => { audio(); startAmbient(); }, {once:true});
+})();
+</script>
+</body>
+</html>
