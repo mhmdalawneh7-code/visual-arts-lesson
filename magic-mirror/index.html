@@ -253,14 +253,20 @@
       rec.onerror = err => {
         micEl.textContent = err.error === 'not-allowed' ? '🎙 الميكروفون غير مسموح' : '🎙 خطأ في التعرف على الكلام';
       };
+      let micOn = false;
       function startMic() {
         try {
           rec.start();
+          micOn = true;
           micEl.textContent = '🎙 قل: يا مراتي ...';
         } catch (_) {}
       }
       // المتصفحات تطلب ضغطة للبدء
       micEl.addEventListener('click', startMic);
+      // مفتاح المسافة (المسطرة) يفعّل الميكروفون أيضاً
+      document.addEventListener('keydown', e => {
+        if (e.code === 'Space' && !micOn) { e.preventDefault(); startMic(); }
+      });
       micEl.textContent = '🎙 اضغط هنا لتفعيل الأوامر الصوتية';
     } else {
       micEl.textContent = 'الأوامر الصوتية تحتاج Chrome أو Edge';
