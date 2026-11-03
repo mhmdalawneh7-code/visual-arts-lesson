@@ -249,17 +249,27 @@
         handleCommand(last[0].transcript.trim());
       };
       // يعيد التشغيل عند توقف التعرف تلقائياً
-      rec.onend = () => { try { rec.start(); } catch (_) {} };
-      rec.onerror = err => {
-        micEl.textContent = err.error === 'not-allowed' ? '🎙 الميكروفون غير مسموح' : '🎙 خطأ في التعرف على الكلام';
-      };
       let micOn = false;
+      rec.onstart = () => { micEl.textContent = '🎙 يستمع الآن: قل يا مراتي ...'; };
+      // إعادة التشغيل تلقائياً ما دام الميكروفون مفعلاً
+      rec.onend = () => { if (micOn) { try { rec.start(); } catch (_) {} } };
+      rec.onerror = err => {
+        // أخطاء الصمت لا تستحق رسالة
+        if (err.error === 'no-speech' || err.error === 'aborted') return;
+        micOn = err.error !== 'not-allowed';
+        micEl.textContent = err.error === 'not-allowed'
+          ? '🎙 الميكروفون غير مسموح: اسمح به من إعدادات المتصفح'
+          : '🎙 خطأ: ' + err.error;
+      };
       function startMic() {
+        micEl.textContent = '🎙 جارٍ تفعيل الميكروفون...';
         try {
-          rec.start();
           micOn = true;
-          micEl.textContent = '🎙 قل: يا مراتي ...';
-        } catch (_) {}
+          rec.start();
+        } catch (err) {
+          micOn = false;
+          micEl.textContent = '🎙 تعذّر البدء: ' + err.message;
+        }
       }
       // المتصفحات تطلب ضغطة للبدء
       micEl.addEventListener('click', startMic);
