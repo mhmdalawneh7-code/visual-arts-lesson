@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>يا مراتي</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&display=swap');
+
+    :root { --glow: rgba(180, 220, 255, 0.85); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #000;
+      color: #f4f8ff;
+      font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+      cursor: none;
+    }
+
+    /* الصورة الخلفية تتغير */
+    .slide {
+      position: fixed; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 2s ease;
+      filter: brightness(0.55) saturate(0.9);
+    }
+    .slide.on { opacity: 1; }
+    .slide.fallback { background: radial-gradient(ellipse at center, #1b2a44 0%, #05080f 80%); }
+
+    /* طبقة المرآة: تعتم الأطراف وتعطي لمعة */
+    .veil {
+      position: fixed; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.85) 100%),
+        linear-gradient(120deg, rgba(180,220,255,0.08), transparent 40%);
+    }
+
+    .frame {
+      position: fixed; inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 5vh 6vw;
+      text-align: center;
+      justify-items: center;
+    }
+
+    .greeting {
+      font-size: clamp(2.4rem, 7vw, 6.5rem);
+      font-weight: 700;
+      text-shadow: 0 0 24px var(--glow), 0 0 60px rgba(120,180,255,0.5);
+      transition: opacity 1.2s ease;
+    }
+    .greeting.fade { opacity: 0; }
+
+    .clock {
+      align-self: center;
+      font-size: clamp(5rem, 18vw, 16rem);
+      font-weight: 300;
+      line-height: 1;
+      text-shadow: 0 0 30px var(--glow), 0 0 80px rgba(120,180,255,0.4);
+      direction: ltr;
+    }
+    .date {
+      font-size: clamp(1.3rem, 3.2vw, 3rem);
+      margin-top: 0.2em;
+      text-shadow: 0 0 18px rgba(180,220,255,0.6);
+    }
+    .date-en { font-size: 0.55em; opacity: 0.7; direction: ltr; }
+
+    .bottom {
+      display: flex; flex-direction: column; align-items: center; gap: 0.5em;
+    }
+    .caption {
+      font-size: clamp(1.2rem, 2.8vw, 2.6rem);
+      font-weight: 500;
+      text-shadow: 0 0 18px rgba(0,0,0,0.9);
+      transition: opacity 1.2s ease;
+    }
+    .caption.fade { opacity: 0; }
+
+    .weather {
+      position: fixed; top: 5vh; right: 6vw;
+      font-size: clamp(1.1rem, 2.4vw, 2.2rem);
+      text-align: right;
+      text-shadow: 0 0 14px rgba(0,0,0,0.9);
+    }
+    .weather .temp { font-size: 2.1em; font-weight: 700; direction: ltr; }
+    .weather .desc { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="slide fallback" id="slideA"></div>
+  <div class="slide fallback" id="slideB"></div>
+  <div class="veil"></div>
+  <div id="mic" style="position:fixed;left:4vw;bottom:3vh;font-size:clamp(0.9rem,1.6vw,1.3rem);opacity:0.55;cursor:pointer;direction:rtl;text-shadow:0 0 10px #000"></div>
+
+  <div class="weather">
+    <div class="temp" id="temp">--°</div>
+    <div class="desc" id="desc">جارٍ تحميل الطقس...</div>
+  </div>
+
+  <div class="frame">
+    <div class="greeting" id="greeting">يا مراتي</div>
+    <div class="clock" id="clock">--:--</div>
+    <div class="bottom">
+      <div class="date" id="date"></div>
+      <div class="date-en" id="dateEn"></div>
+      <div class="caption" id="caption"></div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- العناصر التراثية: ضع الصور بهذه الأسماء داخل مجلد images ----------
+    const ITEMS = [
+      { file: 'images/mahamil.jpg', caption: 'المحامل التقليدية' },
+      { file: 'images/sadu.jpg',    caption: 'السدو' },
+      { file: 'images/qalaa.jpg',   caption: 'القلاع القطرية' },
+      { file: 'images/bahr.jpg',    caption: 'البحر' },
+      { file: 'images/bab.jpg',     caption: 'الباب التراثي' }
+    ];
+
+    // ---------- الساعة والتاريخ ----------
+    const clockEl = document.getElementById('clock');
+    const dateEl = document.getElementById('date');
+    const dateEnEl = document.getElementById('dateEn');
+    function tickClock() {
+      const now = new Date();
+      clockEl.textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      dateEl.textContent = now.toLocaleDateString('ar-QA', { weekday: 'long', day: 'numeric', month: 'long' });
+      dateEnEl.textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // ---------- الطقس (الدوحة) عبر Open-Meteo بدون مفتاح ----------
+    const WEATHER_CODES = {
+      0: 'صافٍ', 1: 'غالباً صافٍ', 2: 'غائم جزئياً', 3: 'غائم',
+      45: 'ضباب', 48: 'ضباب متجمد', 51: 'رذاذ خفيف', 53: 'رذاذ', 55: 'رذاذ كثيف',
+      61: 'مطر خفيف', 63: 'مطر', 65: 'مطر غزير', 80: 'زخات مطر', 81: 'زخات مطر',
+      82: 'زخات عنيفة', 95: 'عاصفة رعدية'
+    };
+    async function loadWeather() {
+      try {
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=25.29&longitude=51.53&current=temperature_2m,weather_code&timezone=Asia%2FQatar';
+        const data = await (await fetch(url)).json();
+        document.getElementById('temp').textContent = Math.round(data.current.temperature_2m) + '°';
+        document.getElementById('desc').textContent = (WEATHER_CODES[data.current.weather_code] || 'الطقس') + ' · الدوحة';
+      } catch (e) {
+        document.getElementById('desc').textContent = 'تعذّر تحميل الطقس';
+      }
+    }
+    loadWeather();
+    setInterval(loadWeather, 15 * 60 * 1000);
+
+    // ---------- الصور: تتبدل كل 10 ثوانٍ مع الشرح ----------
+    const slides = [document.getElementById('slideA'), document.getElementById('slideB')];
+    const captionEl = document.getElementById('caption');
+    let idx = 0, front = 0;
+
+    function showItem(i) {
+      const item = ITEMS[i % ITEMS.length];
+      const next = slides[1 - front];
+      const img = new Image();
+      img.onload = () => {
+        next.style.backgroundImage = `url("${item.file}")`;
+        next.classList.remove('fallback');
+        next.classList.add('on');
+        slides[front].classList.remove('on');
+        front = 1 - front;
+      };
+      img.onerror = () => {
+        // لا توجد صورة بهذا الاسم: تبقى الخلفية المتدرجة
+        next.style.backgroundImage = '';
+        next.classList.add('fallback', 'on');
+        slides[front].classList.remove('on');
+        front = 1 - front;
+      };
+      img.src = item.file;
+
+      captionEl.classList.add('fade');
+      setTimeout(() => { captionEl.textContent = item.caption; captionEl.classList.remove('fade'); }, 1200);
+    }
+    let cycleTimer = null;
+    function startCycle() {
+      clearInterval(cycleTimer);
+      cycleTimer = setInterval(() => { idx++; showItem(idx); }, 10000);
+    }
+    showItem(idx);
+    startCycle();
+
+    // ---------- الأوامر الصوتية ----------
+    // تحتاج متصفح يدعم التعرف على الكلام (Chrome أو Edge) وإذناً للميكروفون.
+    // الأمر يبدأ بكلمة "يا مراتي"، مثال: "يا مراتي المحامل" أو "يا مراتي التالي".
+    const micEl = document.getElementById('mic');
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ar-QA';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    const KEYWORDS = [
+      { words: ['المحامل', 'محامل', 'محمل'], run: () => goTo(0) },
+      { words: ['السدو', 'سدو'],             run: () => goTo(1) },
+      { words: ['القلاع', 'قلاع', 'القلعة'],  run: () => goTo(2) },
+      { words: ['البحر', 'بحر'],             run: () => goTo(3) },
+      { words: ['الباب', 'باب'],             run: () => goTo(4) },
+      { words: ['التالي', 'التالية', 'الصورة التالية', 'غيّر', 'غير'], run: () => { idx++; showItem(idx); startCycle(); } },
+      { words: ['توقف', 'وقف', 'ثبت'],        run: () => { clearInterval(cycleTimer); speak('تم إيقاف التبديل'); } },
+      { words: ['استمر', 'كمل', 'ابدأ'],      run: () => { startCycle(); speak('نكمل'); } },
+      { words: ['الوقت', 'الساعة'],           run: () => {
+          const n = new Date();
+          speak('الساعة ' + n.getHours() + ' و ' + n.getMinutes() + ' دقيقة');
+      } }
+    ];
+
+    function goTo(i) {
+      idx = i;
+      showItem(idx);
+      startCycle();
+    }
+
+    function handleCommand(text) {
+      const pos = text.indexOf('مراتي');
+      if (pos === -1) return;
+      const cmd = text.slice(pos + 'مراتي'.length).trim();
+      if (!cmd) return;
+      for (const k of KEYWORDS) {
+        if (k.words.some(w => cmd.includes(w))) {
+          k.run();
+          micEl.textContent = '🎙 نفذت: ' + k.words[0];
+          setTimeout(() => { micEl.textContent = '🎙 قل: يا مراتي ...'; }, 2500);
+          return;
+        }
+      }
+    }
+
+    if (SR) {
+      const rec = new SR();
+      rec.lang = 'ar-QA';
+      rec.continuous = true;
+      rec.interimResults = false;
+      rec.onresult = e => {
+        const last = e.results[e.results.length - 1];
+        handleCommand(last[0].transcript.trim());
+      };
+      // يعيد التشغيل عند توقف التعرف تلقائياً
+      rec.onend = () => { try { rec.start(); } catch (_) {} };
+      rec.onerror = err => {
+        micEl.textContent = err.error === 'not-allowed' ? '🎙 الميكروفون غير مسموح' : '🎙 خطأ في التعرف على الكلام';
+      };
+      function startMic() {
+        try {
+          rec.start();
+          micEl.textContent = '🎙 قل: يا مراتي ...';
+        } catch (_) {}
+      }
+      // المتصفحات تطلب ضغطة للبدء
+      micEl.addEventListener('click', startMic);
+      micEl.textContent = '🎙 اضغط هنا لتفعيل الأوامر الصوتية';
+    } else {
+      micEl.textContent = 'الأوامر الصوتية تحتاج Chrome أو Edge';
+    }
+
+    // ---------- تحديث الصفحة كل ساعة ----------
+    setTimeout(() => location.reload(), 60 * 60 * 1000);
+  </script>
+</body>
+</html>
