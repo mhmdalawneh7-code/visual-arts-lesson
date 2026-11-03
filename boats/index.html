@@ -92,9 +92,9 @@ function speak(text){
  if(desired && recognizing){pausingForTTS=true;try{recognition.stop()}catch{pausingForTTS=false}}
  else if(desired){pausingForTTS=true}
  u.onend=()=>resumeAfterTTS();u.onerror=()=>resumeAfterTTS();
- ttsTimer=setTimeout(()=>{try{speechSynthesis.speak(u);clearTimeout(ttsWatchdog);ttsWatchdog=setTimeout(()=>{if(pausingForTTS){try{speechSynthesis.cancel()}catch{}resumeAfterTTS()}},12000)}catch{resumeAfterTTS()}},desired?320:0);
+ ttsTimer=setTimeout(()=>{try{speechSynthesis.speak(u);clearTimeout(ttsWatchdog);ttsWatchdog=setTimeout(()=>{if(pausingForTTS){try{speechSynthesis.cancel()}catch{}resumeAfterTTS()}},12000)}catch{resumeAfterTTS()}},desired?120:0);
 }
-function resumeAfterTTS(){clearTimeout(ttsWatchdog);pausingForTTS=false;if(desired)scheduleRestart(350)}
+function resumeAfterTTS(){clearTimeout(ttsWatchdog);pausingForTTS=false;if(desired)scheduleRestart(150)}
 function display(h,t,spoken=true){headline.textContent=h;subtitle.textContent=t;setStatus(t);if(spoken)speak(h+'، '+t)}
 function act(command){getAudio();stage.classList.remove('storm');switch(command){
  case 'raise':stage.classList.remove('sail-down');stage.classList.add('sail-up');beep(870);display('ارتفع الشراع! ⛵','أحسنت! الشراع يلتقط الرياح ليساعد المحمل على الإبحار.');break;
