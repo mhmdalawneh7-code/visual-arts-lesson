@@ -1,0 +1,10 @@
+{
+  "name": "quiz-ar",
+  "version": "1.0.0",
+  "description": "منصة مسابقات تفاعلية بالعربية مع دخول الطلاب برمز PIN",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT"
+}

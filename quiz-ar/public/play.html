@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الدخول كطالب</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar"><a href="index.html">→ الرئيسية</a><span id="quizTitle">الدخول للمسابقة</span></div>
+  <main>
+
+    <!-- إدخال الرمز والاسم -->
+    <section id="joinView" class="card">
+      <h2>ادخل المسابقة</h2>
+      <label for="pin">رمز PIN</label>
+      <input id="pin" type="text" inputmode="numeric" maxlength="6" placeholder="000000" style="direction:ltr;text-align:center;font-size:1.6rem;letter-spacing:6px">
+      <label for="name">اسمك</label>
+      <input id="name" type="text" maxlength="20" placeholder="اكتب اسمك">
+      <p id="joinError" class="error"></p>
+      <button id="joinBtn" class="block">دخول</button>
+    </section>
+
+    <!-- بانتظار بدء المعلم -->
+    <section id="waitView" class="card hidden center">
+      <h2>أهلاً <span id="myName"></span> 👋</h2>
+      <p class="muted">بانتظار المعلم لبدء المسابقة...</p>
+    </section>
+
+    <!-- السؤال -->
+    <section id="questionView" class="hidden">
+      <div class="card">
+        <div class="row between muted"><span id="qProg"></span><span id="qTimer"></span></div>
+        <div class="progress"><div id="timeBar" style="width:100%"></div></div>
+        <div class="big" id="qText"></div>
+      </div>
+      <div class="options" id="options"></div>
+      <p id="sentMsg" class="center muted hidden" style="margin-top:14px">✅ تم إرسال إجابتك، انتظر الكشف عن الإجابة</p>
+    </section>
+
+    <!-- النتيجة بعد كل سؤال -->
+    <section id="resultView" class="card center hidden">
+      <div style="font-size:4rem" id="resIcon"></div>
+      <div class="big" id="resText"></div>
+      <p class="muted" id="resPoints"></p>
+      <p><strong>مجموعك:</strong> <span id="resScore"></span> — <strong>ترتيبك:</strong> <span id="resRank"></span></p>
+      <p class="muted">انتظر السؤال التالي...</p>
+    </section>
+
+    <!-- نهاية المسابقة -->
+    <section id="endView" class="card hidden">
+      <h2 class="center">🏁 انتهت المسابقة</h2>
+      <p class="center">ترتيبك النهائي: <strong id="finalRank"></strong> — مجموعك: <strong id="finalScore"></strong></p>
+      <h2>أفضل الطلاب</h2>
+      <ol class="board" id="finalBoard"></ol>
+    </section>
+
+    <p id="notice" class="error center"></p>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const $ = s => document.querySelector(s);
+    const COLORS = ['c0', 'c1', 'c2', 'c3'];
+    const SYMBOLS = ['▲', '◆', '●', '■'];
+    let answered = false;
+    let deadline = 0;
+    let timerId = null;
+    let timeLimit = 20;
+    let myRank = '-';
+    let myScore = 0;
+
+    function showView(id) {
+      ['joinView', 'waitView', 'questionView', 'resultView', 'endView'].forEach(v => {
+        $('#' + v).classList.toggle('hidden', v !== id);
+      });
+    }
+
+    // الدخول
+    $('#pin').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+    $('#joinBtn').addEventListener('click', () => {
+      const pin = $('#pin').value.trim();
+      const name = $('#name').value.trim();
+      $('#joinError').textContent = '';
+      if (!pin) return ($('#joinError').textContent = 'اكتب رمز PIN');
+      if (!name) return ($('#joinError').textContent = 'اكتب اسمك');
+      $('#joinBtn').disabled = true;
+      socket.emit('player:join', { pin, name }, res => {
+        $('#joinBtn').disabled = false;
+        if (!res.ok) return ($('#joinError').textContent = res.error);
+        $('#quizTitle').textContent = res.title;
+        $('#myName').textContent = name;
+        showView('waitView');
+      });
+    });
+
+    // بدء سؤال جديد
+    socket.on('game:question', q => {
+      answered = false;
+      timeLimit = q.time;
+      deadline = Date.now() + q.time * 1000;
+      $('#qProg').textContent = `السؤال ${q.index + 1} من ${q.total}`;
+      $('#qText').textContent = q.text;
+      $('#sentMsg').classList.add('hidden');
+
+      const wrap = $('#options');
+      wrap.textContent = '';
+      q.options.forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.className = `opt ${COLORS[i]}`;
+        b.type = 'button';
+        b.textContent = `${SYMBOLS[i]}  ${opt}`;
+        b.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+          socket.emit('player:answer', { choice: i });
+          [...wrap.children].forEach(c => { c.disabled = true; if (c !== b) c.classList.add('dim'); });
+          $('#sentMsg').classList.remove('hidden');
+        });
+        wrap.appendChild(b);
+      });
+
+      showView('questionView');
+      clearInterval(timerId);
+      timerId = setInterval(tick, 200);
+      tick();
+    });
+
+    function tick() {
+      const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      $('#qTimer').textContent = `⏱ ${left} ث`;
+      $('#timeBar').style.width = Math.max(0, (deadline - Date.now()) / (timeLimit * 1000) * 100) + '%';
+      if (left === 0) clearInterval(timerId);
+    }
+
+    // لم يُجب الطالب أو الإجابة وصلت
+    socket.on('player:answered', () => {});
+
+    // نتيجة الطالب بعد الكشف
+    socket.on('player:result', r => {
+      clearInterval(timerId);
+      myRank = r.rank;
+      myScore = r.score;
+      $('#resIcon').textContent = !r.answered ? '⏰' : r.correct ? '✅' : '❌';
+      $('#resText').textContent = !r.answered ? 'لم تُجب في الوقت' : r.correct ? 'إجابة صحيحة!' : 'إجابة خاطئة';
+      $('#resPoints').textContent = r.points ? `+${r.points} نقطة` : '';
+      $('#resScore').textContent = r.score;
+      $('#resRank').textContent = r.rank;
+      showView('resultView');
+    });
+
+    // نهاية المسابقة
+    socket.on('game:end', data => {
+      clearInterval(timerId);
+      $('#finalRank').textContent = myRank;
+      $('#finalScore').textContent = myScore;
+      const board = $('#finalBoard');
+      board.textContent = '';
+      data.leaderboard.forEach(p => {
+        const li = document.createElement('li');
+        const n = document.createElement('span');
+        n.textContent = p.name;
+        const s = document.createElement('strong');
+        s.textContent = p.score;
+        li.append(n, s);
+        board.appendChild(li);
+      });
+      showView('endView');
+    });
+
+    socket.on('room:closed', () => {
+      clearInterval(timerId);
+      $('#notice').textContent = 'أغلق المعلم المسابقة.';
+      showView('joinView');
+    });
+
+    socket.on('disconnect', () => {
+      $('#notice').textContent = 'انقطع الاتصال بالخادم، حاول تحديث الصفحة.';
+    });
+  </script>
+</body>
+</html>

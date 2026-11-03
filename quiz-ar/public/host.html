@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إنشاء مسابقة</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar"><a href="index.html">→ الرئيسية</a><span>لوحة المعلم</span></div>
+  <main>
+
+    <!-- 1) بناء المسابقة -->
+    <section id="builderView">
+      <div class="card">
+        <h2>عنوان المسابقة</h2>
+        <input id="title" type="text" maxlength="100" placeholder="مثال: مراجعة الفنون الإسلامية">
+      </div>
+
+      <div id="questions"></div>
+
+      <div class="row between">
+        <button id="addQ" class="secondary">+ إضافة سؤال</button>
+        <button id="createBtn">إنشاء الغرفة وعرض الرمز</button>
+      </div>
+      <p id="builderError" class="error"></p>
+    </section>
+
+    <!-- 2) الانتظار في الغرفة -->
+    <section id="lobbyView" class="hidden">
+      <div class="pin-box">
+        <div class="hint">رمز الدخول للطلاب</div>
+        <div class="pin" id="pinCode">------</div>
+        <div class="hint">ادخلوا من صفحة «الدخول كطالب»</div>
+      </div>
+      <div class="card">
+        <div class="row between">
+          <h2 style="margin:0">الطلاب المنضمون (<span id="count">0</span>)</h2>
+          <button id="startBtn">▶ ابدأ المسابقة</button>
+        </div>
+        <div class="players" id="players" style="margin-top:14px"></div>
+      </div>
+    </section>
+
+    <!-- 3) السؤال المباشر -->
+    <section id="liveView" class="hidden">
+      <div class="card">
+        <div class="row between muted"><span id="liveProg"></span><span id="answerCount"></span></div>
+        <div class="big" id="liveText"></div>
+      </div>
+      <div class="card" id="barsCard"></div>
+      <div class="row between">
+        <button id="revealBtn" class="secondary">كشف الإجابة الآن</button>
+        <button id="nextBtn" class="hidden">السؤال التالي</button>
+      </div>
+    </section>
+
+    <!-- 4) النتائج النهائية -->
+    <section id="endView" class="hidden card">
+      <h2 class="center">🏆 الترتيب النهائي</h2>
+      <ol class="board" id="finalBoard"></ol>
+      <div class="center" style="margin-top:16px"><button onclick="location.reload()">مسابقة جديدة</button></div>
+    </section>
+
+    <p id="notice" class="error center"></p>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const $ = s => document.querySelector(s);
+    const SYMBOLS = ['▲', '◆', '●', '■'];
+    const COLORS = ['c0', 'c1', 'c2', 'c3'];
+    let total = 0;
+    let currentIndex = 0;
+    let questionCount = 0;
+
+    function showView(id) {
+      ['builderView', 'lobbyView', 'liveView', 'endView'].forEach(v => {
+        $('#' + v).classList.toggle('hidden', v !== id);
+      });
+    }
+
+    // ---------- بناء الأسئلة ----------
+    function addQuestion() {
+      questionCount++;
+      const n = questionCount;
+      const card = document.createElement('div');
+      card.className = 'card qcard';
+
+      const head = document.createElement('div');
+      head.className = 'row between';
+      const label = document.createElement('strong');
+      label.className = 'qnum';
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'ghost';
+      del.textContent = 'حذف';
+      del.addEventListener('click', () => { card.remove(); renumber(); });
+      head.append(label, del);
+
+      const text = document.createElement('input');
+      text.type = 'text';
+      text.className = 'qtext';
+      text.maxLength = 300;
+      text.placeholder = 'نص السؤال';
+
+      const list = document.createElement('div');
+      list.className = 'opts-list';
+      for (let i = 0; i < 4; i++) {
+        const row = document.createElement('div');
+        row.className = 'opt-row';
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.className = 'opt-radio';
+        radio.name = 'correct' + n;
+        radio.value = i;
+        if (i === 0) radio.checked = true;
+        const opt = document.createElement('input');
+        opt.type = 'text';
+        opt.className = 'opt-text';
+        opt.maxLength = 150;
+        opt.placeholder = `الخيار ${SYMBOLS[i]}`;
+        row.append(radio, opt);
+        list.appendChild(row);
+      }
+
+      const timeLabel = document.createElement('label');
+      timeLabel.textContent = 'الوقت بالثواني: ';
+      const time = document.createElement('input');
+      time.type = 'number';
+      time.className = 'qtime';
+      time.min = 5;
+      time.max = 120;
+      time.value = 20;
+      timeLabel.appendChild(time);
+
+      const hint = document.createElement('p');
+      hint.className = 'muted';
+      hint.style.margin = '6px 0 0';
+      hint.textContent = 'حدد الدائرة بجانب الإجابة الصحيحة';
+
+      card.append(head, text, list, timeLabel, hint);
+      $('#questions').appendChild(card);
+      renumber();
+    }
+
+    function renumber() {
+      document.querySelectorAll('.qcard').forEach((c, i) => {
+        c.querySelector('.qnum').textContent = `السؤال ${i + 1}`;
+      });
+    }
+
+    function collectQuiz() {
+      const questions = [...document.querySelectorAll('.qcard')].map(card => {
+        const options = [...card.querySelectorAll('.opt-text')].map(i => i.value.trim());
+        const checked = card.querySelector('.opt-radio:checked');
+        return {
+          text: card.querySelector('.qtext').value.trim(),
+          options,
+          answer: checked ? Number(checked.value) : -1,
+          time: Number(card.querySelector('.qtime').value) || 20
+        };
+      });
+      return { title: $('#title').value.trim(), questions };
+    }
+
+    function validateQuiz(quiz) {
+      if (quiz.questions.length === 0) return 'أضف سؤالاً واحداً على الأقل';
+      for (let i = 0; i < quiz.questions.length; i++) {
+        const q = quiz.questions[i];
+        if (!q.text) return `اكتب نص السؤال ${i + 1}`;
+        if (q.options.some(o => !o)) return `املأ جميع خيارات السؤال ${i + 1}`;
+        if (q.answer < 0) return `حدد الإجابة الصحيحة للسؤال ${i + 1}`;
+      }
+      return null;
+    }
+
+    // ---------- الغرفة ----------
+    $('#addQ').addEventListener('click', addQuestion);
+
+    $('#createBtn').addEventListener('click', () => {
+      const quiz = collectQuiz();
+      const err = validateQuiz(quiz);
+      $('#builderError').textContent = err || '';
+      if (err) return;
+      if (!quiz.title) quiz.title = 'مسابقة بدون عنوان';
+
+      $('#createBtn').disabled = true;
+      socket.emit('host:create', quiz, res => {
+        $('#createBtn').disabled = false;
+        if (!res.ok) return ($('#builderError').textContent = res.error);
+        $('#pinCode').textContent = res.pin;
+        showView('lobbyView');
+      });
+    });
+
+    socket.on('host:players', list => {
+      $('#count').textContent = list.length;
+      const wrap = $('#players');
+      wrap.textContent = '';
+      list.forEach(name => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = name;
+        wrap.appendChild(chip);
+      });
+    });
+
+    $('#startBtn').addEventListener('click', () => {
+      if (Number($('#count').textContent) === 0) return ($('#notice').textContent = 'انتظر انضمام طالب واحد على الأقل');
+      socket.emit('host:start');
+    });
+
+    // ---------- السؤال المباشر ----------
+    socket.on('game:question', q => {
+      total = q.total;
+      currentIndex = q.index;
+      $('#liveProg').textContent = `السؤال ${q.index + 1} من ${q.total}`;
+      $('#liveText').textContent = q.text;
+      $('#answerCount').textContent = '';
+
+      const bars = $('#barsCard');
+      bars.textContent = '';
+      q.options.forEach((opt, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'bar-wrap';
+        const lbl = document.createElement('div');
+        lbl.className = 'bar-label';
+        const name = document.createElement('span');
+        name.textContent = `${SYMBOLS[i]} ${opt}`;
+        const cnt = document.createElement('span');
+        cnt.id = 'cnt' + i;
+        cnt.textContent = '0';
+        lbl.append(name, cnt);
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        const fill = document.createElement('div');
+        fill.id = 'fill' + i;
+        fill.style.width = '0%';
+        bar.appendChild(fill);
+        wrap.append(lbl, bar);
+        bars.appendChild(wrap);
+      });
+
+      $('#revealBtn').classList.remove('hidden');
+      $('#nextBtn').classList.add('hidden');
+      showView('liveView');
+    });
+
+    socket.on('host:answers', d => {
+      $('#answerCount').textContent = `أجاب ${d.count} من ${d.total}`;
+    });
+
+    socket.on('game:reveal', d => {
+      const sum = d.counts.reduce((a, b) => a + b, 0) || 1;
+      d.counts.forEach((c, i) => {
+        $('#cnt' + i).textContent = c;
+        const fill = $('#fill' + i);
+        fill.style.width = (c / sum * 100) + '%';
+        fill.style.background = i === d.answer ? 'var(--green)' : 'var(--accent)';
+      });
+      $('#revealBtn').classList.add('hidden');
+      const last = currentIndex + 1 >= total;
+      $('#nextBtn').textContent = last ? 'إنهاء وعرض النتائج' : 'السؤال التالي';
+      $('#nextBtn').classList.remove('hidden');
+    });
+
+    $('#revealBtn').addEventListener('click', () => socket.emit('host:reveal'));
+    $('#nextBtn').addEventListener('click', () => socket.emit('host:next'));
+
+    // ---------- النهاية ----------
+    socket.on('game:end', d => {
+      const board = $('#finalBoard');
+      board.textContent = '';
+      d.leaderboard.forEach(p => {
+        const li = document.createElement('li');
+        const n = document.createElement('span');
+        n.textContent = p.name;
+        const s = document.createElement('strong');
+        s.textContent = p.score;
+        li.append(n, s);
+        board.appendChild(li);
+      });
+      showView('endView');
+    });
+
+    socket.on('room:closed', () => {
+      $('#notice').textContent = 'انقطع اتصال المعلم وأُغلقت الغرفة.';
+    });
+
+    socket.on('disconnect', () => {
+      $('#notice').textContent = 'انقطع الاتصال بالخادم، حدّث الصفحة وأنشئ الغرفة من جديد.';
+    });
+
+    // سؤال افتراضي جاهز عند فتح الصفحة
+    addQuestion();
+  </script>
+</body>
+</html>
