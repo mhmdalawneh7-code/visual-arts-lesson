@@ -65,17 +65,12 @@ const stage=$('stage'),statusEl=$('status'),headline=$('headline'),subtitle=$('s
 const micState=$('micState'),meterFill=$('meterFill'),levelText=$('levelText');
 const btns=[...document.querySelectorAll('.mic-toggle')],narration=$('narration'),effects=$('effects');
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let recognition=null,desired=false,recognizing=false,starting=false,pausingForTTS=false;
+let rec=null,micOn=false,quiet=false,retries=0,restartT=0,quietT=0;
 let audioContext=null,micStream=null,analyser=null,meterAnim=0;
-let ttsTimer=0,ttsWatchdog=0,restartTimer=0,restartAttempts=0,abortCount=0,lastFinal='',lastTime=0;
 let score=0,qi=0,answered=false,allowVoiceResponses=true;
 
 function setStatus(msg,warning=false){statusEl.textContent=msg;statusEl.classList.toggle('warn',warning)}
-function setMicUI(state,message){
- stage.classList.toggle('listening',state==='listening'); stage.classList.toggle('thinking',state==='waiting');
- micState.textContent=message||({listening:'الميكروفون يستمع الآن',waiting:'جارٍ الاتصال بالصوت…',off:'الميكروفون متوقف'}[state]);
- btns.forEach(b=>{b.textContent=desired?'⏹️ إيقاف الميكروفون':'🎙️ تشغيل الميكروفون';b.classList.toggle('danger',desired);b.classList.toggle('primary',!desired);});
-}
+function setMicUI(){ stage.classList.toggle('listening',micOn&&!quiet); micState.textContent=micOn?'الميكروفون يستمع الآن 🎤':'الميكروفون متوقف'; btns.forEach(b=>{b.textContent=micOn?'⏹️ إيقاف الميكروفون':'🎙️ تشغيل الميكروفون';b.classList.toggle('danger',micOn);b.classList.toggle('primary',!micOn);}); }
 function setLive(text,isInterim=false){liveText.textContent=text;liveText.classList.toggle('interim',isInterim)}
 function addHistory(text){const ol=$('history');if(ol.firstElementChild?.textContent==='لم تبدأ المحادثة بعد.')ol.replaceChildren();const item=document.createElement('li');item.textContent=text;ol.insertBefore(item,ol.firstChild);while(ol.children.length>8)ol.removeChild(ol.lastChild)}
 function getAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;audioContext ||= new C();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});return audioContext}catch{return null}}
@@ -85,16 +80,15 @@ function cheerSparks(){for(let i=0;i<13;i++){let sp=document.createElement('span
 function canSpeak(){return narration.checked&&('speechSynthesis'in window)&&allowVoiceResponses}
 function speak(text){
  if(!canSpeak())return;
- clearTimeout(ttsTimer);
- try{speechSynthesis.cancel()}catch{}
- let u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.92;u.pitch=1.04;u.volume=1;
- const voices=speechSynthesis.getVoices();let v=voices.find(x=>x.lang.toLowerCase().startsWith('ar'));if(v)u.voice=v;
- if(desired && recognizing){pausingForTTS=true;try{recognition.stop()}catch{pausingForTTS=false}}
- else if(desired){pausingForTTS=true}
- u.onend=()=>resumeAfterTTS();u.onerror=()=>resumeAfterTTS();
- ttsTimer=setTimeout(()=>{try{speechSynthesis.speak(u);clearTimeout(ttsWatchdog);ttsWatchdog=setTimeout(()=>{if(pausingForTTS){try{speechSynthesis.cancel()}catch{}resumeAfterTTS()}},12000)}catch{resumeAfterTTS()}},desired?120:0);
+ try{speechSynthesis.cancel()}catch(e){}
+ const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.92;u.pitch=1.04;
+ const v=speechSynthesis.getVoices().find(x=>x.lang.toLowerCase().startsWith('ar'));if(v)u.voice=v;
+ const wasOn=micOn;
+ if(wasOn){quiet=true;try{rec&&rec.abort()}catch(e){}}
+ const done=()=>{clearTimeout(quietT);quiet=false;if(wasOn&&micOn)setTimeout(startRec,250)};
+ u.onend=done;u.onerror=done;quietT=setTimeout(done,15000);
+ speechSynthesis.speak(u);
 }
-function resumeAfterTTS(){clearTimeout(ttsWatchdog);pausingForTTS=false;if(desired)scheduleRestart(150)}
 function display(h,t,spoken=true){headline.textContent=h;subtitle.textContent=t;setStatus(t);if(spoken)speak(h+'، '+t)}
 function act(command){getAudio();stage.classList.remove('storm');switch(command){
  case 'raise':stage.classList.remove('sail-down');stage.classList.add('sail-up');beep(870);display('ارتفع الشراع! ⛵','أحسنت! الشراع يلتقط الرياح ليساعد المحمل على الإبحار.');break;
@@ -140,60 +134,36 @@ function showErr(code){const msg={
  'language-not-supported':'لغة التعرف المختارة غير مدعومة؛ جرّب «العربية – الأكثر توافقًا».',
  'no-speech':'لم يصل كلام واضح؛ تحدث بالقرب من الميكروفون.'
  }[code]||('تعذر التعرف الصوتي: '+code);setStatus(msg,true)}
-function stopRecognitionOnly(){clearTimeout(restartTimer);if(recognition){try{recognition.stop()}catch{}}}
-function scheduleRestart(delay=650){if(!desired||pausingForTTS||recognizing||starting)return;clearTimeout(restartTimer);restartTimer=setTimeout(()=>startRecognition(),delay)}
-function initSpeech(){if(!SR)return;recognition=new SR();recognition.lang=$('dialect').value;recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;
- recognition.onstart=()=>{starting=false;recognizing=true;restartAttempts=0;abortCount=0;setMicUI('listening','الميكروفون يستمع لك الآن 🎤');setStatus('✅ الميكروفون يعمل. تحدث الآن، وستظهر كلماتك بالعربية مباشرة على الشاشة.')};
- recognition.onaudiostart=()=>{if(desired)setMicUI('listening','يتم استقبال الصوت الآن 🎤')};
- recognition.onspeechstart=()=>{if(desired)micState.textContent='جاري التعرف على كلامك… 🎤'};
- recognition.onspeechend=()=>{if(desired)micState.textContent='أكمل حديثك… 🎤'};
- recognition.onresult=(e)=>{
- let interim='', finals=[];
- for(let i=e.resultIndex;i<e.results.length;i++){
-  let r=e.results[i],txt=(r[0]?.transcript||'').trim();if(r.isFinal){if(txt)finals.push(txt)}else if(txt)interim+=' '+txt;
+function initRec(){
+ if(!SR)return;
+ rec=new SR();rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
+ rec.onstart=()=>{retries=0;setMicUI();if(!quiet)setStatus('✅ الميكروفون يعمل. تحدث الآن بالعربية.')};
+ rec.onresult=e=>{retries=0;let interim='',finals=[];
+  for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];const t=((r[0]&&r[0].transcript)||'').trim();if(r.isFinal){if(t)finals.push(t)}else if(t)interim+=' '+t}
+  if(interim.trim())setLive(interim.trim(),true);
+  for(const t of finals){setLive(t,false);addHistory(t);if(!parseCommand(t))setStatus('✅ فهمت كلامك وعرضته. جرّب أوامر مثل «ارفع الشراع» أو «أبحر».')}
+ };
+ rec.onerror=e=>{if(e.error==='aborted'||e.error==='no-speech')return;showErr(e.error);if(['not-allowed','service-not-allowed','audio-capture','language-not-supported'].includes(e.error)){micOn=false;setMicUI()}};
+ rec.onend=()=>{if(!micOn||quiet)return;if(++retries>8){micOn=false;setMicUI();setStatus('توقف التعرف الصوتي عدة مرات. اضغط المايك مرة أخرى، أو اكتب الأمر في المربع أسفل الشاشة.',true);return}clearTimeout(restartT);restartT=setTimeout(startRec,300)};
+}
+function startRec(){if(!rec||!micOn||quiet)return;rec.lang=$('dialect').value;try{rec.start()}catch(e){}}
+function setMicOn(on){
+ if(on){
+  if(!SR){setStatus('هذا المتصفح لا يدعم التعرف الصوتي. افتح الصفحة في Chrome على الكمبيوتر.',true);return}
+  if(!rec)initRec();
+  micOn=true;setMicUI();setLive('🎤 جارٍ تشغيل الميكروفون… تحدث الآن');getAudio();
+  startRec();
+ }else{
+  micOn=false;clearTimeout(restartT);try{rec&&rec.stop()}catch(e){}
+  setMicUI();setLive('تم إيقاف الاستماع. اضغط المايك لتشغيله.');setStatus('الميكروفون متوقف.');
  }
- if(interim.trim())setLive(interim.trim(),true);
- for(let txt of finals){let now=Date.now();if(txt===lastFinal&&now-lastTime<1400)continue;lastFinal=txt;lastTime=now;setLive(txt,false);addHistory(txt);const accepted=parseCommand(txt);if(!accepted)setStatus('✅ فهمت كلامك وعرضته. جرّب أيضًا أوامر مثل «ارفع الشراع» أو «أبحر».');}
- };
- recognition.onerror=e=>{starting=false;recognizing=false;const code=e.error;
- if(code==='aborted'){abortCount++;if(abortCount>=6){abortCount=0;disableMic(false);setStatus('توقف التعرف الصوتي عدة مرات. اضغط زر المايك مرة أخرى، أو اكتب الأمر في المربع أسفل الشاشة.',true);}return;}
- showErr(code);
- if(['not-allowed','service-not-allowed','audio-capture','language-not-supported'].includes(code))disableMic(false);
- else if(code==='network'){restartAttempts++;if(restartAttempts>=2)disableMic(false)}
- };
- recognition.onend=()=>{starting=false;recognizing=false;if(desired&&!pausingForTTS){setMicUI('waiting','إعادة وصل التعرف الصوتي…');scheduleRestart(600)}else if(!desired)setMicUI('off');};
-}
-function startRecognition(){if(!desired||!recognition||pausingForTTS||recognizing||starting)return;starting=true;
- try{recognition.lang=$('dialect').value;recognition.start();setMicUI('waiting','جارٍ بدء التعرف الصوتي…')}catch(err){starting=false;setStatus('لم يبدأ التعرف الصوتي: '+err.message,true);scheduleRestart(1300)}
-}
-async function openMicrophone(){
- if(desired)return;
- if(!SR){setStatus('هذا المتصفح لا يدعم تحويل الكلام العربي إلى نص. افتح الملف في Google Chrome، ويفضل عبر HTTPS.',true);setLive('التعرف الصوتي غير مدعوم في هذا المتصفح');return}
- if(!window.isSecureContext){setStatus('يحتاج الميكروفون إلى صفحة آمنة: افتح الصفحة عبر HTTPS أو localhost؛ لا يمكن ضمان تشغيله من جميع الملفات المحلية.',true);setLive('افتح الصفحة عبر HTTPS أو localhost');return}
- desired=true;setMicUI('waiting','طلب إذن الميكروفون…');setStatus('اختر «سماح» عندما يطلب المتصفح استخدام الميكروفون.');getAudio();
- try{
-  if(!navigator.mediaDevices?.getUserMedia)throw new Error('المتصفح لا يوفر صلاحية الميكروفون في هذه الصفحة.');
-  // Ask for permission once, then release the stream: keeping a second microphone stream open
-  // alongside SpeechRecognition makes Chrome abort recognition while the teacher is speaking.
-  const permStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-  permStream.getTracks().forEach(t=>t.stop());
-  micStream=null;
-  if(!desired)return;
-  setLive('🎤 الميكروفون متصل… تحدث الآن باللغة العربية');startRecognition();
- }catch(e){disableMic(false);let msg=e.name==='NotAllowedError'?'تم منع الميكروفون. اضغط 🔒 بجانب العنوان ← الميكروفون ← سماح، ثم أعد تحميل الصفحة. وإن لم يعمل، اكتب الأمر في المربع أسفل الشاشة.':e.name==='NotFoundError'?'لا يوجد ميكروفون متصل بالجهاز.':e.name==='NotReadableError'?'الميكروفون مشغول بتطبيق آخر أو يتعذر الوصول إليه.':e.message;setStatus('❌ '+msg,true);setLive('لم يتم تشغيل الميكروفون — راجع التعليمات أسفل الصفحة')}
 }
 $('typedForm').addEventListener('submit',e=>{e.preventDefault();const v=$('typedIn').value.trim();if(!v)return;setLive(v,false);addHistory(v);if(!parseCommand(v))setStatus('✅ فهمت كلامك وعرضته. جرّب أوامر مثل «ارفع الشراع» أو «أبحر».');$('typedIn').value='';});
-function monitorLevel(){if(!analyser||!desired)return;let arr=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(arr);let sum=0;for(const b of arr){const v=(b-128)/128;sum+=v*v}const rms=Math.sqrt(sum/arr.length);const level=Math.min(100,Math.round(rms*480));meterFill.style.width=level+'%';levelText.textContent=level+'%';meterAnim=requestAnimationFrame(monitorLevel)}
-function disableMic(manual=true){desired=false;pausingForTTS=false;clearTimeout(restartTimer);clearTimeout(ttsTimer);clearTimeout(ttsWatchdog);if('speechSynthesis'in window){try{speechSynthesis.cancel()}catch{}}
- stopRecognitionOnly();if(meterAnim)cancelAnimationFrame(meterAnim);meterAnim=0;analyser=null;
- if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}
- meterFill.style.width='0';levelText.textContent='0%';setMicUI('off');if(manual){setStatus('الميكروفون متوقف. يمكنك تشغيله مجددًا بضغطة واحدة.');setLive('تم إيقاف الاستماع. اضغط لتشغيل الميكروفون.')}
-}
-for(const b of btns)b.addEventListener('click',()=>desired?disableMic():openMicrophone());
-$('dialect').addEventListener('change',()=>{if(desired){stopRecognitionOnly();setStatus('جارٍ تطبيق لغة التعرف الجديدة.')} });
+btns.forEach(b=>b.addEventListener('click',()=>setMicOn(!micOn)));
+$('dialect').addEventListener('change',()=>{if(micOn&&rec){try{rec.abort()}catch(e){}}});
 $('fullScreen').addEventListener('click',async()=>{try{if(document.fullscreenElement){await document.exitFullscreen()}else{await stage.requestFullscreen()}}catch{setStatus('تعذر ملء الشاشة. اضغط F11 في الكمبيوتر.',true)}});
 
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&desired)setStatus('الصفحة ليست ظاهرة. أبقها مفتوحة أثناء الدرس حتى يظل التعرف الصوتي فعالًا.');});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&micOn)setStatus('الصفحة ليست ظاهرة. أبقها مفتوحة أثناء الدرس حتى يظل التعرف الصوتي فعالًا.');});
 const questions=[
  ['ما الشكل الهندسي الذي يشبه الشراع؟',['المثلث','المربع','الدائرة'],0],
  ['في ماذا استخدم أهل قطر المحامل قديمًا؟',['سباق السيارات','الغوص على اللؤلؤ والصيد والتجارة','الطيران'],1],
@@ -205,7 +175,7 @@ function renderQuiz(){answered=false;const q=questions[qi];$('question').textCon
 function chooseAnswer(i){if(answered||i>2||i<0)return;answered=true;const q=questions[qi],yes=(i===q[2]);if(yes){score++;beep(880);beep(1120,.20,.21);cheerSparks()}else beep(290,.3);$('feedback').textContent=yes?'🌟 إجابة صحيحة! أحسنت!':'💡 الإجابة الصحيحة: '+q[1][q[2]];$('score').textContent='⭐ النجوم: '+score;[...$('answers').children].forEach(b=>b.disabled=true);speak(yes?'أحسنت يا بطل! إجابة صحيحة.':'الإجابة الصحيحة هي '+q[1][q[2]])}
 function nextQuestion(){qi=(qi+1)%questions.length;renderQuiz()}
 function resetQuiz(){qi=0;score=0;$('score').textContent='⭐ النجوم: 0';renderQuiz()}
-renderQuiz();initSpeech();if(!SR)setStatus('⚠️ لا يوجد دعم للتعرف الصوتي بهذا المتصفح. استخدم Google Chrome على الكمبيوتر عبر HTTPS أو localhost.',true);
+renderQuiz();initRec();if(!SR)setStatus('⚠️ لا يوجد دعم للتعرف الصوتي بهذا المتصفح. استخدم Google Chrome على الكمبيوتر عبر HTTPS أو localhost.',true);
 window.addEventListener('beforeunload',()=>{if(micStream)micStream.getTracks().forEach(t=>t.stop())});
 </script>
 </body></html>
