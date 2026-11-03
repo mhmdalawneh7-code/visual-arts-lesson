@@ -243,10 +243,14 @@
       const rec = new SR();
       rec.lang = 'ar-QA';
       rec.continuous = true;
-      rec.interimResults = false;
+      rec.interimResults = true;
       rec.onresult = e => {
         const last = e.results[e.results.length - 1];
-        handleCommand(last[0].transcript.trim());
+        const text = last[0].transcript.trim();
+        // يعرض ما تقوله على الشاشة أثناء الكلام
+        micEl.textContent = '🎙 ' + text;
+        // ينفذ الأمر عند انتهاء الجملة فقط
+        if (last.isFinal) handleCommand(text);
       };
       // يعيد التشغيل عند توقف التعرف تلقائياً
       let micOn = false;
