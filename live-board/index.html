@@ -545,7 +545,7 @@ button:disabled{opacity:.5;cursor:default}
   function noMic(msg){ micOff=true; micBtn.disabled=false; micBtn.classList.remove("on"); micBtn.textContent="ابدأ الكلام"; note(msg); }
   /* Fallback: the browser's own speech recognition, when the platform's dictation is absent. */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec=null, recOn=false, interimT=0, lastInterim="", skipFinal=false;
+  let rec=null, recOn=false, interimT=0, lastInterim="", skipFinal=false, donePrefix="";
   function recUi(){
     micBtn.classList.toggle("on", recOn);
     micBtn.textContent = recOn ? "أوقف الاستماع" : "ابدأ الكلام";
@@ -562,20 +562,22 @@ button:disabled{opacity:.5;cursor:default}
         const r=ev.results[i];
         if(r.isFinal){
           clearTimeout(interimT); lastInterim=""; showPartial("");
-          if(skipFinal) skipFinal=false;
-          else if(r[0].transcript.trim()) addWords(r[0].transcript);
+          const f = r[0].transcript, rest = donePrefix ? f.slice(Math.min(donePrefix.length, f.length)) : f;
+          donePrefix = "";
+          if(rest.trim()) addWords(rest);
         }
         else interim += r[0].transcript;
       }
-      showPartial(interim);
+      showPartial(donePrefix ? interim.slice(Math.min(donePrefix.length, interim.length)) : interim);
       /* The browser can hold a phrase as "not final" for a long time: run it after a short pause. */
       if(interim.trim() && interim!==lastInterim){
         lastInterim = interim; clearTimeout(interimT);
         interimT = setTimeout(()=>{
-          const t = lastInterim; lastInterim="";
-          if(!t.trim() || !recOn) return;
-          skipFinal = true; showPartial(""); addWords(t);
-          try{ rec.stop(); }catch(_){}
+          const t = lastInterim;
+          if(!recOn) return;
+          const part = donePrefix ? t.slice(Math.min(donePrefix.length, t.length)) : t;
+          donePrefix = t;
+          if(part.trim()){ showPartial(""); addWords(part); }
         }, 1300);
       }
     };
@@ -586,7 +588,15 @@ button:disabled{opacity:.5;cursor:default}
         noMic("المتصفح منع الميكروفون عن هذه الصفحة [" + ev.error + "]. اضغط «ابدأ الكلام» للكتابة أو الإملاء من لوحة المفاتيح.");
       else note("تعذّر الاستماع [" + ev.error + "]. اضغط «ابدأ الكلام» للمحاولة مرة أخرى.");
     };
-    rec.onend = ()=>{ skipFinal=false; if(recOn){ try{ rec.start(); }catch(_){ recOn=false; } } recUi(); };
+    rec.onend = ()=>{
+      donePrefix=""; lastInterim=""; clearTimeout(interimT);
+      if(recOn) setTimeout(()=>{
+        if(!recOn) return;
+        try{ rec.start(); }
+        catch(_){ setTimeout(()=>{ if(!recOn) return; try{ rec.start(); }catch(e){ recOn=false; recUi(); note("توقف الاستماع. اضغط «ابدأ الكلام» من جديد."); } }, 600); }
+      }, 200);
+      recUi();
+    };
     recOn=true;
     try{ rec.start(); }catch(_){ recOn=false; }
     recUi();
