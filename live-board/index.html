@@ -621,7 +621,14 @@ button:disabled{opacity:.5;cursor:default}
       try{
         r = await fetch("https://api.anthropic.com/v1/messages", {method:"POST", headers,
           body:JSON.stringify({model:"claude-haiku-5-5", max_tokens:4000, messages:[{role:"user", content:String(input)}]})});
-      }catch(err){ throw {code:"network", message:"تعذّر الاتصال بـ Claude. تحقق من الإنترنت."}; }
+      }catch(err){
+        /* Tell a blocked network apart from a refused request. */
+        let reach=false;
+        try{ await fetch("https://api.anthropic.com/v1/models", {mode:"no-cors"}); reach=true; }catch(_){}
+        throw reach
+          ? {code:"refused", message:"وصل المتصفح إلى Claude لكن الطلب رُفض. تحقق من المفتاح ومن رصيد الحساب، وعطّل إضافات حجب الإعلانات لهذه الصفحة."}
+          : {code:"blocked", message:"الشبكة التي تستخدمها تمنع الوصول إلى api.anthropic.com. جرّب شبكة أخرى، مثل نقطة اتصال الجوال."};
+      }
       let j = null; try{ j = await r.json(); }catch(_){}
       if(!r.ok) throw {code:"api_" + r.status, message:(j && j.error && j.error.message) || ""};
       const t = ((j && j.content) || []).map(c=>c.text || "").join("");
