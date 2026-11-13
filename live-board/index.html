@@ -545,7 +545,7 @@ button:disabled{opacity:.5;cursor:default}
   function noMic(msg){ micOff=true; micBtn.disabled=false; micBtn.classList.remove("on"); micBtn.textContent="ابدأ الكلام"; note(msg); }
   /* Fallback: the browser's own speech recognition, when the platform's dictation is absent. */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec=null, recOn=false;
+  let rec=null, recOn=false, interimT=0, lastInterim="", skipFinal=false;
   function recUi(){
     micBtn.classList.toggle("on", recOn);
     micBtn.textContent = recOn ? "أوقف الاستماع" : "ابدأ الكلام";
@@ -560,10 +560,24 @@ button:disabled{opacity:.5;cursor:default}
       let interim="";
       for(let i=ev.resultIndex;i<ev.results.length;i++){
         const r=ev.results[i];
-        if(r.isFinal){ showPartial(""); if(r[0].transcript.trim()) addWords(r[0].transcript); }
+        if(r.isFinal){
+          clearTimeout(interimT); lastInterim=""; showPartial("");
+          if(skipFinal) skipFinal=false;
+          else if(r[0].transcript.trim()) addWords(r[0].transcript);
+        }
         else interim += r[0].transcript;
       }
       showPartial(interim);
+      /* The browser can hold a phrase as "not final" for a long time: run it after a short pause. */
+      if(interim.trim() && interim!==lastInterim){
+        lastInterim = interim; clearTimeout(interimT);
+        interimT = setTimeout(()=>{
+          const t = lastInterim; lastInterim="";
+          if(!t.trim() || !recOn) return;
+          skipFinal = true; showPartial(""); addWords(t);
+          try{ rec.stop(); }catch(_){}
+        }, 1300);
+      }
     };
     rec.onerror = ev=>{
       if(ev.error==="no-speech" || ev.error==="aborted") return;
@@ -572,7 +586,7 @@ button:disabled{opacity:.5;cursor:default}
         noMic("المتصفح منع الميكروفون عن هذه الصفحة [" + ev.error + "]. اضغط «ابدأ الكلام» للكتابة أو الإملاء من لوحة المفاتيح.");
       else note("تعذّر الاستماع [" + ev.error + "]. اضغط «ابدأ الكلام» للمحاولة مرة أخرى.");
     };
-    rec.onend = ()=>{ if(recOn){ try{ rec.start(); }catch(_){ recOn=false; } } recUi(); };
+    rec.onend = ()=>{ skipFinal=false; if(recOn){ try{ rec.start(); }catch(_){ recOn=false; } } recUi(); };
     recOn=true;
     try{ rec.start(); }catch(_){ recOn=false; }
     recUi();
