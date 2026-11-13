@@ -149,6 +149,35 @@ circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.0
 #mainSvg.erasing{cursor:cell}#mainSvg.erasing #sceneLayer .blk{cursor:cell}
 .hudBtn.active{background:#8a1538;color:#fff;border-color:#8a1538}
 @media(prefers-reduced-motion:reduce){.bulb,.winGlow{animation:none}}
+/* ===== v1.4: ورق مائي خشن + حبر وألوان مائية ===== */
+#artboard{background-color:#fbf8f0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='2' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' lighting-color='%23ffffff' surfaceScale='1.25' diffuseConstant='1.1'%3E%3CfeDistantLight azimuth='45' elevation='58'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23p)'/%3E%3C/svg%3E");background-size:320px 320px}
+#sceneLayer .washG{mix-blend-mode:multiply;opacity:.9}
+#bgWash{mix-blend-mode:multiply;opacity:.82}
+/* لوحة الشرح */
+#topicPanel{position:absolute;z-index:6;top:clamp(10px,3%,26px);bottom:clamp(10px,3%,26px);right:clamp(10px,2%,24px);width:min(47%,640px);display:none;flex-direction:column;gap:clamp(6px,1.2vh,14px);background:rgba(255,253,247,.94);border:2px solid #e6c896;border-radius:24px;box-shadow:0 18px 48px #3a0b1c2e;padding:clamp(12px,2vw,26px);overflow:hidden}
+#topicPanel.open{display:flex;animation:tpIn .5s cubic-bezier(.2,1.1,.4,1)}@keyframes tpIn{from{opacity:0;transform:translateX(40px)}}
+#topicPanel header{display:flex;align-items:center;gap:10px}#topicPanel h2{flex:1;margin:0;font-family:var(--display);color:#58152d;font-size:clamp(22px,3.3vw,50px);line-height:1.3}
+#topicPanel header button{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:#f1e0c9;color:#64233e;font-size:24px;font-weight:800}
+.tpSw{display:flex;flex-wrap:wrap;gap:8px 14px}.tpSw span{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:#5c3a45;font-size:clamp(12px,1.4vw,20px)}
+.tpSw i{width:clamp(22px,2.6vw,38px);height:clamp(22px,2.6vw,38px);border-radius:46% 54% 50% 50%/52% 46% 54% 48%;box-shadow:inset 0 0 0 2px #0000001f,0 2px 5px #0002}
+.tpFacts{flex:1;min-height:0;overflow:auto;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:clamp(5px,1vh,12px);counter-reset:f}
+.tpFacts li{counter-increment:f;position:relative;padding:clamp(6px,1vh,12px) clamp(44px,4.2vw,62px) clamp(6px,1vh,12px) 12px;border-radius:14px;font-weight:700;color:#3f1526;font-size:clamp(14px,1.85vw,29px);line-height:1.55;opacity:.14;transform:translateY(8px);transition:opacity .5s,transform .5s,background .3s,box-shadow .3s}
+.tpFacts li:before{content:counter(f);position:absolute;right:8px;top:50%;transform:translateY(-50%);width:clamp(26px,2.7vw,40px);height:clamp(26px,2.7vw,40px);border-radius:50%;background:#f1e0c9;color:#7a4553;display:grid;place-items:center;font-size:.72em;font-family:var(--display)}
+.tpFacts li.on{opacity:1;transform:none}.tpFacts li.cur{background:#fff3c9;box-shadow:0 0 0 2px #e9b53088,0 6px 22px #e9b53044}.tpFacts li.cur:before{background:#8a1538;color:#fff}
+#topicPanel.done .tpFacts li{opacity:1;transform:none}
+#topicPanel footer{display:flex;flex-wrap:wrap;gap:8px}#topicPanel footer button{border:1.5px solid #e4c9a3;background:#fff;color:#64233e;border-radius:999px;padding:8px 16px;font-weight:800;font-size:clamp(12px,1.3vw,18px)}#topicPanel footer button:hover{background:#58152d;color:#fff}
+#artboard.topicOn #lessonHint{display:none}
+/* ألوان ومواضيع تظهر مع الكلام */
+#swatches{position:absolute;z-index:8;left:0;right:0;bottom:clamp(40px,8%,74px);display:flex;justify-content:center;gap:clamp(6px,1.6vw,24px);pointer-events:none;opacity:0;transition:opacity .4s}
+#swatches.show{opacity:1}#swatches span{display:flex;flex-direction:column;align-items:center;gap:0;animation:swIn .6s cubic-bezier(.2,1.5,.4,1) backwards;animation-delay:var(--d)}
+#swatches svg{width:clamp(64px,10vw,150px);height:clamp(64px,10vw,150px);mix-blend-mode:multiply}#swatches b{font-family:var(--display);color:#3f1526;font-size:clamp(15px,2.1vw,32px);margin-top:-8px;text-shadow:0 0 6px #fff,0 0 6px #fff}
+@keyframes swIn{from{opacity:0;transform:scale(.3) rotate(-20deg)}}
+#mention{position:absolute;z-index:8;left:clamp(10px,2%,24px);bottom:clamp(44px,9%,80px);display:flex;align-items:center;gap:12px;max-width:min(44%,520px);text-align:right;background:rgba(255,253,247,.96);border:2px solid #e6c896;border-radius:20px;padding:10px 16px;box-shadow:0 12px 32px #3a0b1c2b;opacity:0;transform:translateY(20px) scale(.95);pointer-events:none;transition:opacity .35s,transform .45s cubic-bezier(.2,1.3,.4,1)}
+#mention.show{opacity:1;transform:none;pointer-events:auto}#mention svg{flex:none;width:clamp(60px,8vw,110px);height:clamp(60px,8vw,110px)}
+#mention span{display:flex;flex-direction:column;gap:2px;min-width:0}#mention b{font-family:var(--display);color:#58152d;font-size:clamp(16px,2vw,30px)}#mention em{font-style:normal;color:#5c3a45;font-weight:600;font-size:clamp(11px,1.25vw,18px);line-height:1.5}#mention i{font-style:normal;color:#a3516a;font-weight:800;font-size:clamp(10px,1vw,14px)}
+@media(max-width:700px){#topicPanel{width:58%}}
+#artboard.topicOn #conceptLayer{inset:0 auto 0 0;width:52%}
+#sceneLayer.onDark .washG{mix-blend-mode:normal;opacity:1}
 </style>
 </head>
 <body>
@@ -156,7 +185,22 @@ circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.0
 <main id="artboard" aria-label="لوحة الرسم التفاعلية">
  <svg id="mainSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="الرسم المتحرك">
   <defs>
-   <pattern id="paperdots" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="1" cy="1" r=".7" fill="#cfbaaa" opacity=".22"/></pattern>
+   <filter id="inkWobble" filterUnits="userSpaceOnUse" x="-200" y="-200" width="1400" height="1000"><feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>
+   <filter id="wash" filterUnits="userSpaceOnUse" x="-200" y="-200" width="1400" height="1000" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="11" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="B" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="1.5" result="b"/>
+    <feColorMatrix in="b" type="saturate" values="1.55" result="s"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="g"/>
+    <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.5 0 0 0 0.2" result="ga"/>
+    <feComposite in="s" in2="ga" operator="in" result="body"/>
+    <feMorphology in="b" operator="erode" radius="4" result="er"/><feGaussianBlur in="er" stdDeviation="3" result="erb"/>
+    <feComposite in="s" in2="erb" operator="out" result="ring"/>
+    <feColorMatrix in="ring" type="matrix" values=".72 0 0 0 0  0 .72 0 0 0  0 0 .72 0 0  0 0 0 .55 0" result="edge"/>
+    <feMerge><feMergeNode in="body"/><feMergeNode in="edge"/></feMerge>
+   </filter>
+   <radialGradient id="gShadow"><stop offset="0" stop-color="#5a6f95" stop-opacity=".75"/><stop offset=".6" stop-color="#5a6f95" stop-opacity=".35"/><stop offset="1" stop-color="#5a6f95" stop-opacity="0"/></radialGradient>
+   <clipPath id="bgClip"><rect x="26" y="22" width="948" height="556" rx="6"/></clipPath>
    <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9d8ea"/><stop offset="1" stop-color="#f4f3e4"/></linearGradient>
    <linearGradient id="gWarm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe0ea"/><stop offset="1" stop-color="#fdf0d2"/></linearGradient>
    <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb8c6"/><stop offset="1" stop-color="#25738e"/></linearGradient>
@@ -165,22 +209,25 @@ circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.0
    <linearGradient id="gSunset" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d3b77"/><stop offset=".45" stop-color="#e8705c"/><stop offset="1" stop-color="#fbc56f"/></linearGradient>
    <linearGradient id="gGrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ccf82"/><stop offset="1" stop-color="#6fae66"/></linearGradient>
   </defs>
-  <rect x="0" y="0" width="1000" height="600" fill="url(#paperdots)"/><g id="bgLayer"></g><g id="sceneLayer"></g><g id="penLayer"></g>
+  <g id="bgWash"><g id="bgLayer"></g></g><g id="sceneLayer"></g><g id="penLayer"></g>
  </svg>
  <div id="cardLayer" aria-live="polite"></div>
+ <aside id="topicPanel" aria-live="polite"></aside>
+ <div id="swatches" aria-live="polite"></div>
+ <button type="button" id="mention"></button>
  <div id="heard" aria-live="polite"></div>
  <div id="stepIntro" role="status"></div>
  <div id="spoken" aria-live="polite"><span id="spokenText"></span></div>
  <div id="lessonHud"><span id="sceneTitle"></span><span id="stepper"></span><span id="stepBadge"></span><button type="button" class="hudBtn" id="prevStep" title="أعد الخطوة">↶ إعادة</button><button type="button" class="hudBtn" id="nextStep" title="الخطوة التالية">التالي ←</button><button type="button" class="hudBtn" id="fullDrawing">الرسمة كاملة</button><button type="button" class="hudBtn" id="eraserTool" title="امسح جزءاً بإصبعك">ممحاة</button><span id="timerHud">⏳ <span id="timerText">00:30</span> <button id="timerCancel" title="إيقاف المؤقت">×</button></span></div>
  <div id="lessonHint" role="status"></div>
- <div id="status"><span id="version">v1.3.1</span><span id="soundState"><span id="soundDot"></span><span id="soundLabel">الميكروفون متوقف</span></span></div>
+ <div id="status"><span id="version">v1.4.0</span><span id="soundState"><span id="soundDot"></span><span id="soundLabel">الميكروفون متوقف</span></span></div>
  <div id="conceptLayer"><svg id="conceptSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg><div id="conceptCaption"></div></div>
  <div id="studentLayer"><svg id="teacherGhost" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg><canvas id="studentCanvas" width="1000" height="600" aria-label="مساحة رسم الطالب"></canvas></div>
  <div id="studentTools"><label>اللون <input type="color" id="brushColor" value="#60314c"></label><label>السُّمك <input type="range" id="brushWidth" min="1" max="32" value="5"></label><button id="eraserBtn">ممحاة</button><button id="undoBtn">تراجع</button><button id="clearStudentBtn">مسح</button><button id="ghostBtn">إخفاء النموذج</button><button id="mirrorBtn">تماثل</button><button id="exitStudent">إنهاء</button></div>
 </main>
 <footer id="toolbar" aria-label="أوامر المرسم">
 <button type="button" id="micBtn" title="تشغيل الميكروفون" aria-label="تشغيل الميكروفون"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg></button>
-<input id="command" type="text" aria-label="اكتب أمراً للرسم" autocomplete="off" placeholder="قل أو اكتب: ارسم المحمل · أضف أنوار للقلعة">
+<input id="command" type="text" aria-label="اكتب أمراً للرسم" autocomplete="off" placeholder="قل أو اكتب: ارسم المحمل · اشرح عن السدو">
 <button id="sendBtn" type="button" title="تنفيذ الأمر" aria-label="تنفيذ الأمر">➤</button>
 <button id="libraryBtn" class="tool" title="مكتبة الرسومات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="toolText">المكتبة</span></button>
 <button id="questionsBtn" class="tool" title="أسئلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 1 1 5 2.3c-2 1.5-2 2.2-2 3.1M12 17h.01"/></svg><span class="toolText">أسئلة</span></button>
@@ -194,7 +241,7 @@ circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.0
 <script>
 'use strict';
 (()=>{
-const VERSION='1.3.1', $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg', reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const VERSION='1.4.0', $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg', reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const svg=$('#mainSvg'),sceneLayer=$('#sceneLayer'),bgLayer=$('#bgLayer'),pen=$('#penLayer');
 // P: خط يرسمه القلم • F: مساحة لونية • L: رسمة من أربع مراحل (إرشاد، محيط، تفاصيل، تلوين)
 const P=(d,c='#573c43',w=5,extra={})=>({d,c,w,...extra}), F=(d,fill,o=1)=>({d,fill,o});
@@ -516,9 +563,39 @@ Object.assign(META['شمس'],{anim:'spin'});Object.assign(META['غيمة'],{anim
 Object.assign(META['المحمل'],{anim:'rock'});Object.assign(META['سمكة'],{anim:'swim'});Object.assign(META['النخلة'],{anim:'sway'});Object.assign(META['شجرة'],{anim:'sway'});Object.assign(META['زهرة'],{anim:'sway'});
 Object.assign(META['علم قطر'],{anim:'wave'});Object.assign(META['جمل'],{anim:'idle'});Object.assign(META['الصقر'],{anim:'idle'});Object.assign(META['انسان'],{anim:'idle'});Object.assign(META['انسان يمشي'],{anim:'walk'});
 Object.assign(META['الفنر'],{anim:'glow'});Object.assign(META['سيارة'],{anim:'idle'});Object.assign(META['صبار'],{anim:'sway'});
+// ===== لوحات الشرح: كل موضوع يُعرض برسمه وألوانه وحقائقه ويُقرأ بالصوت =====
+// scene: رسمة من المكتبة تُرسم بجانب الشرح • concept: شرح مرسوم من دروس عناصر الفن • quiz: موضوع بطاقات الأسئلة
+const SW={red:['أحمر','#d9423f'],blue:['أزرق','#3f7fd0'],yellow:['أصفر','#f5cf3d'],orange:['برتقالي','#f08a2e'],green:['أخضر','#4fa863'],violet:['بنفسجي','#8e5bb5'],black:['أسود','#2a2226'],white:['أبيض','#fffdf7'],maroon:['عنابي','#8a1538'],gold:['ذهبي','#d9a531'],brown:['بني','#8a5a3a'],sand:['رملي','#e3c594'],sea:['فيروزي','#2bb3a8'],sky:['سماوي','#6ec1e4']};
+const TOPICS={
+ sadu:{t:'السدو',keys:['السدو','سدو','نسيج السدو'],scene:'سدو',quiz:'السدو',colors:[SW.red,SW.black,SW.white,SW.orange],facts:['السدو حرفة نسيج تقليدية أتقنتها نساء البادية.','يُنسج من صوف الغنم ووبر الإبل وشعر الماعز.','تُصنع منه بيوت الشعر والبُسُط والوسائد وزينة الإبل.','نقوشه هندسية: مثلثات ومعيّنات وخطوط تتكرر بإيقاع منتظم.','ألوانه الأساسية الأحمر والأسود والأبيض.']},
+ mahmal:{t:'المحمل',keys:['المحمل','محمل','المحامل','السفن التقليديه','السفينه التقليديه'],scene:'المحمل',quiz:'التراث القطري',colors:[SW.brown,SW.sand,SW.maroon,SW.sea],facts:['المحمل سفينة خشبية شراعية صنعها أهل الخليج بأيديهم.','استُخدم في الغوص على اللؤلؤ وصيد السمك والتجارة.','من أنواعه البوم والسنبوك والجالبوت والبتيل.','صانع السفن يسمى القلّاف، وقائدها يسمى النوخذة.','شراعه المثلث الكبير يدفعه الريح فيتحرك المحمل.']},
+ pearl:{t:'الغوص على اللؤلؤ',keys:['الغوص','اللؤلؤ','لؤلؤ','الغواص','المحار'],scene:'غوص اللؤلؤ',quiz:'التراث القطري',colors:[SW.white,SW.sea,SW.sand],facts:['كان الغوص على اللؤلؤ أهم مصدر رزق في قطر قبل النفط.','موسم الغوص الكبير يكون في الصيف ويستمر نحو أربعة أشهر.','الغيص يغوص إلى القاع، والسيب يسحبه بالحبل إلى السفينة.','يضع الغيص الفطام على أنفه ويجمع المحار في سلة تسمى الديين.','النهّام يغنّي للبحّارة ليشجعهم على العمل.']},
+ zubarah:{t:'قلعة الزبارة',keys:['قلعه الزباره','الزباره','القلعه','قلعه'],scene:'قلعة الزبارة',quiz:'التراث القطري',colors:[SW.sand,SW.brown,SW.maroon],facts:['تقع قلعة الزبارة في شمال غرب قطر.','بُنيت عام 1938 لحماية الساحل.','شكلها مربع، ولها أربعة أبراج في الأركان.','جدرانها سميكة من الحجر والطين لتقي من الحرارة.','موقع الزبارة الأثري مُدرج في قائمة التراث العالمي لليونسكو.']},
+ falcon:{t:'الصقر والصقارة',keys:['الصقر','صقر','الصقاره','الصقور','القنص'],scene:'الصقر',quiz:'التراث القطري',colors:[SW.brown,SW.sand,SW.gold,SW.maroon],facts:['الصقارة رياضة تراثية عريقة في قطر، وتسمى القنص.','يُغطّى رأس الصقر بالبرقع ليبقى هادئاً.','يقف الصقر على قاعدة تسمى الوكر.','يحمل الصقّار صقره على يده فوق واقٍ من القماش أو الجلد.','الصقارة مسجّلة لدى اليونسكو تراثاً إنسانياً حياً.']},
+ palm:{t:'النخلة',keys:['النخله','نخله','النخيل','التمر'],scene:'النخلة',quiz:'التراث القطري',colors:[SW.green,SW.brown,SW.orange],facts:['النخلة شجرة مباركة ورمز للكرم والعطاء.','ثمرها التمر، وكان غذاءً أساسياً لأهل قطر.','من سعفها تُصنع السلال والحُصُر والمراوح اليدوية، وتسمى حرفة الخوص.','جذعها استُخدم في بناء أسقف البيوت القديمة.']},
+ dallah:{t:'الدلّة والقهوة العربية',keys:['الدله','دله','القهوه','القهوه العربيه','الضيافه'],scene:'الدلة',quiz:'التراث القطري',colors:[SW.gold,SW.brown,SW.white],facts:['الدلّة إناء القهوة العربية ورمز الضيافة.','تُقدَّم القهوة للضيف باليد اليمنى في فنجان صغير.','يُصبّ في الفنجان قليل من القهوة احتراماً للضيف.','إذا هزّ الضيف فنجانه فمعناه أنه اكتفى.','القهوة العربية مسجّلة لدى اليونسكو رمزاً للكرم.']},
+ tent:{t:'بيت الشعر',keys:['بيت الشعر','الخيمه','خيمه','الباديه'],scene:'بيت الشعر',quiz:'التراث القطري',colors:[SW.black,SW.red,SW.white,SW.sand],facts:['بيت الشعر مسكن أهل البادية في الصحراء.','يُنسج من شعر الماعز وصوف الغنم بطريقة السدو.','يحمي من حرّ الشمس ومن المطر والرياح.','يسهل فكّه ونقله عند الرحيل من مكان إلى آخر.']},
+ fanar:{t:'الفنر',keys:['الفنر','فنر','الفانوس'],scene:'الفنر',colors:[SW.maroon,SW.yellow,SW.orange],facts:['الفنر مصباح تراثي كان ينير البيوت والمجالس قبل الكهرباء.','له قاعدة فيها الوقود، وفتيل يشتعل داخل زجاجة.','الزجاجة تحمي اللهب من الهواء.','له مقبض يُحمل منه أو يُعلَّق.']},
+ barjeel:{t:'برج الهواء (البارجيل)',keys:['برج الهواء','البارجيل','بارجيل','ملقف الهواء'],scene:'برج الهواء',quiz:'العمارة الإسلامية',colors:[SW.sand,SW.brown],facts:['البارجيل برج يعلو البيت القطري القديم.','يلتقط الهواء من الأعلى ويوجّهه إلى داخل الغرف.','مفتوح من جهاته الأربع ليستقبل الريح من أي اتجاه.','هو تبريد طبيعي بلا كهرباء، ومثال على عمارة تلائم المناخ.']},
+ mabkhara:{t:'المبخرة',keys:['المبخره','مبخره','البخور','العود'],scene:'مبخرة',colors:[SW.brown,SW.gold,SW.orange],facts:['المبخرة وعاء يُحرق فيه العود والبخور لتعطير المكان.','تُصنع من الخشب وتُزيَّن بمسامير نحاسية.','يُقدَّم البخور للضيوف علامةً على الترحيب.','شكلها: قاعدة مائلة، خصر ضيق، وحوض مربع له أركان مرتفعة.']},
+ camel:{t:'الجمل',keys:['الجمل','جمل','الابل','الهجن','سفينه الصحراء'],scene:'جمل',quiz:'التراث القطري',colors:[SW.sand,SW.brown,SW.maroon],facts:['الجمل يسمى سفينة الصحراء لأنه يحمل الناس والأمتعة عبر الرمال.','يتحمّل العطش أياماً طويلة.','سنامه يخزّن الدهن الذي يمدّه بالطاقة.','من وبره يُنسج السدو.','سباقات الهجن رياضة تراثية مشهورة في قطر.']},
+ flag:{t:'علم دولة قطر',keys:['علم قطر','العلم','علم الدوله'],scene:'علم قطر',colors:[SW.maroon,SW.white],facts:['علم قطر لونه عنابي وأبيض.','يفصل بين اللونين خط متعرج له تسعة رؤوس.','يُعرف علم قطر باسم «الأدعم».','يُرفع العلم في اليوم الوطني في الثامن عشر من ديسمبر.']},
+ ornament:{t:'الزخارف الإسلامية',keys:['الزخارف الاسلاميه','الزخرفه الاسلاميه','الزخارف','الزخرفه','زخارف'],scene:'نجمة ثمانية',quiz:'الزخارف الإسلامية',colors:[SW.blue,SW.gold,SW.sea,SW.white],facts:['للزخرفة الإسلامية ثلاثة أنواع: هندسية ونباتية وخطية.','تقوم على التكرار والتماثل والتشابك.','النجمة الثمانية تنتج من مربعين متداخلين.','يمكن أن تمتد الزخرفة في كل اتجاه بلا نهاية.','تزيّن المساجد والأبواب والسجاد والأواني.']},
+ architecture:{t:'العمارة الإسلامية',keys:['العماره الاسلاميه','العماره','المسجد','مسجد','القبه','المئذنه'],scene:'مسجد',quiz:'العمارة الإسلامية',colors:[SW.sand,SW.sea,SW.gold],facts:['من عناصر العمارة الإسلامية: القبة والمئذنة والمحراب والأقواس.','المئذنة برج مرتفع يُرفع منه الأذان.','القبة تغطي قاعة الصلاة وتمنحها اتساعاً.','المحراب يحدّد اتجاه القبلة.','في الدوحة متحف الفن الإسلامي، وهو من أشهر المباني المستوحاة من هذه العمارة.']},
+ calligraphy:{t:'الخط العربي',keys:['الخط العربي','الخطوط العربيه','خط النسخ','خط الرقعه','الخط الكوفي'],concept:'نسخ',quiz:'الخط العربي',colors:[SW.black,SW.gold],facts:['الخط العربي فن الكتابة الجميلة.','من أنواعه: النسخ والرقعة والثلث والكوفي والديواني.','خط النسخ واضح، ولذلك تُكتب به الكتب.','خط الرقعة بسيط وسريع للكتابة اليومية.','الخط الكوفي هندسي، خطوطه مستقيمة وزواياه حادة.']},
+ colors:{t:'الألوان',keys:['الالوان','دائره الالوان','الالوان الاساسيه','الالوان الثانويه','الالوان الحاره','الالوان البارده','اللون'],concept:'الألوان',quiz:'عناصر الفن',colors:[SW.red,SW.orange,SW.yellow,SW.green,SW.blue,SW.violet],facts:['الألوان الأساسية ثلاثة: الأحمر والأزرق والأصفر.','الألوان الثانوية تنتج من مزج لونين أساسيين: البرتقالي والأخضر والبنفسجي.','الألوان الحارة: الأحمر والبرتقالي والأصفر، وتذكّرنا بالشمس والنار.','الألوان الباردة: الأزرق والأخضر والبنفسجي، وتذكّرنا بالماء والسماء.','الأبيض يفتّح اللون، والأسود يغمّقه.']},
+ elements:{t:'عناصر الفن',keys:['عناصر الفن','عناصر العمل الفني','عناصر التصميم'],concept:'الشكل',quiz:'عناصر الفن',colors:[SW.red,SW.blue,SW.yellow],facts:['عناصر الفن هي ما يبني به الفنان لوحته.','الخط: مستقيم أو منحنٍ أو متعرج، ويحدّد الأشكال.','الشكل: مساحة مغلقة مثل الدائرة والمربع والمثلث.','اللون: يعطي العمل الحياة والإحساس.','الملمس: ناعم أو خشن، نراه أو نلمسه.','الفراغ: المساحة حول الأشكال وبينها.']},
+ shade:{t:'الظل والنور',keys:['الظل والنور','الظل','التظليل','الضوء والظل'],concept:'الظل',quiz:'عناصر الفن',colors:[SW.white,['رمادي','#9aa0a6'],SW.black],facts:['الضوء يسقط على الجسم من جهة فتكون مضيئة.','الجهة البعيدة عن الضوء تكون أغمق.','يسقط ظل الجسم على الأرض في الجهة المعاكسة للضوء.','التدرج من الفاتح إلى الغامق يجعل الشكل يبدو مجسّماً.']},
+ perspective:{t:'المنظور',keys:['المنظور','نقطه التلاشي','خط الافق'],concept:'المنظور',quiz:'عناصر الفن',colors:[SW.blue,SW.black],facts:['المنظور يجعل الرسم يبدو عميقاً كما نراه بأعيننا.','الأشياء القريبة تبدو كبيرة، والبعيدة تبدو صغيرة.','خط الأفق هو مستوى نظر العين.','الخطوط المتوازية تلتقي في نقطة التلاشي.']},
+ games:{t:'الألعاب الشعبية القطرية',keys:['الالعاب الشعبيه','العاب شعبيه','الالعاب القديمه','الدوامه','البلبول'],scene:'دوامة',quiz:'الألعاب الشعبية القطرية',colors:[SW.gold,SW.maroon,SW.sea],facts:['الألعاب الشعبية لعبها الأطفال قديماً في الفريج، أي الحي.','أدواتها بسيطة من البيئة: خشب وحجارة وخيوط.','من أشهرها الدوّامة، وتسمى البلبول.','ومنها التيلة وهي الكرات الزجاجية، والخشيشة وهي لعبة الاختباء.','تعلّم التعاون والمهارة والصبر.']},
+ artists:{t:'الفن التشكيلي في قطر',keys:['الفنانون القطريون','الفنانين القطريين','الفنان القطري','الفن القطري','الفن التشكيلي'],scene:'قلم',quiz:'الفنانون القطريون',colors:[SW.maroon,SW.sand,SW.sea],facts:['الفنان القطري يستلهم أعماله من بيئته: البحر والصحراء والتراث.','يوثّق في لوحاته المحامل والأبواب القديمة والسدو والحياة اليومية.','استخدم كثير منهم الحرف العربي والزخرفة في لوحات حديثة.','تعرض المتاحف والمعارض في الدوحة أعمالهم، ومنها المتحف العربي للفن الحديث.','عند مشاهدة عمل فني نسأل: ما عناصر الفن فيه؟ وماذا يريد الفنان أن يقول؟']}
+};
+let TPAT=null;
+function findTopic(n){if(!TPAT){TPAT=[];for(const [id,tp] of Object.entries(TOPICS))for(const k of tp.keys)TPAT.push([normalize(k),id]);TPAT.sort((a,b)=>b[0].length-a[0].length)}
+ for(const [k,id] of TPAT){const bare=k.replace(/^ال/,'');if(new RegExp('(?:^|\\s)[وف]?(?:عن\\s)?(?:ال|بال|لل|ب|ل)?'+bare+'(?:\\s|$)').test(n))return TOPICS[id]}return null}
 // ===== الحالة العامة =====
 const st={blocks:[],active:null,uid:0,lesson:false,bg:null,history:[],queue:[],busy:false,dom:{},anim:null,speed:1,timer:null,remaining:0,timerEnds:0,defaultPause:30,mode:'normal',quiz:null,recognizer:null,mic:false,
- wake:localStorage.getItem('qa-keyword')==='1',tool:null,voiceReply:localStorage.getItem('qa-voice')!=='0',penSound:localStorage.getItem('qa-pen')!=='0',motion:localStorage.getItem('qa-motion')!=='0',fullMode:localStorage.getItem('qa-full')==='1',armedUntil:0,cards:[],cardsHidden:false,usedQ:{},ttsUntil:0,lastSpeech:'',lastSpeechAt:0,speechTimeout:null,retryTimeout:null,
+ wake:localStorage.getItem('qa-keyword')==='1',tool:null,art:localStorage.getItem('qa-art')!=='0',voiceReply:localStorage.getItem('qa-voice')!=='0',penSound:localStorage.getItem('qa-pen')!=='0',motion:localStorage.getItem('qa-motion')!=='0',fullMode:localStorage.getItem('qa-stepwise')!=='1',topic:null,narr:0,armedUntil:0,cards:[],cardsHidden:false,usedQ:{},ttsUntil:0,lastSpeech:'',lastSpeechAt:0,speechTimeout:null,retryTimeout:null,
  students:JSON.parse(localStorage.getItem('qa-students')||'[]'),studentPaths:[],studentCurrent:null,eraser:false,mirror:false,ghost:true,concept:null};
 const stageNames=['الأشكال الأساسية','الخطوط الخارجية','التفاصيل','التلوين'],stageTips=['نبدأ بأشكال بسيطة وخفيفة','نحدّد الخطوط الخارجية بثقة','نضيف التفاصيل الصغيرة','نلوّن ونُظهر الظل والنور'],stageOrd=['الأولى','الثانية','الثالثة','الرابعة'];
 const GROUND=505, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -527,7 +604,7 @@ function elSvg(tag,attrs={},root){const n=document.createElementNS(NS,tag);for(c
 function clear(n){while(n.firstChild)n.removeChild(n.firstChild)}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 // الرد الصوتي: يتوقف الاستماع لحظياً حتى لا يسمع التطبيق صوته
-function say(text){if(!st.voiceReply||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));if(v){u.voice=v;u.lang=v.lang}u.rate=1.02;st.ttsUntil=Date.now()+Math.min(4500,text.length*95+700);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+350};speechSynthesis.speak(u)}catch(e){}}
+function say(text){if(st.topic&&st.narrating)return;if(!st.voiceReply||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));if(v){u.voice=v;u.lang=v.lang}u.rate=1.02;st.ttsUntil=Date.now()+Math.min(4500,text.length*95+700);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+350};speechSynthesis.speak(u)}catch(e){}}
 function announce(text,ms=1650,speak=true){const box=$('#spoken'),t=$('#spokenText');clearTimeout(speakingTimeout);t.textContent=text;box.classList.add('show');speakingTimeout=setTimeout(()=>box.classList.remove('show'),ms);if(speak)say(text)}
 function toast(text){clearTimeout(toastTimeout);$('#toast').textContent=text;$('#toast').classList.add('on');toastTimeout=setTimeout(()=>$('#toast').classList.remove('on'),3500)}
 function showHint(text,ms=6500){const h=$('#lessonHint');h.textContent=text;h.classList.add('visible');clearTimeout(h._timeout);h._timeout=setTimeout(()=>h.classList.remove('visible'),ms)}
@@ -538,6 +615,24 @@ function welcome(){} // الشاشة الرئيسية ورقة فارغة
 // ===== المؤقت =====
 function stopTimer(){if(st.timer)clearInterval(st.timer);st.timer=null;st.remaining=0;$('#timerHud').classList.remove('visible')}
 function timer(seconds){stopTimer();seconds=clamp(Math.round(seconds),1,3600);st.remaining=seconds;st.timerEnds=Date.now()+seconds*1000;const update=()=>{st.remaining=Math.max(0,Math.ceil((st.timerEnds-Date.now())/1000));$('#timerText').textContent=String(Math.floor(st.remaining/60)).padStart(2,'0')+':'+String(st.remaining%60).padStart(2,'0');if(!st.remaining){stopTimer();announce('انتهى الوقت، أحسنتم!',2500)}};$('#timerHud').classList.add('visible');update();st.timer=setInterval(update,250)}
+
+// ===== أسلوب الرسم: حبر أسود بقلم حبر + غسلات ألوان مائية شفافة =====
+const INK='#1b181c',INKY=new Set([palette.dark,palette.brown,palette.brown2,'#573c43','#56313a']);
+const lum=h=>{if(!/^#[0-9a-f]{6}$/i.test(h||''))return .5;const [r,g,b]=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);return .299*r+.587*g+.114*b};
+const inkOf=it=>it.guide?it.c:(!it.c||INKY.has(it.c)||lum(it.c)<.4)?(st.bg&&st.bg.type==='night'?'#f6eedc':INK):it.c;
+const artOn=()=>st.art&&!reduced;
+function rng(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647)/2147483647}
+const hash=k=>{let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))%1000003;return h};
+function splashes(b,bb){const all=sceneFills(b.key),fl=all.filter(f=>(f.o??1)>=.9&&lum(f.fill)<.93);if(!fl.length)return '';const R=rng(hash(b.key)+17),n=7+Math.floor(R()*5),u=Math.max(bb.w,bb.h)/100;let s='';
+ for(let i=0;i<n;i++){const a=R()*Math.PI*2,k=.52+R()*.2,x=bb.cx+Math.cos(a)*bb.w*k,y=bb.cy+Math.sin(a)*bb.h*k*.95,c=fl[Math.floor(R()*fl.length)],idx=all.indexOf(c);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${((.8+R()*R()*4.2)*u).toFixed(1)}" fill="${b.colors[idx]||c.fill}" opacity="${(.45+R()*.4).toFixed(2)}"/>`}return s}
+// الغسلات المائية تُرسم مرة واحدة إلى صورة ثم تُعرض كصورة: الفلاتر الحيّة تُبطئ الحركة كثيراً
+const washCache=new Map();let DEFS=null;
+function bake(markup,vb,k){return new Promise(res=>{DEFS=DEFS||svg.querySelector('defs').innerHTML;const w=Math.max(8,Math.ceil(vb.w*k)),h=Math.max(8,Math.ceil(vb.h*k)),src=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb.x} ${vb.y} ${vb.w} ${vb.h}"><defs>${DEFS}</defs>${markup}</svg>`,url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(src),img=new Image();
+ img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/png'))}catch(e){res(url)}};img.onerror=()=>res(null);img.src=url})}
+function washImage(root,key,markup,vb,k,cls){const img=elSvg('image',{x:vb.x,y:vb.y,width:vb.w,height:vb.h,preserveAspectRatio:'none',class:cls},root);img._wk=key;const hit=washCache.get(key);
+ if(typeof hit==='string'){img.setAttribute('href',hit);return img}
+ if(!hit){washCache.set(key,bake(markup,vb,k).then(url=>{if(washCache.size>90)washCache.delete(washCache.keys().next().value);if(url)washCache.set(key,url);else washCache.delete(key);return url}))}
+ Promise.resolve(washCache.get(key)).then(url=>{if(url&&img.isConnected)img.setAttribute('href',url)});return img}
 
 // ===== هندسة العناصر =====
 const boxCache={};
@@ -551,7 +646,9 @@ function sizeScale(key){const bb=sceneBox(key);let s=meta(key).size*520/bb.h;if(
 
 // ===== الخلفيات =====
 const BG={sea:'بحر',desert:'صحراء',sky:'سماء',garden:'حديقة',night:'ليل',sunset:'غروب'};
-function drawBg(){clear(bgLayer);const b=st.bg;if(!b)return;const R=(y,h,fill,o=1)=>elSvg('rect',{x:-700,y,width:2400,height:h,fill,opacity:o},bgLayer),Pth=(d,fill,o=1)=>elSvg('path',{d,fill,opacity:o},bgLayer);
+function drawBg(){clear(bgLayer);const b=st.bg;if(!b)return;if(!artOn()){bgLayer.removeAttribute('clip-path');return paintBg(bgLayer,b)}
+ bgLayer.removeAttribute('clip-path');const tmp=elSvg('g',{});paintBg(tmp,b);washImage(bgLayer,'bg|'+JSON.stringify(b),`<g filter="url(#wash)"><g clip-path="url(#bgClip)">${tmp.innerHTML}</g></g>`,{x:0,y:0,w:1000,h:600},1.3,'bgImg')}
+function paintBg(bgLayer,b){const R=(y,h,fill,o=1)=>elSvg('rect',{x:-700,y,width:2400,height:h,fill,opacity:o},bgLayer),Pth=(d,fill,o=1)=>elSvg('path',{d,fill,opacity:o},bgLayer);
  const hill=(y,a,fill,o=1)=>Pth(`M-700 ${y}Q-350 ${y-a} 0 ${y}T700 ${y}T1400 ${y}T2100 ${y}V1000H-700Z`,fill,o);
  if(b.type==='color'){R(-400,1400,b.color);return}
  if(b.type==='sea'){R(-400,860,'url(#gSky)');R(455,145,'url(#gSea)');R(600,400,'#25738e');for(const [y,o] of [[478,.55],[515,.4],[556,.3]]){let d=`M-700 ${y}`;for(let i=0;i<48;i++)d+=`q25 ${i%2?9:-9} 50 0`;elSvg('path',{d,fill:'none',stroke:'#fff','stroke-width':3,opacity:o,'stroke-linecap':'round'},bgLayer)}}
@@ -564,17 +661,19 @@ function drawBg(){clear(bgLayer);const b=st.bg;if(!b)return;const R=(y,h,fill,o=
 function setBg(type,color){if(!type&&!st.bg)return toast('لا توجد خلفية.');pushHistory();st.bg=type?{type,color}:null;welcome(false);backToBoard();render();announce(type?(type==='color'?'لوّنت الخلفية':'خلفية '+BG[type]):'أزلت الخلفية',1100)}
 
 // ===== العرض =====
-function render(){clear(sceneLayer);clear(pen);drawBg();const map={};
+function render(){clear(sceneLayer);clear(pen);drawBg();sceneLayer.classList.toggle('onDark',!!st.bg&&st.bg.type==='night');const map={};
  for(const b of st.blocks){const sc=scenes[b.key];if(!sc)continue;const t=tf(b),bb=sceneBox(b.key),m=meta(b.key);
   const g=elSvg('g',{'data-id':b.id,class:'blk'},sceneLayer);
-  if(b.step>=3&&!m.sky&&!m.flat){const r=rectOf(b);elSvg('ellipse',{cx:r.cx,cy:r.bottom+2,rx:r.w*.46,ry:Math.max(4,r.h*.03),fill:'#2e1a22',opacity:.14,class:'shadow'},g)}
+  if(b.step>=3&&!m.sky&&!m.flat){const r=rectOf(b);const sh=elSvg('ellipse',{cx:r.cx+r.w*.04,cy:r.bottom+3,rx:r.w*.5,ry:Math.max(5,r.h*.04),fill:artOn()?'url(#gShadow)':'#2e1a22',opacity:artOn()?.55:.14,class:'shadow'},g)}
   const mv=elSvg('g',{class:'mv'+(b.step>=3&&st.motion&&!b.still&&!reduced&&m.anim?' a-'+m.anim:'')},g);
   const inner=elSvg('g',{transform:`translate(${t.tx} ${t.ty}) scale(${t.sx} ${t.sy})`},mv);
   elSvg('rect',{x:bb.x,y:bb.y,width:bb.w,height:bb.h,fill:'transparent',class:'hit'},inner);
-  const content=elSvg('g',{},inner),pg=elSvg('g',{},content),ig=elSvg('g',{},content),strokes=[],fills=[],winIdx=(m.parts||{})['نوافذ'];
+  const content=elSvg('g',{},inner),pg=elSvg('g',{},content),ig=elSvg('g',{},content),strokes=[],fills=[],winIdx=(m.parts||{})['نوافذ'],art=artOn();
+  let washM='';if(art)pg.setAttribute('class','washG');
   for(let i=0;i<=b.step;i++){let fi=0;for(const it of sc.steps[i]||[]){
-   if(it.fill){const idx=fi++;fills.push(elSvg('path',{d:it.d,fill:(i===3&&b.lights&&idx===winIdx&&'#ffe27a')||(i===3&&b.colors[idx])||it.fill,stroke:'none',opacity:it.o??1,class:i===3&&b.lights&&idx===winIdx?'winGlow':''},pg))}
-   else{if(it.guide&&b.step>=3)continue;const el=elSvg('path',{d:it.d,fill:'none',stroke:it.c||palette.dark,'stroke-width':it.w||5,'stroke-linecap':'round','stroke-linejoin':'round',class:it.guide?'guide':''},ig);if(it.dash)el.setAttribute('stroke-dasharray','7 9');let twin=null;if(!it.guide&&(it.w||5)>=3.5)twin=elSvg('path',{d:it.d,fill:'none',stroke:it.c||palette.dark,'stroke-width':Math.max(1.4,(it.w||5)*.38),'stroke-linecap':'round','stroke-linejoin':'round',opacity:b.step>=3?.3:.5,transform:`translate(${(i%2?2.4:-2)} ${i%2?-1.8:2.2}) rotate(${i%2?.35:-.3} ${bb.cx} ${bb.cy})`},ig);strokes.push({path:el,twin,step:i,t})}}}
+   if(it.fill){const idx=fi++,fc=(i===3&&b.lights&&idx===winIdx&&'#ffe27a')||(i===3&&b.colors[idx])||it.fill;if(art)washM+=`<path d="${it.d}" fill="${fc}" opacity="${it.o??1}"/>`;else fills.push(elSvg('path',{d:it.d,fill:fc,stroke:'none',opacity:it.o??1,class:i===3&&b.lights&&idx===winIdx?'winGlow':''},pg))}
+   else{if(it.guide&&b.step>=3)continue;const sc0=art?inkOf(it):(it.c||palette.dark),sw=art&&!it.guide?(it.w||5)*.82:(it.w||5);const el=elSvg('path',{d:it.d,fill:'none',stroke:sc0,'stroke-width':sw,'stroke-linecap':'round','stroke-linejoin':'round',class:it.guide?'guide':''},ig);if(it.dash)el.setAttribute('stroke-dasharray','7 9');let twin=null;if(!it.guide&&(it.w||5)>=3.5)twin=elSvg('path',{d:it.d,fill:'none',stroke:sc0,'stroke-width':Math.max(1.4,(it.w||5)*.38),'stroke-linecap':'round','stroke-linejoin':'round',opacity:b.step>=3?.3:.5,transform:`translate(${(i%2?2.4:-2)} ${i%2?-1.8:2.2}) rotate(${i%2?.35:-.3} ${bb.cx} ${bb.cy})`},ig);strokes.push({path:el,twin,step:i,t})}}}
+  if(art&&washM){const pad=48,vb={x:bb.x-pad,y:bb.y-pad,w:bb.w+2*pad,h:bb.h+2*pad},mk2=`<g filter="url(#wash)" transform="translate(${(bb.cx+bb.w*.008).toFixed(1)} ${(bb.cy+bb.h*.006).toFixed(1)}) scale(.975) translate(${-bb.cx} ${-bb.cy})">${washM}${splashes(b,bb)}</g>`;fills.push(washImage(pg,b.key+'|'+mk2.length+'|'+hash(mk2),mk2,vb,Math.min(1.7,820/Math.max(vb.w,vb.h)),'washImg'))}
   decorate(b,sc,bb,content,inner);
   map[b.id]={g,inner,strokes,fills}}
  st.dom=map;updateHud();return map}
@@ -597,7 +696,7 @@ function decorate(b,sc,bb,content,inner){const fl=sceneFills(b.key),mf=fl[meta(b
   if(b.cut){const c=b.cut,rx=c==='right'?bb.cx:bb.x-400,ry=c==='bottom'?bb.cy:bb.y-400,rw=c==='left'?bb.cx-rx:c==='right'?bb.w/2+400:bb.w+800,rh=c==='top'?bb.cy-ry:c==='bottom'?bb.h/2+400:bb.h+800;elSvg('rect',{x:rx,y:ry,width:rw,height:rh,fill:'#000'},mk)}
   content.setAttribute('mask',`url(#${mid})`)}}
 function setTool(tool){st.tool=tool;svg.classList.toggle('erasing',tool==='eraser');$('#eraserTool').classList.toggle('active',tool==='eraser');if(tool==='eraser'){stopAnimation();showHint('الممحاة جاهزة: امسح بإصبعك الجزء الذي تريد. قل «أوقف الممحاة» عند الانتهاء.',6000);announce('الممحاة جاهزة',1100)}else announce('أوقفت الممحاة',900)}
-function updateHud(){const b=activeBlock(),on=!!b&&st.mode==='normal';$('#lessonHud').classList.toggle('visible',on);sceneLayer.classList.toggle('locked',st.blocks.length<2&&st.lesson);if(!on)return;
+function updateHud(){const b=activeBlock(),on=!!b&&st.mode==='normal'&&!st.topic;$('#lessonHud').classList.toggle('visible',on);sceneLayer.classList.toggle('locked',st.blocks.length<2&&st.lesson);if(!on)return;
  const many=st.blocks.length>1,complete=st.blocks.every(x=>x.step>=3);for(const id of ['#prevStep','#nextStep'])$(id).style.display=many&&complete?'none':'';$('#fullDrawing').style.display=complete?'none':'';$('#eraserTool').style.display=complete?'':'none';
  $('#sceneTitle').textContent=many?`لوحة مركّبة • ${st.blocks.length} عناصر`:scenes[b.key].title;
  const showSteps=!many;$('#stepper').style.display=showSteps?'':'none';$('#stepBadge').style.display=showSteps?'none':'';
@@ -611,7 +710,7 @@ function flashSel(id){const m=st.dom[id];if(!m||st.blocks.length<2)return;m.g.cl
 let actx=null,scr=null;
 function audio(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}catch(e){return null}return actx}
 function scratch(on){if(on){if(scr||!st.penSound)return;const a=audio();if(!a||a.state!=='running')return;const len=a.sampleRate*2,buf=a.createBuffer(1,len,a.sampleRate),d=buf.getChannelData(0);let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=last*.55+w*.45;d[i]=(w-last)*(.6+.4*Math.sin(i/a.sampleRate*37))}
-  const src=a.createBufferSource();src.buffer=buf;src.loop=true;const bp=a.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3000;bp.Q.value=.6;const g=a.createGain();g.gain.value=0;src.connect(bp);bp.connect(g);g.connect(a.destination);src.start();g.gain.setTargetAtTime(.13,a.currentTime,.03);scr={src,g,bp,a}}
+  const src=a.createBufferSource();src.buffer=buf;src.loop=true;const bp=a.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3000;bp.Q.value=.6;const g=a.createGain();g.gain.value=0;src.connect(bp);bp.connect(g);g.connect(a.destination);src.start();g.gain.setTargetAtTime(st.duck?.012:.075,a.currentTime,.03);scr={src,g,bp,a}}
  else if(scr){const s=scr;scr=null;try{s.g.gain.cancelScheduledValues(s.a.currentTime);s.g.gain.setTargetAtTime(0,s.a.currentTime,.03);setTimeout(()=>{try{s.src.stop()}catch(e){}},220)}catch(e){}}}
 function chime(){if(!st.penSound)return;const a=audio();if(!a||a.state!=='running')return;[880,1320].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,a.currentTime+i*.11);g.gain.linearRampToValueAtTime(.12,a.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+i*.11+.5);o.connect(g);g.connect(a.destination);o.start(a.currentTime+i*.11);o.stop(a.currentTime+i*.11+.55)})}
 function cancelAnim(){if(st.anim){cancelAnimationFrame(st.anim);st.anim=null}scratch(false);clear(pen);sceneLayer.querySelectorAll('.blk.drawing').forEach(g=>g.classList.remove('drawing'))}
@@ -623,24 +722,24 @@ function playPaths(list,done,mul=1){cancelAnim();if(reduced){done();return}const
  const setOff=(v,len,off)=>{v.path.setAttribute('stroke-dashoffset',off);if(v.twin)v.twin.setAttribute('stroke-dashoffset',off)};
  drawable.forEach((v,i)=>{v.path.style.strokeDasharray=String(lengths[i]);if(v.twin)v.twin.style.strokeDasharray=String(lengths[i]);setOff(v,lengths[i],String(lengths[i]))});scratch(true);let lastIdx=-1;
  const tip=elSvg('g',{class:'pen-trace'},pen),pc=elSvg('g',{transform:'rotate(38) scale(1.25)'},tip);
- elSvg('path',{d:'M-8 -18H8V-92H-8Z',fill:'#f5c542',stroke:'#4e2539','stroke-width':2},pc);elSvg('path',{d:'M-2.6 -18V-92M2.6 -18V-92',stroke:'#c99a1e','stroke-width':1.2,fill:'none'},pc);elSvg('path',{d:'M0 0L8 -18H-8Z',fill:'#e8c9a0',stroke:'#4e2539','stroke-width':2,'stroke-linejoin':'round'},pc);elSvg('path',{d:'M0 0L3.2 -7H-3.2Z',fill:'#3a3136'},pc);elSvg('path',{d:'M-8 -92H8V-101H-8Z',fill:'#c9ced6',stroke:'#4e2539','stroke-width':2},pc);elSvg('path',{d:'M-8 -101H8V-110Q0 -117 -8 -110Z',fill:'#ee8fb0',stroke:'#4e2539','stroke-width':2},pc);
+ elSvg('path',{d:'M-8 -40H8V-112Q0 -122 -8 -112Z',fill:'#1f1c22',stroke:'#0d0b0f','stroke-width':1.5},pc);elSvg('path',{d:'M-4.5 -44V-108',stroke:'#55505c','stroke-width':1.6,fill:'none'},pc);elSvg('path',{d:'M-8 -40H8V-45H-8Z',fill:'#d9a531'},pc);elSvg('path',{d:'M-6.5 -22H6.5L8 -40H-8Z',fill:'#2c2830',stroke:'#0d0b0f','stroke-width':1.2},pc);elSvg('path',{d:'M0 0L6 -15Q4 -22 0 -24Q-4 -22 -6 -15Z',fill:'#e4b355',stroke:'#7a5a12','stroke-width':1.2,'stroke-linejoin':'round'},pc);elSvg('path',{d:'M0 -1V-14',stroke:'#7a5a12','stroke-width':1,fill:'none'},pc);elSvg('circle',{cx:0,cy:-15,r:1.5,fill:'#7a5a12'},pc);
  let ended=false;const finish=()=>{if(ended)return;ended=true;st.anim=null;scratch(false);clear(pen);drawable.forEach(v=>{try{setOff(v,0,'0');v.path.style.strokeDasharray=v.path.classList.contains('guide')?'10 9':'';if(v.twin)v.twin.style.strokeDasharray=''}catch(e){}});try{done()}catch(e){console.error(e)}};
  const tick=now=>{try{if(!drawable[0].path.isConnected)return finish();const elapsed=Math.max(0,now-start);let remaining=elapsed,idx=0;for(;idx<durations.length;idx++){if(remaining<=durations[idx])break;remaining-=durations[idx]}
   drawable.forEach((v,j)=>setOff(v,lengths[j],j<idx?'0':j>idx?String(lengths[j]):String(lengths[j]*(1-Math.min(1,remaining/durations[j])))));
-  if(idx!==lastIdx){lastIdx=idx;if(scr){const n=scr.a.currentTime;scr.g.gain.cancelScheduledValues(n);scr.g.gain.setValueAtTime(.02,n);scr.g.gain.linearRampToValueAtTime(.1+Math.random()*.07,n+.07);scr.bp.frequency.setTargetAtTime(2300+Math.random()*1700,n,.05)}}
+  if(idx!==lastIdx){lastIdx=idx;if(scr){const n=scr.a.currentTime;scr.g.gain.cancelScheduledValues(n);scr.g.gain.setValueAtTime(.02,n);scr.g.gain.linearRampToValueAtTime(st.duck?.012:.055+Math.random()*.04,n+.07);scr.bp.frequency.setTargetAtTime(2300+Math.random()*1700,n,.05)}}
   if(idx<drawable.length){const q=drawable[idx],pt=q.path.getPointAtLength(lengths[idx]*Math.min(1,remaining/durations[idx]));tip.setAttribute('transform',`translate(${q.t.tx+q.t.sx*pt.x} ${q.t.ty+q.t.sy*pt.y}) rotate(${(Math.sin(elapsed/90)*4).toFixed(1)})`)}
   if(elapsed<sum)st.anim=requestAnimationFrame(tick);else finish()}catch(err){console.error(err);finish()}};
  st.anim=requestAnimationFrame(tick)}
 function animateBlock(b,steps,done,mul=1){const m=render()[b.id];if(!m){done&&done();return}
  const list=m.strokes.filter(s=>steps.includes(s.step)),fade=steps.includes(3)&&!reduced,sh=m.g.querySelector('.shadow');m.g.classList.add('drawing');
- if(fade){m.fills.forEach(p=>{p.dataset.o=p.getAttribute('opacity');p.style.opacity='0';p.style.transition='opacity .7s ease'});if(sh){sh.style.opacity='0';sh.style.transition='opacity .7s ease'}}
- playPaths(list,()=>{if(fade){m.fills.forEach(p=>p.style.opacity=p.dataset.o);if(sh)sh.style.opacity=''}setTimeout(()=>m.g.classList.remove('drawing'),fade?750:0);done&&done()},mul)}
+ const pgEl=m.fills[0]&&m.fills[0].parentNode;if(fade){if(pgEl){pgEl.style.opacity='0';pgEl.style.transition='opacity 1.1s ease'}if(sh){sh.style.opacity='0';sh.style.transition='opacity 1.1s ease'}}
+ playPaths(list,()=>{if(fade){if(pgEl)pgEl.style.opacity='';if(sh)sh.style.opacity=''}setTimeout(()=>m.g.classList.remove('drawing'),fade?1150:0);done&&done()},mul)}
 
 // ===== الدرس: رسمة واحدة بأربع مراحل =====
-function backToBoard(){svg.style.visibility='visible';$('#conceptLayer').classList.remove('open');st.concept=null;$('#studentLayer').classList.remove('open');$('#studentTools').classList.remove('open');st.mode='normal'}
+function backToBoard(){closeTopic();svg.style.visibility='visible';$('#conceptLayer').classList.remove('open');st.concept=null;$('#studentLayer').classList.remove('open');$('#studentTools').classList.remove('open');st.mode='normal'}
 function resetVisual(){stopAnimation();backToBoard()}
-function drawScene(key,{color,bg,full}={}){if(!scenes[key])return false;pushHistory();stopTimer();resetVisual();welcome(false);if(key==='__ai__')delete boxCache[key];const bb=sceneBox(key);
- const b=mk(key,{cx:bb.cx,cy:bb.cy,step:-1});if(color)b.colors[meta(key).main||0]=color;st.blocks=[b];st.active=b.id;st.lesson=true;if(bg)st.bg={type:bg};showHint(scenes[key].desc,6000);if(full||st.fullMode){b.step=3;say(scenes[key].title);enqueue(done=>animateBlock(b,[1,2,3],done,1.15))}else nextStep();return true}
+function drawScene(key,{color,bg,full,stepwise}={}){if(!scenes[key])return false;pushHistory();stopTimer();resetVisual();welcome(false);if(key==='__ai__')delete boxCache[key];const bb=sceneBox(key);
+ const b=mk(key,{cx:bb.cx,cy:bb.cy,step:-1});if(color)b.colors[meta(key).main||0]=color;st.blocks=[b];st.active=b.id;st.lesson=true;if(bg)st.bg={type:bg};showHint(scenes[key].desc,6000);if(!stepwise&&(full||st.fullMode)){b.step=3;say(scenes[key].title);enqueue(done=>animateBlock(b,[1,2,3],done,1.15))}else nextStep();return true}
 function setStep(n){const b=activeBlock();if(!b)return toast('اختر رسمة أولاً: اكتب «المكتبة».');stopAnimation();stopTimer();b.step=clamp(n,0,3);if(st.lesson&&st.blocks.length===1)stepIntro(b.step);
  animateBlock(b,[b.step],()=>{if(st.lesson&&st.blocks.length===1){timer(st.defaultPause);showHint(b.step<3?'توقّف القلم؛ دور الطلاب للتقليد. قل «الخطوة التالية» للمتابعة.':'اكتملت الرسمة. جرّب: «أضف شمساً» أو «لوّن … أحمر».',5200)}})}
 function nextStep(){let b=activeBlock();if(!b)return sceneMenu();if(b.step>=3){b=st.blocks.find(x=>x.step<3);if(!b)return announce('اكتملت الرسمة');st.active=b.id}setStep(b.step+1)}
@@ -667,7 +766,7 @@ function place(b,rel,tb,n=0){const m=meta(b.key),bb=sceneBox(b.key);let w=bb.w*b
  else if(m.sky){const slots=[[800,140],[200,150],[500,128],[650,205],[350,205],[905,240],[95,240]];const s=slots.find(([x,y])=>!st.blocks.some(o=>o!==b&&Math.hypot(o.cx-x,o.cy-y)<125))||slots[st.blocks.length%slots.length];b.cx=s[0];b.cy=s[1]}
  else{const xs=[500,215,785,355,645,95,905];let x=xs.find(x=>x-w/2>=-20&&x+w/2<=1020&&!overlaps(b,x,w));let dy=0;if(x===undefined){const gr=st.blocks.filter(o=>o!==b&&!meta(o.key).sky),gap=x=>Math.min(...gr.map(o=>Math.abs(o.cx-x)),999);x=xs.slice().sort((a,c)=>gap(c)-gap(a))[0];fit(.88);dy=-14;b.back=true}b.cx=x;b.cy=(m.flat?330:GROUND)-h/2+dy}
  if(w<990)b.cx=clamp(b.cx,w/2+4,996-w/2);if(h<530)b.cy=clamp(b.cy,h/2+60,596-h/2);else if(h<590)b.cy=clamp(b.cy,h/2+4,596-h/2)}
-function addElement(key,opt={}){if(!scenes[key])return null;welcome(false);if(st.mode!=='normal')backToBoard();enterSceneMode();const b=mk(key,{scale:sizeScale(key)});if(opt.color)b.colors[meta(key).main||0]=opt.color;
+function addElement(key,opt={}){if(!scenes[key])return null;closeTopic();if(st.mode!=='normal')backToBoard();enterSceneMode();const b=mk(key,{scale:sizeScale(key)});if(opt.color)b.colors[meta(key).main||0]=opt.color;
  place(b,opt.rel,opt.target,opt.n||0);const ti=st.blocks.indexOf(opt.target);if(opt.rel==='behind'&&ti>=0)st.blocks.splice(ti,0,b);else if(b.back){delete b.back;st.blocks.unshift(b)}else st.blocks.push(b);st.active=b.id;
  enqueue(done=>animateBlock(b,[1,2,3],done,2.4));return b}
 function removeBlock(b){st.blocks=st.blocks.filter(x=>x!==b);if(st.active===b.id)st.active=st.blocks.length?st.blocks[st.blocks.length-1].id:null;if(!st.blocks.length){st.lesson=false;welcome(!st.bg)}}
@@ -687,7 +786,8 @@ function thumb(key){const bb=sceneBox(key),sc=scenes[key],pad=14;let f='',s='';f
  return `<svg viewBox="${bb.x-pad} ${bb.y-pad} ${bb.w+2*pad} ${bb.h+2*pad}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${f}${s}</svg>`}
 function sceneMenu(){const keys=Object.keys(scenes).filter(k=>!k.startsWith('__')),has=st.blocks.length>0;
  openModal('مكتبة الرسومات',`<p class="muted">اضغط الرسمة لبدء درسها بأربع مراحل${has?'، أو اضغط ＋ لإضافتها إلى اللوحة الحالية':''}.</p>`+CATS.map((c,ci)=>{const ks=keys.filter(k=>meta(k).cat===ci);return ks.length?`<h3 class="libHead">${c}</h3><div class="libGrid">${ks.map(k=>`<div class="libCard"><button type="button" class="thumb" data-draw="${escapeHtml(k)}" title="ارسم ${escapeHtml(scenes[k].title)}">${thumb(k)}<span class="nm">${escapeHtml(scenes[k].title)}</span></button>${has?`<button type="button" class="addBtn" data-add="${escapeHtml(k)}" title="أضف إلى اللوحة" aria-label="أضف ${escapeHtml(scenes[k].title)} إلى اللوحة">＋</button>`:''}</div>`).join('')}</div>`:''}).join(''))}
-const HELP=[['الرسم بالقلم',['ارسم المحمل','ارسم بيت وشجرة وشمس','ارسم صقر على النخلة','ارسم ثلاث نخلات','الخطوة التالية','أعد الخطوة','الرسمة كاملة','فعّل الرسمة كاملة','خطوة بخطوة']],
+const HELP=[['الرسم بالقلم',['ارسم المحمل','ارسم المحمل خطوة بخطوة','الخطوة التالية','أعد الخطوة','الرسمة كاملة','ارسم بيت وشجرة وشمس','ارسم صقر على النخلة','ارسم ثلاث نخلات']],
+ ['الشرح بالصوت',['اشرح عن السدو','تكلم عن المحمل','اشرح الألوان','ما هي الزخارف الإسلامية','اشرح قلعة الزبارة','أعد الشرح','أغلق الشرح']],
  ['عنصر على عنصر',['أضف شمساً فوق البيت','أضف شجرة يمين البيت','أضف سيارة أمام البيت','أضف جبلاً خلف البيت','ضع الصقر على البيت','كرّر النخلة']],
  ['بطاقات الأسئلة',['أضف بطاقة','أضف بطاقة عن السدو','أضف ثلاث بطاقات عن التراث','ضع ضوء على الجواب الصحيح','أخفِ الجواب','احذف بطاقة','احذف البطاقة الأولى','احذف كل البطاقات']],
  ['رسمة تفاعلية',['أضف أنوار للقلعة','أطفئ الأنوار','أضف زخارف للبيت','أضف زخارف سدو للمحمل','أضف زخارف نباتية للدلة','احذف الزخارف','امسح سقف البيت','امسح النصف الأيمن من الشجرة','الممحاة','أوقف الممحاة','أصلح البيت']],
@@ -697,7 +797,7 @@ const HELP=[['الرسم بالقلم',['ارسم المحمل','ارسم بيت
  ['الدرس والتقييم',['اشرح دائرة الألوان','امزج الأزرق والأصفر','اشرح الظل والنور','اشرح المنظور','اختبار عن السدو','مؤقت دقيقتين','اختر طالب','وضع الطالب']]];
 function help(){openModal('كل الأوامر',`<p class="muted">قل الأمر مباشرة أو اكتبه، أو اضغط أي مثال لتجربته. يمكنك سحب أي عنصر بإصبعك، ولمسه لينطق اسمه.</p><div class="helpGrid">${HELP.map(([t,c])=>`<div class="helpBox"><h3>${t}</h3>${c.map(x=>`<button type="button" data-cmd="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('')}</div>`).join('')}</div>`)}
 function settings(){const chk=(id,on,label)=>`<p><label><input type="checkbox" id="${id}" ${on?'checked':''}> ${label}</label></p>`;
- openModal('الإعدادات والأدوات',chk('wakeToggle',st.wake,'كلمة مفتاح اختيارية <b>«طيب»</b>: عند تفعيلها لا يُنفَّذ الأمر الصوتي إلا إذا بدأ بها')+`<p class="muted">الوضع العادي بلا كلمة مفتاح: قل الأمر مباشرة «ارسم المحمل». فعّل هذا الخيار فقط إذا التقطت اللوحة كلام الطلاب.</p>`+chk('fullToggle',st.fullMode,'الرسمة كاملة: يرسم القلم الرسمة حتى نهايتها دون توقف بين الخطوات')+chk('motionToggle',st.motion,'العناصر المتحركة: الشمس تدور، الطائر يحلّق، المحمل يتمايل…')+chk('penToggle',st.penSound,'صوت القلم على الورق أثناء الرسم')+chk('voiceToggle',st.voiceReply,'الرد الصوتي: ينطق التطبيق تأكيداً قصيراً بعد كل أمر')+`<p><button class="btn" data-action="library">مكتبة الرسومات</button><button class="btn alt" data-action="help">كل الأوامر</button><button class="btn alt" data-action="studentMode">وضع الطالب</button><button class="btn alt" data-action="studentNames">أسماء الطلاب</button><button class="btn alt" data-action="apiSettings">إعدادات الذكاء الاصطناعي</button><button class="btn green" data-action="micHelp">🎙 فحص الميكروفون</button></p><p class="muted">الإصدار ${VERSION} • جميع الرسومات والأسئلة المحلية داخل هذا الملف. قد تتطلب خدمات التعرّف على الصوت اتصالاً بالإنترنت، بحسب المتصفح.</p><p class="muted">مراجعة التراث: متاحف قطر (موقع الزبارة الأثري)، اليونسكو (الزبارة)، وVisit Qatar (الغوص على اللؤلؤ). الروابط معلوماتية فقط وليست مطلوبة للتشغيل.</p>`)}
+ openModal('الإعدادات والأدوات',chk('wakeToggle',st.wake,'كلمة مفتاح اختيارية <b>«طيب»</b>: عند تفعيلها لا يُنفَّذ الأمر الصوتي إلا إذا بدأ بها')+`<p class="muted">الوضع العادي بلا كلمة مفتاح: قل الأمر مباشرة «ارسم المحمل». فعّل هذا الخيار فقط إذا التقطت اللوحة كلام الطلاب.</p>`+chk('fullToggle',st.fullMode,'الرسمة كاملة (الوضع العادي): يرسم القلم الرسمة حتى نهايتها. أزل العلامة للرسم خطوة بخطوة دائماً')+chk('artToggle',st.art,'أسلوب الحبر والألوان المائية (أوقفه إذا كانت الشاشة بطيئة)')+chk('motionToggle',st.motion,'العناصر المتحركة: الشمس تدور، الطائر يحلّق، المحمل يتمايل…')+chk('penToggle',st.penSound,'صوت القلم على الورق أثناء الرسم')+chk('voiceToggle',st.voiceReply,'الرد الصوتي: ينطق التطبيق تأكيداً قصيراً بعد كل أمر')+`<p><button class="btn" data-action="library">مكتبة الرسومات</button><button class="btn alt" data-action="help">كل الأوامر</button><button class="btn alt" data-action="studentMode">وضع الطالب</button><button class="btn alt" data-action="studentNames">أسماء الطلاب</button><button class="btn alt" data-action="apiSettings">إعدادات الذكاء الاصطناعي</button><button class="btn green" data-action="micHelp">🎙 فحص الميكروفون</button></p><p class="muted">الإصدار ${VERSION} • جميع الرسومات والأسئلة المحلية داخل هذا الملف. قد تتطلب خدمات التعرّف على الصوت اتصالاً بالإنترنت، بحسب المتصفح.</p><p class="muted">مراجعة التراث: متاحف قطر (موقع الزبارة الأثري)، اليونسكو (الزبارة)، وVisit Qatar (الغوص على اللؤلؤ). الروابط معلوماتية فقط وليست مطلوبة للتشغيل.</p>`)}
 function studentMode(){closeModal();stopAnimation();stopTimer();welcome(false);svg.style.visibility='hidden';$('#conceptLayer').classList.remove('open');$('#studentLayer').classList.add('open');$('#studentTools').classList.add('open');st.mode='student';updateHud();fitStudentCanvas();refreshGhost();redrawStudent();announce('وضع الطالب: ابدأ الرسم',1600)}
 function refreshGhost(){const ghost=$('#teacherGhost');ghost.innerHTML='';for(const b of st.blocks){const t=tf(b),g=elSvg('g',{transform:`translate(${t.tx} ${t.ty}) scale(${t.sx} ${t.sy})`},ghost);for(const step of scenes[b.key].steps.slice(1))for(const v of step)if(v.d&&!v.fill)elSvg('path',{d:v.d,stroke:'#78485b','stroke-width':v.w||4,fill:'none','stroke-linecap':'round','stroke-linejoin':'round'},g)}}
 function exitStudent(){backToBoard();render()}
@@ -717,7 +817,7 @@ function renderCards(fresh=0){const L=$('#cardLayer'),n=st.cards.length;L.classL
 $('#cardLayer').addEventListener('click',e=>{const d=e.target.closest('[data-card-del]');if(d)return removeCards(+d.dataset.cardDel);const o=e.target.closest('[data-card]');if(o)answerCard(+o.dataset.card,+o.dataset.opt)});
 
 // ===== كلامي في منتصف الشاشة: ملوَّن ويركّز على الطلب =====
-const VERB_RE=/^[وف]?(ارسم|ارسمي|ارسمها|اضف|اضيف|ضيف|زد|لون|لوني|اصبغ|احذف|امسح|شيل|ازل|حرك|انقل|كبر|صغر|اقلب|اعكس|كرر|انسخ|ضع|حط|خل|خلي|اجعل|تراجع|اشرح|اعمل|هات|اظهر|اخف|اخفي|شغل|اوقف|ثبت|فعل|اختبار|موقت|مؤقت)$/;
+const VERB_RE=/^[وف]?(ارسم|ارسمي|ارسمها|ارسملي|سوي|تكلم|حدثنا|عرف|اغلق|اعد|اضف|اضيف|ضيف|زد|لون|لوني|اصبغ|احذف|امسح|شيل|ازل|حرك|انقل|كبر|صغر|اقلب|اعكس|كرر|انسخ|ضع|حط|خل|خلي|اجعل|تراجع|اشرح|اعمل|هات|اظهر|اخف|اخفي|شغل|اوقف|ثبت|فعل|اختبار|موقت|مؤقت)$/;
 const REL_RE=/^(علي|فوق|تحت|اسفل|اعلي|يمين|يسار|بجانب|جنب|جانب|امام|قدام|خلف|وراء|داخل|وسط|في|عن)$/;
 const KEY_RE=/^(طيب|طيبه|طب)$/;
 function showHeard(text,{live=false,request=true,ms=2000}={}){const box=$('#heard');if(!box)return;const words=String(text||'').trim().split(/\s+/).filter(Boolean).slice(-14);if(!words.length)return;
@@ -739,6 +839,44 @@ svg.addEventListener('pointerdown',e=>{if(st.tool!=='eraser'||st.mode!=='normal'
 svg.addEventListener('pointermove',e=>{if(rubbing&&e.pointerId===rubbing.id)rubAt(e)});
 const endRub=()=>{if(rubbing){rubbing=null;render()}};svg.addEventListener('pointerup',endRub);svg.addEventListener('pointercancel',endRub);
 $('#eraserTool').addEventListener('click',()=>setTool(st.tool==='eraser'?null:'eraser'));
+
+// ===== لوحة الشرح: رسم + ألوان + حقائق تُقرأ بالصوت =====
+function speakThen(text,next){let done=false;const go=()=>{if(done)return;done=true;clearTimeout(tm);next()};let tm=setTimeout(go,text.length*130+3500);
+ if(!st.voiceReply||!('speechSynthesis' in window)){clearTimeout(tm);tm=setTimeout(go,1300+text.length*55);return}
+ try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));if(v){u.voice=v;u.lang=v.lang}u.rate=.95;st.ttsUntil=Date.now()+Math.min(16000,text.length*130+2500);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+450;setTimeout(go,260)};speechSynthesis.speak(u)}catch(e){go()}}
+function narrate(){const P=$('#topicPanel'),items=[...P.querySelectorAll('.tpFacts li')],tp=st.topic;if(!tp)return;const token=++st.narr;st.narrating=true;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+ items.forEach(li=>li.classList.remove('on','cur'));let i=-1;
+ const step=()=>{if(token!==st.narr||st.topic!==tp)return;i++;items.forEach((li,k)=>{li.classList.toggle('on',k<=i);li.classList.toggle('cur',k===i)});if(i>=items.length){st.narrating=false;P.classList.add('done');return}const li=items[i];li.scrollIntoView&&li.scrollIntoView({block:'nearest',behavior:'smooth'});speakThen(li.textContent,step)};
+ P.classList.remove('done');speakThen(tp.t,step)}
+function closeTopic(){if(!st.topic)return;st.topic=null;st.narr++;st.narrating=false;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}st.ttsUntil=Date.now()+300;$('#topicPanel').classList.remove('open');$('#conceptSvg').setAttribute('viewBox','0 0 1000 600');$('#conceptCaption').style.visibility='';$('#artboard').classList.remove('topicOn')}
+function openTopic(tp){if(!tp)return false;pushHistory();stopTimer();resetVisual();st.cards=[];renderCards();st.blocks=[];st.active=null;st.lesson=false;st.bg=null;$('#lessonHint').classList.remove('visible');$('#stepIntro').classList.remove('show');
+ if(tp.concept){render();if(tp.concept==='نسخ')handwriting('نسخ');else createConcept(tp.concept);$('#conceptCaption').style.visibility='hidden'}
+ st.topic=tp;
+ if(!tp.concept){if(tp.scene&&scenes[tp.scene]){const bb=sceneBox(tp.scene),s=Math.min(1.05,430/bb.w,400/bb.h),b=mk(tp.scene,{cx:265,cy:318,scale:s,step:3});st.blocks=[b];st.active=b.id;enqueue(done=>animateBlock(b,[1,2,3],done,1.25))}else render()}
+ const P=$('#topicPanel');P.innerHTML=`<header><h2>${escapeHtml(tp.t)}</h2><button type="button" data-tp="close" aria-label="أغلق الشرح">×</button></header>${(tp.colors||[]).length?`<div class="tpSw">${tp.colors.map(([n,h])=>`<span><i style="background:${h}"></i>${escapeHtml(n)}</span>`).join('')}</div>`:''}<ol class="tpFacts">${tp.facts.map(f=>`<li>${escapeHtml(f)}</li>`).join('')}</ol><footer><button type="button" data-tp="again">🔊 أعد الشرح</button>${tp.quiz?'<button type="button" data-tp="card">بطاقة سؤال</button>':''}${tp.scene?'<button type="button" data-tp="steps">ارسمها خطوة بخطوة</button>':''}</footer>`;
+ P.classList.add('open');$('#artboard').classList.add('topicOn');updateHud();narrate();return true}
+function sceneTopic(key){const sc=scenes[key];return{t:sc.title,scene:key,facts:[sc.desc],colors:sceneFills(key).filter(f=>(f.o??1)>=.9).slice(0,4).map(f=>['',f.fill])}}
+$('#topicPanel').addEventListener('click',e=>{const b=e.target.closest('[data-tp]');if(!b||!st.topic)return;const a=b.dataset.tp,tp=st.topic;if(a==='close'){closeTopic();render()}else if(a==='again')narrate();else if(a==='card'){closeTopic();render();addCards(1,tp.quiz||null)}else if(a==='steps'){const k=tp.scene;closeTopic();drawScene(k,{stepwise:true})}});
+async function askAITopic(text){const key=localStorage.getItem('qa-api-key');if(!key)return false;announce('أبحث عن الموضوع…',1500,false);
+ try{const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4.1-mini',temperature:.2,response_format:{type:'json_object'},messages:[{role:'system',content:'أنت مساعد معلم تربية فنية للصف الخامس والسادس في قطر. أعد JSON فقط بصيغة {"title":"...","facts":["...","...","...","...","..."],"colors":[{"name":"...","hex":"#rrggbb"}]}. خمس جمل عربية قصيرة ودقيقة وبسيطة عن الموضوع، وثلاثة ألوان مرتبطة به. لا تذكر معلومة غير مؤكدة.'},{role:'user',content:text}]})});
+  if(!r.ok){toast(r.status===401?'مفتاح الذكاء الاصطناعي مرفوض (401).':'تعذّر جلب الشرح ('+r.status+').');return true}
+  const o=JSON.parse((await r.json()).choices?.[0]?.message?.content||'{}'),facts=(o.facts||[]).filter(x=>typeof x==='string').slice(0,6).map(x=>x.slice(0,220));if(!facts.length)throw Error('data');
+  const ms=findScenes(normalize(text));openTopic({t:String(o.title||'شرح').slice(0,60),facts,scene:ms[0]&&ms[0].key,colors:(o.colors||[]).filter(c=>c&&/^#[0-9a-f]{6}$/i.test(c.hex)).slice(0,5).map(c=>[String(c.name||'').slice(0,14),c.hex])})}
+ catch(e){toast('تعذّر جلب الشرح من الذكاء الاصطناعي.')}return true}
+
+// ===== ما أتكلم عنه يظهر: ألوان وبطاقة موضوع صغيرة =====
+function colorsIn(n){const out=[];for(const w of n.split(' ')){for(const [alts,hex] of COLORS){if(new RegExp('^(?:و|ب|بال|ال|وال|لل)?(?:'+alts+')$').test(w)){const name=alts.split('|')[0];if(!out.some(o=>o[1]===hex))out.push([name,hex])}}}return out}
+const COLOR_AR={'احمر':'أحمر','سماوي':'سماوي','كحلي':'كحلي','ازرق':'أزرق','اخضر':'أخضر','اصفر':'أصفر','برتقالي':'برتقالي','بنفسجي':'بنفسجي','وردي':'وردي','بني':'بني','اسود':'أسود','ابيض':'أبيض','رمادي':'رمادي','عنابي':'عنابي','ذهبي':'ذهبي','فضي':'فضي','تركواز':'تركواز','بيج':'بيج'};
+function showSwatches(list){const el=$('#swatches');el.innerHTML=list.slice(0,7).map(([n,h],i)=>`<span style="--d:${i*90}ms"><svg viewBox="0 0 420 420" aria-hidden="true"><circle cx="210" cy="210" r="150" fill="${h}" filter="url(#wash)"/></svg><b>${escapeHtml(COLOR_AR[n]||n)}</b></span>`).join('');el.classList.remove('show');void el.offsetWidth;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),6500);chime()}
+function showMention(o){const el=$('#mention');el.innerHTML=`${o.key&&scenes[o.key]?thumb(o.key):''}<span><b>${escapeHtml(o.title)}</b><em>${escapeHtml(o.line||'')}</em><i>اضغط للشرح</i></span>`;el._o=o;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),8000)}
+$('#mention').addEventListener('click',()=>{const o=$('#mention')._o;$('#mention').classList.remove('show');if(o)openTopic(o.tp||sceneTopic(o.key))});
+// كلام ليس أمراً: إن ذُكر فيه موضوع أو عنصر أو لون يظهر على الشاشة
+function ambient(n){let shown=false;const cols=colorsIn(n),tp=findTopic(n),ms=findScenes(n),busyBoard=st.blocks.length>0||st.cards.length>0||st.mode!=='normal';
+ if(tp&&(!busyBoard||st.topic)&&tp!==st.topic){openTopic(tp);return true}
+ if(cols.length>=2||(cols.length===1&&/(لون|الوان)/.test(n))){showSwatches(cols);shown=true}
+ if(tp&&tp!==st.topic){showMention({title:tp.t,key:tp.scene,line:tp.facts[0],tp});shown=true}
+ else if(!tp&&ms.length){const k=ms[0].key;if(!st.blocks.some(b=>b.key===k)){showMention({title:scenes[k].title,key:k,line:scenes[k].desc});shown=true}}
+ return shown}
 const questions={
 'السدو':[['ما العنصر الذي يتكرر في نقوش السدو؟',['الأشكال الهندسية','الصور الفوتوغرافية','الحروف الإنجليزية'],0],['كيف يظهر الإيقاع في زخرفة السدو؟',['بتكرار الأشكال والألوان','بترك الفراغ بلا ترتيب','برسم شكل واحد فقط'],0],['أي الأشكال أكثر حضوراً في الزخارف الهندسية؟',['المثلثات والمعينات','الغيوم الواقعية','الأجسام البشرية'],0],['ما معنى التماثل؟',['تشابه الأجزاء حول محور','تغيير الألوان عشوائياً','طمس التفاصيل'],0],['ما الوسيلة التقليدية لإنتاج السدو؟',['النسيج اليدوي','الطباعة ثلاثية الأبعاد','النحت بالحديد'],0]],
 'الزخارف الإسلامية':[['كيف تتكوّن النجمة الثمانية في الدرس؟',['من مربعين أحدهما مائل','من ثلاث دوائر متلاصقة','من مثلث واحد'],0],['ماذا نعني بالتكرار؟',['إعادة وحدة زخرفية','التلوين دون نظام','رسم أشخاص فقط'],0],['أي مما يلي زخرفة نباتية؟',['أوراق وأغصان مبسّطة','إشارات المرور','الأرقام وحدها'],0],['ما الشكل الذي يشبه المعيّن؟',['مربع مائل','دائرة','خط متعرج'],0],['ما الذي يساعد على انتظام الشبكة الزخرفية؟',['التباعد المتساوي','تغيير حجم كل وحدة عشوائياً','حذف الخطوط الإرشادية قبل البدء'],0]],
@@ -803,6 +941,29 @@ const NUMS={'واحد':1,'واحده':1,'اثنين':2,'اثنتين':2,'ثنت�
 function findCount(n){const d=n.match(/(?:^|\s)(\d+)(?:\s|$)/);if(d)return clamp(+d[1],1,6);for(const w of n.split(' '))if(NUMS[w])return NUMS[w];return 0}
 function findPart(key,n){const parts=meta(key).parts||{};for(const [name,idx] of Object.entries(parts))if(new RegExp('(?:^|\\s)[وف]?(?:ال|لل|بال)?'+name+'(?:\\s|$)').test(n))return idx;return null}
 const concept=t=>{welcome(false);createConcept(t)};
+// تصحيح السمع: حروف متقاربة النطق تُعامل كحرف واحد، ثم أقرب كلمة معروفة بفارق حرف
+const FOLD={'ص':'س','ث':'س','ط':'ت','ض':'د','ظ':'د','ذ':'ز','ق':'ك','ح':'ه','ع':'ا','ء':'ا','ئ':'ي','ؤ':'و'};
+const fold=w=>[...w].map(c=>FOLD[c]||c).join('').replace(/(.)\1+/g,'$1');
+function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
+const CMD_WORDS='ارسم ارسمي ارسملي اضف اضيف ضيف زد لون لوني اصبغ احذف امسح شيل ازل حرك انقل كبر صغر اقلب اعكس كرر انسخ ضع حط اجعل تراجع اشرح اعمل هات اظهر اخف شغل اوقف ثبت فعل اختبار موقت تكلم حدثنا عرف اغلق اعد علي فوق تحت اسفل اعلي يمين يسار بجانب جنب امام قدام خلف وراء داخل وسط بطاقه بطاقات بطاقتين خلفيه الجواب الاجابه الصحيح الصحيحه ضوء انوار اضواء زخارف نقوش الشاشه اللوحه التاليه التالي الخطوه خطوه بخطوه كامله كامل ممحاه الحركه الشرح اسئله سؤال سؤالين بحر صحراء سماء حديقه ليل غروب نصف الجزء جزء الايمن الايسر العلوي السفلي كل الكل'.split(' ');
+const SAFE_WORDS='جمال جميل جمالا شرح الشراع شراع الشجره رسم رسمه الرسمه رسمها رسمنا نرسم يرسم اسم قسم درس الدرس اليوم هذا هذه هذي ذلك التي الذي على عن من الى في مع ثم او لكن نعم لا يا ما هل كيف ماذا لماذا اين متى انا انت نحن هو هي هم كان يكون قال قلت شكرا ممتاز احسنت جميل جميله جدا شباب طلاب استاذ يلا تعال انظر انظروا لون الوان الالوان اللون ورقه قلم كتاب حصه فن فنون تربيه'.split(' ');
+let VOC=null;
+function vocab(){if(VOC)return VOC;const cmd=new Set(CMD_WORDS),names=new Set();for(const [p] of patterns())if(!p.includes(' '))names.add(p);for(const [alts] of COLORS)alts.split('|').forEach(a=>names.add(a));
+ for(const tp of Object.values(TOPICS))for(const k of tp.keys){const w=normalize(k);if(!w.includes(' '))names.add(w.replace(/^ال/,''))}
+ for(const m of Object.values(META))for(const k of Object.keys(m.parts||{}))names.add(k);
+ const set=new Set([...SAFE_WORDS,...cmd,...names]),byFold=new Map();for(const w of [...cmd,...names]){const f=fold(w);if(!byFold.has(f))byFold.set(f,w)}
+ const L=s=>[...s].filter(w=>w.length>=4).map(w=>[w,fold(w)]);return VOC={set,byFold,cmd:L(cmd),names:L(names)}}
+const PRE_RE=/^([وف]?(?:ال|بال|لل|كال|ب|ل)?)(.{3,})$/;
+function exactWord(w){const V=vocab();if(V.set.has(w))return w;const f=fold(w);if(V.byFold.has(f))return V.byFold.get(f);if(w.endsWith('ت')){const alt=w.slice(0,-1)+'ه';if(V.set.has(alt))return alt;if(V.byFold.has(fold(alt)))return V.byFold.get(fold(alt))}return null}
+function nearWord(w,lists){if(w.length<4)return null;const f=fold(w);let best=null,bd=9,ties=0;for(const list of lists)for(const [c,cf] of list){if(Math.abs(c.length-w.length)>1||cf[0]!==f[0])continue;const d=lev(f,cf);if(d<bd){bd=d;best=c;ties=1}else if(d===bd&&c!==best)ties++}return bd===1&&ties===1?best:null}
+function fixHeard(n){const V=vocab(),toks=n.split(' ');
+ // 1) تطابق تام أو تطابق نطق  2) أقرب كلمة بفارق حرف: للأفعال دائماً، ولأسماء العناصر فقط إذا كانت الجملة أمراً
+ const out=toks.map(tok=>{if(tok.length<3||/^\d+$/.test(tok)||NUMS[tok])return tok;const m=tok.match(PRE_RE);const whole=exactWord(tok);if(whole)return whole;if(m&&m[1]){const core=exactWord(m[2]);if(core)return m[1]+core}return null});
+ const isCmd=out.some(w=>w&&VERB_RE.test(w));
+ return out.map((w,i)=>{if(w)return w;const tok=toks[i],lists=isCmd?[V.cmd,V.names]:[V.cmd],m=tok.match(PRE_RE);if(m&&m[1]){const core=nearWord(m[2],lists);if(core)return m[1]+core}return nearWord(tok,lists)||tok}).join(' ')}
+// من بين بدائل التعرف على الكلام نختار الأقرب إلى أمر مفهوم
+function cmdScore(raw){const n=fixHeard(normalize(raw));let s=0;for(const w of n.split(' ')){if(VERB_RE.test(w))s+=3;else if(REL_RE.test(w))s+=.5}return s+findScenes(n).length*2+(findTopic(n)?2:0)+colorsIn(n).length+(/(بطاقه|بطاقات|خلفيه|الجواب|الشاشه|التاليه|كامله|تراجع|انوار|زخارف|خطوه)/.test(n)?2:0)}
+function bestHeard(alts){let best=alts[0]||'',bs=cmdScore(best);for(const a of alts.slice(1)){const s=cmdScore(a);if(s>bs+.5){bs=s;best=a}}return best}
 const ok=(text)=>announce(text,1100);
 
 // ينفّذ أوامر الإضافة والرسم المركّب. يعيد true إذا نُفّذ شيء.
@@ -811,7 +972,7 @@ function compose(n,opt={}){let draw=!!opt.draw;const moveExisting=!!opt.moveExis
  const total=subjects.reduce((a,m)=>a+(m.plural?(cnt||3):m.dual?2:(subjects.length===1&&cnt?cnt:1)),0);
  const targetOn=rel&&lastBlock(rel.target.key);const fresh=/(جديد|جديده|درس)(\s|$)/.test(n);if(draw&&!fresh&&!st.lesson&&st.blocks.length)draw=false;
  const bgIn=findBg(n.replace(/في وسط/g,'')),bg=bgIn&&/(في|علي|وقت|عند)\s(ال)?(بحر|شاطئ|ساحل|صحراء|صحرا|رمال|حديقه|عشب|ليل|غروب|سماء|نهار)/.test(n)?bgIn:null;
- if(draw&&!rel&&total===1&&!(also&&st.blocks.length)){drawScene(subjects[0].key,{color,bg,full:/(كامل|كامله|دفعه واحده|مره واحده)(\s|$)/.test(n)});return true}
+ if(draw&&!rel&&total===1&&!(also&&st.blocks.length)){drawScene(subjects[0].key,{color,bg,full:/(كامل|كامله|دفعه واحده|مره واحده)(\s|$)/.test(n),stepwise:/(خطوه بخطوه|خطوه خطوه|بالخطوات|بالتدريج|مراحل)/.test(n)});return true}
  pushHistory();if(draw&&!targetOn&&!also){stopAnimation();stopTimer();backToBoard();st.blocks=[];st.active=null;st.lesson=false}
  let tb=null;if(rel){tb=lastBlock(rel.target.key)||addElement(rel.target.key)}
  const names=[];
@@ -822,7 +983,7 @@ function compose(n,opt={}){let draw=!!opt.draw;const moveExisting=!!opt.moveExis
  showHint('يمكنك سحب أي عنصر بإصبعك، أو قل: «حرّك … يمين»، «كبّر …»، «لوّن … أحمر».',5200);ok((moveExisting&&names.length===1&&lastBlock(subjects[0].key)&&tb?'وضعت ':'أضفت ')+names.join(' و'));return true}
 function targetBlocks(n){const ms=findScenes(n),out=[];for(const m of ms){const b=lastBlock(m.key);if(b&&!out.includes(b))out.push(b)}return {ms,blocks:out}}
 
-function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!text)return;let n=normalize(text);
+function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!text)return;let n=normalize(text);if(voice)n=fixHeard(n);
  if(voice&&!st.wake)showHeard(text);
  if(voice&&st.wake){const hits=[...n.matchAll(/(?:^|\s)(طيب|طيبه|طب|يا لوحه)(?=\s|$)/g)],m=hits[hits.length-1],armed=Date.now()<st.armedUntil;
   if(!m&&!armed){showHeard(text,{request:false,ms:1500});return}
@@ -837,6 +998,12 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
  const has=re=>re.test(n);
  // أوامر عامة
  if(has(/(مساعده|كل الاوامر|قائمه الاوامر|ماذا اقول|ساعدني)/))return help();
+ // لوحة الشرح
+ if(st.topic){if(has(/(اغلق|اقفل|اخف|اخفي|انه|انهي|ازل|كفي).*(الشرح|الموضوع|المعلومات)|^(اغلق|كفي|خلاص)$/)){closeTopic();render();return ok('أغلقت الشرح')}if(has(/(اعد|كرر|اقرا|اسمعنا).*(الشرح|الموضوع)|مره اخري/))return narrate()}
+ if(has(/(^|\s)[وف]?(اشرح|اشرحي|اشرحلي|حدثنا|حدثني|تكلم|تحدث|عرف|عرفنا|عرفني|معلومات|ماذا تعرف|احك|احكي|اخبرنا|اخبرني)(\s|$)|(^|\s)(ما هو|ماهو|ما هي|ماهي|ما معني)(\s|$)/)){
+  const tp=findTopic(n);if(tp)return openTopic(tp);
+  const ms0=findScenes(n);if(ms0.length&&!has(/(النسب|التماثل|التكرار|الايقاع|انواع الخطوط|الاشكال الاساسيه|الملمس|الفراغ)/))return openTopic(sceneTopic(ms0[0].key));
+  if(!has(/(النسب|تقسيم الوجه|التماثل|التكرار|الايقاع|اشرح الخط|انواع الخطوط|اشرح الشكل|الاشكال الاساسيه|الملمس|الفراغ)/)){if(localStorage.getItem('qa-api-key')){askAITopic(text);return}return toast('هذا الموضوع ليس في المكتبة. المواضيع المتاحة: السدو، المحمل، اللؤلؤ، الزبارة، الصقر، النخلة، القهوة، الألوان، الزخارف، العمارة، الخط العربي…')}}
  // بطاقات الأسئلة
  const ordM=n.match(/(الاولي|الاول|الثانيه|الثاني|الثالثه|الثالث|الرابعه|الرابع|الخامسه|الخامس|السادسه|السادس)(\s|$)/),ord=ordM?{'الاولي':0,'الاول':0,'الثانيه':1,'الثاني':1,'الثالثه':2,'الثالث':2,'الرابعه':3,'الرابع':3,'الخامسه':4,'الخامس':4,'السادسه':5,'السادس':5}[ordM[1]]:null;
  const delVerb=has(/(^|\s)(احذف|امسح|شيل|ازل|الغ)(\s|$)/),hideVerb=has(/(^|\s)(اخف|اخفي|اطفئ|اطفي)(\s|$)/);
@@ -860,8 +1027,8 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
    st.active=list[0].id;render();if(lightW&&!off){chime();if(!st.bg)showHint('جرّب «خلفية ليل» لتظهر الأنوار أجمل.',4500)}return ok((off?'أزلت ':'أضفت ')+(lightW?'الأنوار':'الزخارف')+(off?' عن ':' إلى ')+list.map(b=>scenes[b.key].title).join(' و'))}}
  if(has(/(^|\s)(اصلح|رمم|اعد|ارجع)(\s|$)/)&&!has(/(خطوه|مرحله)/)){const b=targetBlocks(n).blocks[0]||(has(/(الجزء|الممسوح|المحذوف|الرسمه)/)?activeBlock():null);if(b&&((b.erased||[]).length||(b.rub||[]).length||b.cut)){pushHistory();delete b.erased;delete b.rub;delete b.cut;render();return ok('أصلحت '+scenes[b.key].title)}}
  // أوضاع العرض
- if(has(/(فعل|شغل|اريد|خل|خلي).*(الرسمه كامله|الرسمه الكامله|الرسم الكامل|الرسم كامل)|رسم كامل دائما/)){st.fullMode=true;localStorage.setItem('qa-full','1');return ok('وضع الرسمة كاملة مفعّل')}
- if(has(/(خطوه بخطوه|خطوه خطوه|بالخطوات|(اوقف|الغ|عطل).*(الرسمه كامله|الرسمه الكامله|الرسم الكامل))/)){st.fullMode=false;localStorage.setItem('qa-full','0');return ok('الرسم خطوة بخطوة')}
+ if(has(/(فعل|شغل|اريد|خل|خلي|ارجع).*(الرسمه كامله|الرسمه الكامله|الرسم الكامل|الرسم كامل)|رسم كامل دائما/)){st.fullMode=true;localStorage.setItem('qa-stepwise','0');return ok('القلم يرسم الرسمة كاملة')}
+ if(has(/(خطوه بخطوه|خطوه خطوه|بالخطوات|بالتدريج|(اوقف|الغ|عطل).*(الرسمه كامله|الرسمه الكامله|الرسم الكامل))/)&&!findScenes(n).length){if(has(/(دائما|كل مره|كل الرسومات)/)){st.fullMode=false;localStorage.setItem('qa-stepwise','1');return ok('الرسم خطوة بخطوة دائماً')}if(st.blocks.length===1)return drawScene(st.blocks[0].key,{stepwise:true});if(st.topic&&st.topic.scene){const k=st.topic.scene;return drawScene(k,{stepwise:true})}st.fullMode=false;localStorage.setItem('qa-stepwise','1');return ok('الرسم خطوة بخطوة')}
  if(has(/(اوقف|وقف|اسكت|اكتم|اطفئ).*(صوت القلم|صوت الرسم)/)){st.penSound=false;localStorage.setItem('qa-pen','0');scratch(false);return ok('أوقفت صوت القلم')}
  if(has(/(شغل|فعل).*(صوت القلم|صوت الرسم)/)){st.penSound=true;localStorage.setItem('qa-pen','1');return ok('صوت القلم يعمل')}
  if(has(/(اوقف|وقف|جمد|ثبت).*(الحركه|العناصر|الكل|كل شي)|بدون حركه/)){st.motion=false;localStorage.setItem('qa-motion','0');render();return ok('أوقفت الحركة')}
@@ -921,9 +1088,9 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
   else{st.history.pop();if(!meta(b.key).anim)return toast('إلى أين؟ قل: يمين، يسار، فوق، تحت، أو «بجانب البيت».');delete b.still;st.motion=true;localStorage.setItem('qa-motion','1');render();return ok(scenes[b.key].title+' يتحرك')}
   b.cx=clamp(b.cx,20,980);b.cy=clamp(b.cy,20,580);st.active=b.id;render();flashSel(b.id);return ok('حرّكت '+scenes[b.key].title)}
  // الشرح والتقييم
- if(has(/(دائره الالوان|الالوان الاساسيه|الالوان الثانويه|الالوان الحاره|الالوان البارده)/))return concept('الألوان');
- if(has(/(اشرح|درس|وضح).*(ظل|نور|تظليل|اضاءه)|الظل والنور|التظليل/))return concept('الظل');
- if(has(/(المنظور|نقطه التلاشي|خط الافق)/))return concept('المنظور');
+ if(has(/(دائره الالوان|الالوان الاساسيه|الالوان الثانويه|الالوان الحاره|الالوان البارده)/))return openTopic(TOPICS.colors);
+ if(has(/(اشرح|درس|وضح).*(ظل|نور|تظليل|اضاءه)|الظل والنور|التظليل/))return openTopic(TOPICS.shade);
+ if(has(/(المنظور|نقطه التلاشي|خط الافق)/))return openTopic(TOPICS.perspective);
  if(has(/(النسب|تقسيم الوجه)/))return concept('النسب');
  if(has(/(التماثل|التكرار|الايقاع)/))return concept('التماثل');
  if(has(/(اشرح الخط|انواع الخطوط)/))return concept('الخط');
@@ -943,9 +1110,12 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
  if(has(/(^|\s)(كرر|كرري|انسخ|ضاعف)(\s|$)/)){const tg=targetBlocks(n);if(tg.ms.length&&!tg.blocks.length){compose(n);return}const b=tg.blocks[0]||activeBlock();if(!b)return toast('ارسم شيئاً أولاً.');pushHistory();const k=findCount(n)||1;for(let i=0;i<k;i++)addElement(b.key,{color:b.colors[meta(b.key).main||0]});return ok('كرّرت '+scenes[b.key].title)}
  if(has(/(^|\s)(ضع|حط|خل|خلي)(\s|$)/)){if(compose(n,{moveExisting:true}))return;return toast('اكتب مثلاً: ضع الصقر على النخلة.')}
  if(has(/(^|\s)[وف]?(اضف|اضافه|اضيف|ضيف|زد|زيد|اريد|ابغي|ابي)(\s|$)/)){if(compose(n))return;if(bgType)return setBg(bgType);return toast('لم أجد هذا العنصر. افتح «المكتبة» لرؤية كل الرسومات.')}
- if(has(/(^|\s)[وف]?(ارسم|ارسمي|ارسملي|ارسموا|ارسمها|اعرض|اظهر)(\s|$)/)){if(compose(n,{draw:true}))return;if(bgType)return setBg(bgType);return askAI(text)}
+ if(has(/(^|\s)[وف]?(ارسم|ارسمي|ارسملي|ارسموا|ارسمها|اعرض|اظهر|سو|سوي|سويلي)(\s|$)/)){if(compose(n,{draw:true}))return;if(bgType)return setBg(bgType);return askAI(text)}
+ const words=n.split(' ').length,stepAsk=/(خطوه بخطوه|خطوه خطوه|بالخطوات)/.test(n);
+ if(voice&&words>(stepAsk?5:2)){ambient(n);showHeard(text,{request:false,ms:1800});return}
  if(compose(n,{draw:true}))return;
- if(bgType)return setBg(bgType);
+ if(bgType&&words<=2)return setBg(bgType);
+ if(ambient(n))return;
  if(voice){showHeard(text,{request:false,ms:1400});return}
  if(localStorage.getItem('qa-api-key'))return askAI(text);
  return toast('لم أفهم. جرّب: «ارسم المحمل»، «أضف شمساً فوق البيت»، «أضف بطاقة»، أو قل «المساعدة».')
@@ -1042,7 +1212,7 @@ async function testAudioInput(){
 }
 function queueSpeechText(text){
  text=String(text||'').trim();if(!text)return;
- if(Date.now()<(st.ttsUntil||0)){if(st.ttsUntil-Date.now()>9000)st.ttsUntil=0;else return} // لا نستمع لصوت الرد الآلي
+ if(Date.now()<(st.ttsUntil||0)){if(st.ttsUntil-Date.now()>20000)st.ttsUntil=0;else return} // لا نستمع لصوت الرد الآلي
  st.micPending=st.micPending||[];st.micPending.push(text);
  clearTimeout(st.speechTimeout);
  st.speechTimeout=setTimeout(()=>{
@@ -1069,22 +1239,22 @@ function startRecognizer(){
  clearTimeout(st.retryTimeout);clearTimeout(st.partialTimeout);
  const old=st.recognizer;st.recognizer=null;if(old){old.onend=old.onerror=old.onresult=old.onstart=null;try{old.abort()}catch(err){}}
  const gen=st.micGen=(st.micGen||0)+1,alive=()=>st.mic&&gen===st.micGen,beat=()=>{st.micBeat=Date.now()};
- const r=new SR();r.lang=st.micLang||'ar-QA';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
+ const r=new SR();r.lang=st.micLang||'ar-QA';r.continuous=true;r.interimResults=true;r.maxAlternatives=4;
  const finalIndexes=new Set();st.micPartial='';st.micStartAsk=Date.now();st.micStartedAt=0;beat();
  const retry=delay=>{clearTimeout(st.retryTimeout);st.retryTimeout=setTimeout(()=>{if(alive())startRecognizer()},delay)};
  r.onstart=()=>{if(!alive())return;st.micStartedAt=Date.now();beat();st.micFault='';setMicState('listening','يستمع • العربية')};
  r.onaudiostart=()=>{if(alive()){beat();setMicState('hearing','اتصال الميكروفون جاهز')}};
  r.onsoundstart=()=>{if(alive()){beat();setMicState('hearing','يصل صوت')}};
- r.onspeechstart=()=>{if(alive()){beat();setMicState('hearing','يلتقط كلاماً')}};
+ r.onspeechstart=()=>{if(alive()){beat();st.duck=true;if(scr)scr.g.gain.setTargetAtTime(.012,scr.a.currentTime,.05);setMicState('hearing','يلتقط كلاماً')}};
  r.onspeechend=()=>{
-  if(!alive())return;beat();setMicState('decoding','يميّز الكلام');
+  st.duck=false;if(!alive())return;beat();setMicState('decoding','يميّز الكلام');
   if(st.micPartial){clearTimeout(st.partialTimeout);st.partialTimeout=setTimeout(()=>{if(alive()&&st.micPartial&&!st.micPending?.length){const p=st.micPartial;st.micPartial='';queueSpeechText(p)}},1100)}
  };
  r.onresult=e=>{
   if(!alive())return;beat();st.micErrStreak=0;st.micEndStreak=0;
   let finals=[],partial='';
   for(let i=e.resultIndex;i<e.results.length;i++){
-   const result=e.results[i],t=result[0]?.transcript||'';
+   const result=e.results[i],t=result.isFinal?bestHeard(Array.from({length:result.length||1},(_,k)=>result[k]?.transcript||'').filter(Boolean)):(result[0]?.transcript||'');
    if(result.isFinal){if(!finalIndexes.has(i)){finalIndexes.add(i);finals.push(t)}}else partial+=t;
   }
   if(partial){st.micPartial=partial;if(Date.now()>=(st.ttsUntil||0))showHeard(partial,{live:true,request:false});setMicState('decoding','يميّز: '+partial.slice(0,21))}
@@ -1100,7 +1270,7 @@ function startRecognizer(){
   if(st.micErrStreak===5)toast(code==='network'?'الإنترنت ضعيف: التعرف على الصوت يعيد المحاولة تلقائياً. يمكنك كتابة الأمر مؤقتاً.':'الميكروفون يعيد المحاولة تلقائياً ('+code+').');
  };
  r.onend=()=>{
-  if(gen!==st.micGen)return;clearTimeout(st.partialTimeout);
+  st.duck=false;if(gen!==st.micGen)return;clearTimeout(st.partialTimeout);
   if(!st.mic){if(!st.micFault)setMicState('','الميكروفون متوقف');return}
   if(st.micPartial&&!st.micPending?.length){const p=st.micPartial;st.micPartial='';queueSpeechText(p)}
   const lived=st.micStartedAt?Date.now()-st.micStartedAt:0;st.micEndStreak=lived<1200?(st.micEndStreak||0)+1:0;
@@ -1150,8 +1320,8 @@ $('#modalBody').addEventListener('click',e=>{const b=e.target.closest('[data-dra
   removeApi:()=>{localStorage.removeItem('qa-api-key');$('#apiKey').value='';toast('حُذف المفتاح من التخزين المحلي.')}};
  if(acts[a])acts[a]()});
 $('#modalBody').addEventListener('change',e=>{if(e.target.id==='wakeToggle'){st.wake=e.target.checked;localStorage.setItem('qa-keyword',st.wake?'1':'0');toast(st.wake?'كلمة المفتاح «طيب» مفعّلة':'كلمة المفتاح متوقفة: تُنفَّذ كل الأوامر الصوتية')}
- const tg={fullToggle:['fullMode','qa-full','الرسمة كاملة'],motionToggle:['motion','qa-motion','العناصر المتحركة'],penToggle:['penSound','qa-pen','صوت القلم']}[e.target.id];
- if(tg){st[tg[0]]=e.target.checked;localStorage.setItem(tg[1],e.target.checked?'1':'0');if(tg[0]==='motion')render();if(tg[0]==='penSound'&&!e.target.checked)scratch(false);toast(tg[2]+(e.target.checked?': مفعّل':': متوقف'))}
+ const tg={artToggle:['art','qa-art','أسلوب الحبر والألوان المائية'],fullToggle:['fullMode','qa-stepwise','الرسمة كاملة'],motionToggle:['motion','qa-motion','العناصر المتحركة'],penToggle:['penSound','qa-pen','صوت القلم']}[e.target.id];
+ if(tg){st[tg[0]]=e.target.checked;localStorage.setItem(tg[1],(tg[0]==='fullMode'?!e.target.checked:e.target.checked)?'1':'0');if(tg[0]==='motion'||tg[0]==='art')render();if(tg[0]==='penSound'&&!e.target.checked)scratch(false);toast(tg[2]+(e.target.checked?': مفعّل':': متوقف'))}
  if(e.target.id==='voiceToggle'){st.voiceReply=e.target.checked;localStorage.setItem('qa-voice',st.voiceReply?'1':'0');if(!st.voiceReply)window.speechSynthesis?.cancel();toast(st.voiceReply?'الرد الصوتي مفعّل':'الرد الصوتي متوقف')}});
 $('#eraserBtn').addEventListener('click',()=>{st.eraser=!st.eraser;$('#eraserBtn').classList.toggle('active',st.eraser)});$('#undoBtn').addEventListener('click',()=>{st.studentPaths.pop();redrawStudent()});$('#clearStudentBtn').addEventListener('click',()=>{st.studentPaths=[];st.studentCurrent=null;redrawStudent()});$('#ghostBtn').addEventListener('click',()=>{st.ghost=!st.ghost;$('#teacherGhost').style.display=st.ghost?'':'none';$('#ghostBtn').textContent=st.ghost?'إخفاء النموذج':'إظهار النموذج'});$('#mirrorBtn').addEventListener('click',()=>{st.mirror=!st.mirror;$('#mirrorBtn').classList.toggle('active',st.mirror)});$('#exitStudent').addEventListener('click',exitStudent);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='F8'){e.preventDefault();sceneMenu()}if(e.ctrlKey&&e.key.toLowerCase()==='z'&&document.activeElement!==$('#command')){e.preventDefault();undo()}if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();$('#command').focus()}});
@@ -1159,7 +1329,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.ke
 let wakeLock=null;const keepAwake=async()=>{try{if('wakeLock' in navigator&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}}catch(e){}};
 document.addEventListener('pointerdown',keepAwake,{once:true});document.addEventListener('pointerdown',()=>audio(),{once:true});document.addEventListener('keydown',()=>audio(),{once:true});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')keepAwake()});
 if('speechSynthesis' in window)speechSynthesis.getVoices();
-window.__qaTest={VERSION,scenes,questions,st,normalize,runCommand,drawScene,addElement,setStep,nextStep,fullDrawing,stopAnimation,timer,render,undo,findScenes,rectOf,createConcept,startQuiz,answerQuiz,studentMode,redrawStudent,handwriting,micHelp,testAudioInput,stopAudioTest,toggleMic,sceneMenu,help,addCards,removeCards,lightCards,showHeard,renderCards,setTool};
+window.__qaTest={VERSION,scenes,questions,st,normalize,runCommand,drawScene,addElement,setStep,nextStep,fullDrawing,stopAnimation,timer,render,undo,findScenes,rectOf,createConcept,startQuiz,answerQuiz,studentMode,redrawStudent,handwriting,micHelp,testAudioInput,stopAudioTest,toggleMic,sceneMenu,help,addCards,removeCards,lightCards,showHeard,renderCards,setTool,openTopic,closeTopic,TOPICS,findTopic,ambient,fixHeard};
 render();
 })();
 </script>
