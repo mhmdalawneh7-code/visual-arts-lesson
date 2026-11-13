@@ -139,6 +139,16 @@
 .a-glow{animation:aGlow 1.9s ease-in-out infinite}@keyframes aGlow{50%{filter:brightness(1.12) drop-shadow(0 0 14px #ffc95a)}}
 @media(max-width:900px){.stp i{display:none!important}#stepper{padding:4px 8px}}
 @media(prefers-reduced-motion:reduce){#sceneLayer .mv{animation:none!important}}
+/* ===== v1.3: رسمة تفاعلية ===== */
+.bulb{animation:bulb 1.6s ease-in-out infinite alternate}@keyframes bulb{from{opacity:.25}to{opacity:1}}
+circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.08}to{opacity:.42}}
+.winGlow{animation:winGlow 2.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 10px #ffd95a)}@keyframes winGlow{from{opacity:.75}to{opacity:1}}
+.orn,.lights{animation:decoIn .7s ease-out}@keyframes decoIn{from{opacity:0}}
+#sceneLayer .blk{transform-box:fill-box;transform-origin:50% 100%}
+#sceneLayer .blk.tap{animation:tapPop .5s cubic-bezier(.3,1.6,.5,1)}@keyframes tapPop{40%{transform:scale(1.08)}}
+#mainSvg.erasing{cursor:cell}#mainSvg.erasing #sceneLayer .blk{cursor:cell}
+.hudBtn.active{background:#8a1538;color:#fff;border-color:#8a1538}
+@media(prefers-reduced-motion:reduce){.bulb,.winGlow{animation:none}}
 </style>
 </head>
 <body>
@@ -161,16 +171,16 @@
  <div id="heard" aria-live="polite"></div>
  <div id="stepIntro" role="status"></div>
  <div id="spoken" aria-live="polite"><span id="spokenText"></span></div>
- <div id="lessonHud"><span id="sceneTitle"></span><span id="stepper"></span><span id="stepBadge"></span><button type="button" class="hudBtn" id="prevStep" title="أعد الخطوة">↶ إعادة</button><button type="button" class="hudBtn" id="nextStep" title="الخطوة التالية">التالي ←</button><button type="button" class="hudBtn" id="fullDrawing">الرسمة كاملة</button><span id="timerHud">⏳ <span id="timerText">00:30</span> <button id="timerCancel" title="إيقاف المؤقت">×</button></span></div>
+ <div id="lessonHud"><span id="sceneTitle"></span><span id="stepper"></span><span id="stepBadge"></span><button type="button" class="hudBtn" id="prevStep" title="أعد الخطوة">↶ إعادة</button><button type="button" class="hudBtn" id="nextStep" title="الخطوة التالية">التالي ←</button><button type="button" class="hudBtn" id="fullDrawing">الرسمة كاملة</button><button type="button" class="hudBtn" id="eraserTool" title="امسح جزءاً بإصبعك">ممحاة</button><span id="timerHud">⏳ <span id="timerText">00:30</span> <button id="timerCancel" title="إيقاف المؤقت">×</button></span></div>
  <div id="lessonHint" role="status"></div>
- <div id="status"><span id="version">v1.2.0</span><span id="soundState"><span id="soundDot"></span><span id="soundLabel">الميكروفون متوقف</span></span></div>
+ <div id="status"><span id="version">v1.3.0</span><span id="soundState"><span id="soundDot"></span><span id="soundLabel">الميكروفون متوقف</span></span></div>
  <div id="conceptLayer"><svg id="conceptSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg><div id="conceptCaption"></div></div>
  <div id="studentLayer"><svg id="teacherGhost" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg><canvas id="studentCanvas" width="1000" height="600" aria-label="مساحة رسم الطالب"></canvas></div>
  <div id="studentTools"><label>اللون <input type="color" id="brushColor" value="#60314c"></label><label>السُّمك <input type="range" id="brushWidth" min="1" max="32" value="5"></label><button id="eraserBtn">ممحاة</button><button id="undoBtn">تراجع</button><button id="clearStudentBtn">مسح</button><button id="ghostBtn">إخفاء النموذج</button><button id="mirrorBtn">تماثل</button><button id="exitStudent">إنهاء</button></div>
 </main>
 <footer id="toolbar" aria-label="أوامر المرسم">
 <button type="button" id="micBtn" title="تشغيل الميكروفون" aria-label="تشغيل الميكروفون"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg></button>
-<input id="command" type="text" aria-label="اكتب أمراً للرسم" autocomplete="off" placeholder="قل: طيب ارسم المحمل · أو اكتب الأمر هنا">
+<input id="command" type="text" aria-label="اكتب أمراً للرسم" autocomplete="off" placeholder="قل أو اكتب: ارسم المحمل · أضف أنوار للقلعة">
 <button id="sendBtn" type="button" title="تنفيذ الأمر" aria-label="تنفيذ الأمر">➤</button>
 <button id="libraryBtn" class="tool" title="مكتبة الرسومات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="toolText">المكتبة</span></button>
 <button id="questionsBtn" class="tool" title="أسئلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 1 1 5 2.3c-2 1.5-2 2.2-2 3.1M12 17h.01"/></svg><span class="toolText">أسئلة</span></button>
@@ -184,7 +194,7 @@
 <script>
 'use strict';
 (()=>{
-const VERSION='1.2.0', $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg', reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const VERSION='1.3.0', $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg', reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const svg=$('#mainSvg'),sceneLayer=$('#sceneLayer'),bgLayer=$('#bgLayer'),pen=$('#penLayer');
 // P: خط يرسمه القلم • F: مساحة لونية • L: رسمة من أربع مراحل (إرشاد، محيط، تفاصيل، تلوين)
 const P=(d,c='#573c43',w=5,extra={})=>({d,c,w,...extra}), F=(d,fill,o=1)=>({d,fill,o});
@@ -508,7 +518,7 @@ Object.assign(META['علم قطر'],{anim:'wave'});Object.assign(META['جمل'],
 Object.assign(META['الفنر'],{anim:'glow'});Object.assign(META['سيارة'],{anim:'idle'});Object.assign(META['صبار'],{anim:'sway'});
 // ===== الحالة العامة =====
 const st={blocks:[],active:null,uid:0,lesson:false,bg:null,history:[],queue:[],busy:false,dom:{},anim:null,speed:1,timer:null,remaining:0,timerEnds:0,defaultPause:30,mode:'normal',quiz:null,recognizer:null,mic:false,
- wake:localStorage.getItem('qa-wake')!=='0',voiceReply:localStorage.getItem('qa-voice')!=='0',penSound:localStorage.getItem('qa-pen')!=='0',motion:localStorage.getItem('qa-motion')!=='0',fullMode:localStorage.getItem('qa-full')==='1',armedUntil:0,cards:[],cardsHidden:false,usedQ:{},ttsUntil:0,lastSpeech:'',lastSpeechAt:0,speechTimeout:null,retryTimeout:null,
+ wake:localStorage.getItem('qa-keyword')==='1',tool:null,voiceReply:localStorage.getItem('qa-voice')!=='0',penSound:localStorage.getItem('qa-pen')!=='0',motion:localStorage.getItem('qa-motion')!=='0',fullMode:localStorage.getItem('qa-full')==='1',armedUntil:0,cards:[],cardsHidden:false,usedQ:{},ttsUntil:0,lastSpeech:'',lastSpeechAt:0,speechTimeout:null,retryTimeout:null,
  students:JSON.parse(localStorage.getItem('qa-students')||'[]'),studentPaths:[],studentCurrent:null,eraser:false,mirror:false,ghost:true,concept:null};
 const stageNames=['الأشكال الأساسية','الخطوط الخارجية','التفاصيل','التلوين'],stageTips=['نبدأ بأشكال بسيطة وخفيفة','نحدّد الخطوط الخارجية بثقة','نضيف التفاصيل الصغيرة','نلوّن ونُظهر الظل والنور'],stageOrd=['الأولى','الثانية','الثالثة','الرابعة'];
 const GROUND=505, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -561,14 +571,34 @@ function render(){clear(sceneLayer);clear(pen);drawBg();const map={};
   const mv=elSvg('g',{class:'mv'+(b.step>=3&&st.motion&&!b.still&&!reduced&&m.anim?' a-'+m.anim:'')},g);
   const inner=elSvg('g',{transform:`translate(${t.tx} ${t.ty}) scale(${t.sx} ${t.sy})`},mv);
   elSvg('rect',{x:bb.x,y:bb.y,width:bb.w,height:bb.h,fill:'transparent',class:'hit'},inner);
-  const pg=elSvg('g',{},inner),ig=elSvg('g',{},inner),strokes=[],fills=[];
+  const content=elSvg('g',{},inner),pg=elSvg('g',{},content),ig=elSvg('g',{},content),strokes=[],fills=[],winIdx=(m.parts||{})['نوافذ'];
   for(let i=0;i<=b.step;i++){let fi=0;for(const it of sc.steps[i]||[]){
-   if(it.fill){const idx=fi++;fills.push(elSvg('path',{d:it.d,fill:(i===3&&b.colors[idx])||it.fill,stroke:'none',opacity:it.o??1},pg))}
+   if(it.fill){const idx=fi++;fills.push(elSvg('path',{d:it.d,fill:(i===3&&b.lights&&idx===winIdx&&'#ffe27a')||(i===3&&b.colors[idx])||it.fill,stroke:'none',opacity:it.o??1,class:i===3&&b.lights&&idx===winIdx?'winGlow':''},pg))}
    else{if(it.guide&&b.step>=3)continue;const el=elSvg('path',{d:it.d,fill:'none',stroke:it.c||palette.dark,'stroke-width':it.w||5,'stroke-linecap':'round','stroke-linejoin':'round',class:it.guide?'guide':''},ig);if(it.dash)el.setAttribute('stroke-dasharray','7 9');let twin=null;if(!it.guide&&(it.w||5)>=3.5)twin=elSvg('path',{d:it.d,fill:'none',stroke:it.c||palette.dark,'stroke-width':Math.max(1.4,(it.w||5)*.38),'stroke-linecap':'round','stroke-linejoin':'round',opacity:b.step>=3?.3:.5,transform:`translate(${(i%2?2.4:-2)} ${i%2?-1.8:2.2}) rotate(${i%2?.35:-.3} ${bb.cx} ${bb.cy})`},ig);strokes.push({path:el,twin,step:i,t})}}}
+  decorate(b,sc,bb,content,inner);
   map[b.id]={g,inner,strokes,fills}}
  st.dom=map;updateHud();return map}
+// ===== الرسمة التفاعلية: أنوار، زخارف، ومسح أجزاء =====
+const pbCache={};
+function pathBox(d){if(d in pbCache)return pbCache[d];const p=elSvg('path',{d,visibility:'hidden'},svg);let b=null;try{b=p.getBBox()}catch(e){}p.remove();return pbCache[d]=b&&b.width&&b.height?{x:b.x,y:b.y,w:b.width,h:b.height}:null}
+function sceneFills(key){return (scenes[key].steps[3]||[]).filter(i=>i.fill)}
+function decorate(b,sc,bb,content,inner){const fl=sceneFills(b.key),mf=fl[meta(b.key).main||0]||fl[0],mb=mf&&pathBox(mf.d);
+ if(b.step>=3&&b.orn&&mb){const cid='clip'+b.id,cp=elSvg('clipPath',{id:cid},content);elSvg('path',{d:mf.d},cp);const g=elSvg('g',{'clip-path':`url(#${cid})`,class:'orn'},content);
+  const h=clamp(mb.h*.24,16,70),y=mb.y+mb.h*.52-h/2,n=Math.max(4,Math.round(mb.w/(h*.95))),x0=mb.x,x1=mb.x+mb.w,R=(yy,hh,fill,o=1)=>elSvg('rect',{x:x0,y:yy,width:mb.w,height:hh,fill,opacity:o},g),Pt=(d,fill)=>elSvg('path',{d,fill},g),Ln=(d,c,w)=>elSvg('path',{d,fill:'none',stroke:c,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+  if(b.orn==='sadu'){R(y,h,'#a8242f');R(y,h*.2,'#2b2126');R(y+h*.8,h*.2,'#2b2126');Pt(zig(x0,x1,y+h*.8,y+h*.42,n),'#f7f1e6');Pt(zig(x0,x1,y+h*.2,y+h*.5,n),'#2b2126');Ln(`M${x0} ${y}H${x1}M${x0} ${y+h}H${x1}`,'#e4b355',h*.06)}
+  else if(b.orn==='plant'){R(y,h,'#fffdf7',.82);let v=`M${x0} ${y+h/2}`,lv='';const w=mb.w/n;for(let i=0;i<n;i++){v+=`q${w/4} ${i%2?h*.38:-h*.38} ${w/2} 0t${w/2} 0`;const cx=x0+i*w+w/2;lv+=petals(cx,y+h/2,h*.05,h*.4,4,.5,Math.PI/4)}Pt(lv,'#74b377');Ln(v,'#3f7a4a',h*.07);Ln(`M${x0} ${y}H${x1}M${x0} ${y+h}H${x1}`,'#3f7a4a',h*.06)}
+  else{R(y,h,'#fffdf7',.9);Pt(diamonds(x0,x1,y+h/2,h*.4,n,1),'#d9a531');Pt(diamonds(x0,x1,y+h/2,h*.4,n,.45),'#8a1538');Ln(`M${x0} ${y}H${x1}M${x0} ${y+h}H${x1}`,'#8a1538',h*.07)}}
+ if(b.step>=3&&b.lights){const base=mb||bb,g=elSvg('g',{class:'lights'},content),sw=clamp(Math.round(base.w/150),1,4),W=base.w/sw,S=Math.max(9,W*.11),r=clamp(base.w/62,4,9),cols=['#ffd23f','#ff6b6b','#4fc3f7','#7ee081','#ffa94d'];let wire='',k=0;
+  for(let s=0;s<sw;s++){const xa=base.x+s*W,y0=base.y;wire+=`M${xa} ${y0}Q${xa+W/2} ${y0+2*S} ${xa+W} ${y0}`;for(let j=0;j<5;j++){const tt=(j+.5)/5,x=xa+W*tt,y=y0+4*S*tt*(1-tt)+r*1.1,c=cols[k%cols.length];elSvg('circle',{cx:x,cy:y,r:r*2.6,fill:c,opacity:.3,class:'bulb',style:`animation-delay:${(k*.23%1.6).toFixed(2)}s`},g);elSvg('circle',{cx:x,cy:y,r,fill:c,stroke:'#56313a','stroke-width':r*.18,class:'bulb',style:`animation-delay:${(k*.23%1.6).toFixed(2)}s`},g);k++}}
+  elSvg('path',{d:wire,fill:'none',stroke:'#56313a','stroke-width':Math.max(1.5,r*.3)},g)}
+ if((b.erased&&b.erased.length)||(b.rub&&b.rub.length)||b.cut){const mid='mask'+b.id,mk=elSvg('mask',{id:mid,maskUnits:'userSpaceOnUse',x:bb.x-400,y:bb.y-400,width:bb.w+800,height:bb.h+800},inner);elSvg('rect',{x:bb.x-400,y:bb.y-400,width:bb.w+800,height:bb.h+800,fill:'#fff'},mk);
+  for(const idx of b.erased||[])if(fl[idx])elSvg('path',{d:fl[idx].d,fill:'#000',stroke:'#000','stroke-width':16,'stroke-linejoin':'round'},mk);
+  for(const s of b.rub||[])elSvg('path',{d:s.d,fill:'none',stroke:'#000','stroke-width':s.w,'stroke-linecap':'round','stroke-linejoin':'round'},mk);
+  if(b.cut){const c=b.cut,rx=c==='right'?bb.cx:bb.x-400,ry=c==='bottom'?bb.cy:bb.y-400,rw=c==='left'?bb.cx-rx:c==='right'?bb.w/2+400:bb.w+800,rh=c==='top'?bb.cy-ry:c==='bottom'?bb.h/2+400:bb.h+800;elSvg('rect',{x:rx,y:ry,width:rw,height:rh,fill:'#000'},mk)}
+  content.setAttribute('mask',`url(#${mid})`)}}
+function setTool(tool){st.tool=tool;svg.classList.toggle('erasing',tool==='eraser');$('#eraserTool').classList.toggle('active',tool==='eraser');if(tool==='eraser'){stopAnimation();showHint('الممحاة جاهزة: امسح بإصبعك الجزء الذي تريد. قل «أوقف الممحاة» عند الانتهاء.',6000);announce('الممحاة جاهزة',1100)}else announce('أوقفت الممحاة',900)}
 function updateHud(){const b=activeBlock(),on=!!b&&st.mode==='normal';$('#lessonHud').classList.toggle('visible',on);sceneLayer.classList.toggle('locked',st.blocks.length<2&&st.lesson);if(!on)return;
- const many=st.blocks.length>1,complete=st.blocks.every(x=>x.step>=3);for(const id of ['#prevStep','#nextStep'])$(id).style.display=many&&complete?'none':'';$('#fullDrawing').style.display=complete?'none':'';
+ const many=st.blocks.length>1,complete=st.blocks.every(x=>x.step>=3);for(const id of ['#prevStep','#nextStep'])$(id).style.display=many&&complete?'none':'';$('#fullDrawing').style.display=complete?'none':'';$('#eraserTool').style.display=complete?'':'none';
  $('#sceneTitle').textContent=many?`لوحة مركّبة • ${st.blocks.length} عناصر`:scenes[b.key].title;
  const showSteps=!many;$('#stepper').style.display=showSteps?'':'none';$('#stepBadge').style.display=showSteps?'none':'';
  if(showSteps)$('#stepper').innerHTML=stageNames.map((n,i)=>`<span class="stp ${i<b.step||b.step>=3?'done':''} ${i===b.step&&b.step<3?'cur':''}"><b>${i<b.step||b.step>=3?'✓':i+1}</b><i>${n}</i></span>`).join('<span class="stpLine"></span>');
@@ -613,7 +643,7 @@ function drawScene(key,{color,bg,full}={}){if(!scenes[key])return false;pushHist
 function setStep(n){const b=activeBlock();if(!b)return toast('اختر رسمة أولاً: اكتب «المكتبة».');stopAnimation();stopTimer();b.step=clamp(n,0,3);if(st.lesson&&st.blocks.length===1)stepIntro(b.step);
  animateBlock(b,[b.step],()=>{if(st.lesson&&st.blocks.length===1){timer(st.defaultPause);showHint(b.step<3?'توقّف القلم؛ دور الطلاب للتقليد. قل «الخطوة التالية» للمتابعة.':'اكتملت الرسمة. جرّب: «أضف شمساً» أو «لوّن … أحمر».',5200)}})}
 function nextStep(){let b=activeBlock();if(!b)return sceneMenu();if(b.step>=3){b=st.blocks.find(x=>x.step<3);if(!b)return announce('اكتملت الرسمة');st.active=b.id}setStep(b.step+1)}
-function fullDrawing(){const todo=st.blocks.filter(b=>b.step<3);if(!st.blocks.length)return toast('اختر رسمة أولاً.');if(!todo.length)return toast('الرسمة مكتملة.');stopAnimation();stopTimer();
+function fullDrawing(){const todo=st.blocks.filter(b=>b.step<3);if(!st.blocks.length)return toast('اختر رسمة أولاً.');if(!todo.length)return toast('الرسمة مكتملة.');stopAnimation();stopTimer();$('#stepIntro').classList.remove('show');
  for(const b of todo){const steps=[];for(let i=Math.max(1,b.step+1);i<=3;i++)steps.push(i);b.step=3;enqueue(done=>animateBlock(b,steps,done,1.15))}showHint('القلم يكمل الرسمة حتى النهاية.',4000)}
 function clearScreen(){if(st.blocks.length||st.bg||st.cards.length)pushHistory();stopTimer();resetVisual();st.blocks=[];st.active=null;st.lesson=false;st.bg=null;st.cards=[];st.cardsHidden=false;$('#lessonHint').classList.remove('visible');$('#stepIntro').classList.remove('show');render();renderCards();announce('لوحة نظيفة',950)}
 
@@ -622,7 +652,7 @@ function pushHistory(){st.history.push(JSON.stringify({blocks:st.blocks,bg:st.bg
 function undo(){const s=st.history.pop();if(!s)return toast('لا يوجد ما يُتراجع عنه.');stopAnimation();stopTimer();backToBoard();Object.assign(st,JSON.parse(s));st.blocks.forEach(b=>{if(b.step<0)b.step=0});st.cards=st.cards||[];render();renderCards();announce('تراجع',800)}
 
 // ===== التركيب: عنصر على عنصر =====
-function enterSceneMode(){if(!st.lesson)return;st.lesson=false;stopTimer();for(const b of st.blocks){b.step=3;if(b.scale!==1)continue;const bb=sceneBox(b.key),m=meta(b.key);b.scale=sizeScale(b.key);b.cx=500;b.cy=m.sky?140:m.flat?310:GROUND-bb.h*b.scale/2}}
+function enterSceneMode(){if(!st.lesson)return;st.lesson=false;stopTimer();$('#stepIntro').classList.remove('show');for(const b of st.blocks){b.step=3;if(b.scale!==1)continue;const bb=sceneBox(b.key),m=meta(b.key);b.scale=sizeScale(b.key);b.cx=500;b.cy=m.sky?140:m.flat?310:GROUND-bb.h*b.scale/2}}
 function overlaps(b,x,w,skip){return st.blocks.some(o=>{if(o===b||o===skip||meta(o.key).sky)return false;const r=rectOf(o);return Math.abs(x-r.cx)<(w+r.w)/2*.72})}
 function place(b,rel,tb,n=0){const m=meta(b.key),bb=sceneBox(b.key);let w=bb.w*b.scale,h=bb.h*b.scale;const fit=k=>{b.scale*=k;w=bb.w*b.scale;h=bb.h*b.scale};
  if(tb&&rel){const T=rectOf(tb);
@@ -646,9 +676,9 @@ function applyColor(b,part,color){const sc=scenes[b.key],n=(sc.steps[3]||[]).fil
 // ===== السحب باللمس أو الفأرة =====
 let drag=null;
 function svgPoint(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
-sceneLayer.addEventListener('pointerdown',e=>{const g=e.target.closest('.blk');if(!g||st.mode!=='normal'||(st.lesson&&st.blocks.length<2))return;const b=st.blocks.find(x=>x.id===+g.dataset.id);if(!b)return;const p=svgPoint(e);drag={b,dx:b.cx-p.x,dy:b.cy-p.y,moved:false,id:e.pointerId};st.active=b.id;try{sceneLayer.setPointerCapture(e.pointerId)}catch(err){}});
-sceneLayer.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const p=svgPoint(e);if(!drag.moved){if(Math.hypot(p.x+drag.dx-drag.b.cx,p.y+drag.dy-drag.b.cy)<4)return;drag.moved=true;stopAnimation();pushHistory()}drag.b.cx=clamp(p.x+drag.dx,0,1000);drag.b.cy=clamp(p.y+drag.dy,0,600);const m=st.dom[drag.b.id],t=tf(drag.b);if(m){m.inner.setAttribute('transform',`translate(${t.tx} ${t.ty}) scale(${t.sx} ${t.sy})`);const sh=m.g.querySelector('.shadow');if(sh){const r=rectOf(drag.b);sh.setAttribute('cx',r.cx);sh.setAttribute('cy',r.bottom+2)}}});
-const endDrag=e=>{if(!drag)return;const d=drag;drag=null;if(d.moved)render();else{updateHud();flashSel(d.b.id)}};
+sceneLayer.addEventListener('pointerdown',e=>{const g=e.target.closest('.blk');if(!g||st.mode!=='normal'||st.tool==='eraser')return;const b=st.blocks.find(x=>x.id===+g.dataset.id);if(!b)return;const p=svgPoint(e);drag={b,dx:b.cx-p.x,dy:b.cy-p.y,moved:false,id:e.pointerId};st.active=b.id;try{sceneLayer.setPointerCapture(e.pointerId)}catch(err){}});
+sceneLayer.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(st.lesson&&st.blocks.length<2)return;const p=svgPoint(e);if(!drag.moved){if(Math.hypot(p.x+drag.dx-drag.b.cx,p.y+drag.dy-drag.b.cy)<4)return;drag.moved=true;stopAnimation();pushHistory()}drag.b.cx=clamp(p.x+drag.dx,0,1000);drag.b.cy=clamp(p.y+drag.dy,0,600);const m=st.dom[drag.b.id],t=tf(drag.b);if(m){m.inner.setAttribute('transform',`translate(${t.tx} ${t.ty}) scale(${t.sx} ${t.sy})`);const sh=m.g.querySelector('.shadow');if(sh){const r=rectOf(drag.b);sh.setAttribute('cx',r.cx);sh.setAttribute('cy',r.bottom+2)}}});
+const endDrag=e=>{if(!drag)return;const d=drag;drag=null;if(d.moved)render();else{updateHud();flashSel(d.b.id);const m=st.dom[d.b.id];if(m&&d.b.step>=3){m.g.classList.remove('tap');void m.g.getBBox();m.g.classList.add('tap');say(scenes[d.b.key].title)}}};
 sceneLayer.addEventListener('pointerup',endDrag);sceneLayer.addEventListener('pointercancel',endDrag);
 
 // ===== المكتبة والمساعدة والإعدادات =====
@@ -659,13 +689,14 @@ function sceneMenu(){const keys=Object.keys(scenes).filter(k=>!k.startsWith('__'
 const HELP=[['الرسم بالقلم',['ارسم المحمل','ارسم بيت وشجرة وشمس','ارسم صقر على النخلة','ارسم ثلاث نخلات','الخطوة التالية','أعد الخطوة','الرسمة كاملة','فعّل الرسمة كاملة','خطوة بخطوة']],
  ['عنصر على عنصر',['أضف شمساً فوق البيت','أضف شجرة يمين البيت','أضف سيارة أمام البيت','أضف جبلاً خلف البيت','ضع الصقر على البيت','كرّر النخلة']],
  ['بطاقات الأسئلة',['أضف بطاقة','أضف بطاقة عن السدو','أضف ثلاث بطاقات عن التراث','ضع ضوء على الجواب الصحيح','أخفِ الجواب','احذف بطاقة','احذف البطاقة الأولى','احذف كل البطاقات']],
+ ['رسمة تفاعلية',['أضف أنوار للقلعة','أطفئ الأنوار','أضف زخارف للبيت','أضف زخارف سدو للمحمل','أضف زخارف نباتية للدلة','احذف الزخارف','امسح سقف البيت','امسح النصف الأيمن من الشجرة','الممحاة','أوقف الممحاة','أصلح البيت']],
  ['التلوين',['لوّن الشراع أحمر','لوّن سقف البيت أزرق','لوّن الشجرة أخضر غامق','أضف سيارة زرقاء','لوّن الخلفية أصفر فاتح']],
  ['الحركة والحجم',['حرّك الشجرة يمين','كبّر البيت','صغّر الشجرة','اقلب الجمل','أوقف الحركة','شغّل الحركة','ثبّت الشمس','احذف الشجرة','تراجع','امسح الشاشة']],
  ['الخلفيات',['خلفية بحر','خلفية صحراء','خلفية سماء','خلفية حديقة','خلفية ليل','خلفية غروب','احذف الخلفية']],
  ['الدرس والتقييم',['اشرح دائرة الألوان','امزج الأزرق والأصفر','اشرح الظل والنور','اشرح المنظور','اختبار عن السدو','مؤقت دقيقتين','اختر طالب','وضع الطالب']]];
-function help(){openModal('كل الأوامر',`<p class="muted">بالصوت ابدأ بكلمة <b>«طيب»</b> ثم الأمر: «طيب ارسم المحمل». أو اكتب الأمر، أو اضغط أي مثال لتجربته. يمكنك سحب أي عنصر بإصبعك.</p><div class="helpGrid">${HELP.map(([t,c])=>`<div class="helpBox"><h3>${t}</h3>${c.map(x=>`<button type="button" data-cmd="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('')}</div>`).join('')}</div>`)}
+function help(){openModal('كل الأوامر',`<p class="muted">قل الأمر مباشرة أو اكتبه، أو اضغط أي مثال لتجربته. يمكنك سحب أي عنصر بإصبعك، ولمسه لينطق اسمه.</p><div class="helpGrid">${HELP.map(([t,c])=>`<div class="helpBox"><h3>${t}</h3>${c.map(x=>`<button type="button" data-cmd="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('')}</div>`).join('')}</div>`)}
 function settings(){const chk=(id,on,label)=>`<p><label><input type="checkbox" id="${id}" ${on?'checked':''}> ${label}</label></p>`;
- openModal('الإعدادات والأدوات',chk('wakeToggle',st.wake,'كلمة المفتاح <b>«طيب»</b>: لا يُنفَّذ أي أمر صوتي إلا إذا بدأ بها، مثل «طيب ارسم المحمل»')+`<p class="muted">يظهر كلامك على الشاشة دائماً، لكن اللوحة لا تنفّذ إلا ما يأتي بعد «طيب»، فلا تلتقط كلام الطلاب. الكتابة لا تحتاج كلمة مفتاح.</p>`+chk('fullToggle',st.fullMode,'الرسمة كاملة: يرسم القلم الرسمة حتى نهايتها دون توقف بين الخطوات')+chk('motionToggle',st.motion,'العناصر المتحركة: الشمس تدور، الطائر يحلّق، المحمل يتمايل…')+chk('penToggle',st.penSound,'صوت القلم على الورق أثناء الرسم')+chk('voiceToggle',st.voiceReply,'الرد الصوتي: ينطق التطبيق تأكيداً قصيراً بعد كل أمر')+`<p><button class="btn" data-action="library">مكتبة الرسومات</button><button class="btn alt" data-action="help">كل الأوامر</button><button class="btn alt" data-action="studentMode">وضع الطالب</button><button class="btn alt" data-action="studentNames">أسماء الطلاب</button><button class="btn alt" data-action="apiSettings">إعدادات الذكاء الاصطناعي</button><button class="btn green" data-action="micHelp">🎙 فحص الميكروفون</button></p><p class="muted">الإصدار ${VERSION} • جميع الرسومات والأسئلة المحلية داخل هذا الملف. قد تتطلب خدمات التعرّف على الصوت اتصالاً بالإنترنت، بحسب المتصفح.</p><p class="muted">مراجعة التراث: متاحف قطر (موقع الزبارة الأثري)، اليونسكو (الزبارة)، وVisit Qatar (الغوص على اللؤلؤ). الروابط معلوماتية فقط وليست مطلوبة للتشغيل.</p>`)}
+ openModal('الإعدادات والأدوات',chk('wakeToggle',st.wake,'كلمة مفتاح اختيارية <b>«طيب»</b>: عند تفعيلها لا يُنفَّذ الأمر الصوتي إلا إذا بدأ بها')+`<p class="muted">الوضع العادي بلا كلمة مفتاح: قل الأمر مباشرة «ارسم المحمل». فعّل هذا الخيار فقط إذا التقطت اللوحة كلام الطلاب.</p>`+chk('fullToggle',st.fullMode,'الرسمة كاملة: يرسم القلم الرسمة حتى نهايتها دون توقف بين الخطوات')+chk('motionToggle',st.motion,'العناصر المتحركة: الشمس تدور، الطائر يحلّق، المحمل يتمايل…')+chk('penToggle',st.penSound,'صوت القلم على الورق أثناء الرسم')+chk('voiceToggle',st.voiceReply,'الرد الصوتي: ينطق التطبيق تأكيداً قصيراً بعد كل أمر')+`<p><button class="btn" data-action="library">مكتبة الرسومات</button><button class="btn alt" data-action="help">كل الأوامر</button><button class="btn alt" data-action="studentMode">وضع الطالب</button><button class="btn alt" data-action="studentNames">أسماء الطلاب</button><button class="btn alt" data-action="apiSettings">إعدادات الذكاء الاصطناعي</button><button class="btn green" data-action="micHelp">🎙 فحص الميكروفون</button></p><p class="muted">الإصدار ${VERSION} • جميع الرسومات والأسئلة المحلية داخل هذا الملف. قد تتطلب خدمات التعرّف على الصوت اتصالاً بالإنترنت، بحسب المتصفح.</p><p class="muted">مراجعة التراث: متاحف قطر (موقع الزبارة الأثري)، اليونسكو (الزبارة)، وVisit Qatar (الغوص على اللؤلؤ). الروابط معلوماتية فقط وليست مطلوبة للتشغيل.</p>`)}
 function studentMode(){closeModal();stopAnimation();stopTimer();welcome(false);svg.style.visibility='hidden';$('#conceptLayer').classList.remove('open');$('#studentLayer').classList.add('open');$('#studentTools').classList.add('open');st.mode='student';updateHud();fitStudentCanvas();refreshGhost();redrawStudent();announce('وضع الطالب: ابدأ الرسم',1600)}
 function refreshGhost(){const ghost=$('#teacherGhost');ghost.innerHTML='';for(const b of st.blocks){const t=tf(b),g=elSvg('g',{transform:`translate(${t.tx} ${t.ty}) scale(${t.sx} ${t.sy})`},ghost);for(const step of scenes[b.key].steps.slice(1))for(const v of step)if(v.d&&!v.fill)elSvg('path',{d:v.d,stroke:'#78485b','stroke-width':v.w||4,fill:'none','stroke-linecap':'round','stroke-linejoin':'round'},g)}}
 function exitStudent(){backToBoard();render()}
@@ -698,6 +729,15 @@ function showHeard(text,{live=false,request=true,ms=2000}={}){const box=$('#hear
   else if(VERB_RE.test(nw))cls='hv';else if(REL_RE.test(nw))cls='hr';else if(/^\d+$/.test(nw)||NUMS[nw])cls='hn';
   html+=`<span class="${cls}"${style}>${escapeHtml(w)}</span> `});
  box.innerHTML=`<div class="heardPill${live?' live':''}${request?'':' idle'}">${html}</div>`;box.classList.add('show');clearTimeout(box._t);box._t=setTimeout(()=>box.classList.remove('show'),live?1800:ms)}
+
+// الممحاة باليد: كل لمسة تُضاف إلى قناع العنصر الذي تمرّ فوقه
+let rubbing=null,rubRaf=0;
+function rubAt(e){const p=svgPoint(e);for(const b of st.blocks){const r=rectOf(b);if(p.x<r.left-24||p.x>r.right+24||p.y<r.top-24||p.y>r.bottom+24)continue;const t=tf(b),x=((p.x-t.tx)/t.sx).toFixed(1),y=((p.y-t.ty)/t.sy).toFixed(1);let s=rubbing.strokes.get(b.id);if(!s){s={d:`M${x} ${y}l.1 0`,w:Math.round(38/b.scale)};(b.rub=b.rub||[]).push(s);rubbing.strokes.set(b.id,s)}else s.d+=`L${x} ${y}`}
+ if(!rubRaf)rubRaf=requestAnimationFrame(()=>{rubRaf=0;render()})}
+svg.addEventListener('pointerdown',e=>{if(st.tool!=='eraser'||st.mode!=='normal'||!st.blocks.length)return;e.preventDefault();stopAnimation();pushHistory();st.blocks.forEach(b=>b.step=3);rubbing={strokes:new Map(),id:e.pointerId};try{svg.setPointerCapture(e.pointerId)}catch(err){}rubAt(e)});
+svg.addEventListener('pointermove',e=>{if(rubbing&&e.pointerId===rubbing.id)rubAt(e)});
+const endRub=()=>{if(rubbing){rubbing=null;render()}};svg.addEventListener('pointerup',endRub);svg.addEventListener('pointercancel',endRub);
+$('#eraserTool').addEventListener('click',()=>setTool(st.tool==='eraser'?null:'eraser'));
 const questions={
 'السدو':[['ما العنصر الذي يتكرر في نقوش السدو؟',['الأشكال الهندسية','الصور الفوتوغرافية','الحروف الإنجليزية'],0],['كيف يظهر الإيقاع في زخرفة السدو؟',['بتكرار الأشكال والألوان','بترك الفراغ بلا ترتيب','برسم شكل واحد فقط'],0],['أي الأشكال أكثر حضوراً في الزخارف الهندسية؟',['المثلثات والمعينات','الغيوم الواقعية','الأجسام البشرية'],0],['ما معنى التماثل؟',['تشابه الأجزاء حول محور','تغيير الألوان عشوائياً','طمس التفاصيل'],0],['ما الوسيلة التقليدية لإنتاج السدو؟',['النسيج اليدوي','الطباعة ثلاثية الأبعاد','النحت بالحديد'],0]],
 'الزخارف الإسلامية':[['كيف تتكوّن النجمة الثمانية في الدرس؟',['من مربعين أحدهما مائل','من ثلاث دوائر متلاصقة','من مثلث واحد'],0],['ماذا نعني بالتكرار؟',['إعادة وحدة زخرفية','التلوين دون نظام','رسم أشخاص فقط'],0],['أي مما يلي زخرفة نباتية؟',['أوراق وأغصان مبسّطة','إشارات المرور','الأرقام وحدها'],0],['ما الشكل الذي يشبه المعيّن؟',['مربع مائل','دائرة','خط متعرج'],0],['ما الذي يساعد على انتظام الشبكة الزخرفية؟',['التباعد المتساوي','تغيير حجم كل وحدة عشوائياً','حذف الخطوط الإرشادية قبل البدء'],0]],
@@ -782,11 +822,12 @@ function compose(n,opt={}){let draw=!!opt.draw;const moveExisting=!!opt.moveExis
 function targetBlocks(n){const ms=findScenes(n),out=[];for(const m of ms){const b=lastBlock(m.key);if(b&&!out.includes(b))out.push(b)}return {ms,blocks:out}}
 
 function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!text)return;let n=normalize(text);
+ if(voice&&!st.wake)showHeard(text);
  if(voice&&st.wake){const hits=[...n.matchAll(/(?:^|\s)(طيب|طيبه|طب|يا لوحه)(?=\s|$)/g)],m=hits[hits.length-1],armed=Date.now()<st.armedUntil;
   if(!m&&!armed){showHeard(text,{request:false,ms:1500});return}
   if(m){const after=n.slice(m.index+m[0].length).trim();if(!after){st.armedUntil=Date.now()+7000;showHeard(text);return}n=after;text=text.replace(/^[\s\S]*(?:^|\s)طي[\u0651]?ب[ةه]?\s+/,'')}
-  st.armedUntil=0}
- showHeard(text);
+  st.armedUntil=0;showHeard(text)}
+ if(!voice)showHeard(text);
  n=n.replace(/(^|\s)(يا لوحه|طيب|طيبه|لو سمحت|من فضلك|ممكن|رجاء|الان|هيا|يلا)(?=\s|$)/g,' ').replace(/\s+/g,' ').trim();text=text.replace(/^\s*يا\s+لوحة\s*/,'').trim();if(!n)return;
  if(voice){const now=Date.now();if(st.lastSpeech===n&&now-st.lastSpeechAt<1800)return;st.lastSpeech=n;st.lastSpeechAt=now}
  if(st.quiz&&!st.quiz.done&&$('#modalShade').classList.contains('open')&&(/الاجابه|الاختيار|^الف$|^باء$|^جيم$/.test(n))){if(/الف|اول|^ا$/.test(n))return answerQuiz(0);if(/باء|ثاني|^ب$/.test(n))return answerQuiz(1);if(/جيم|ثالث|^ج$/.test(n))return answerQuiz(2)}
@@ -806,6 +847,17 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
   if(has(/(^|\s)(اظهر|اعرض|رجع|ارجع)(\s|$)/)&&st.cards.length){st.cardsHidden=false;renderCards();return ok('هذه البطاقات')}
   return addCards(has(/بطاقتين/)?2:(findCount(n)||(has(/بطاقات/)?3:1)),resolveTopic(n))}
  if(has(/(اسئله|سؤال|سؤالين)(\s|$)/)&&!has(/(اختبار|تقييم)/)){const cnt=has(/سؤالين/)?2:(findCount(n)||(has(/اسئله/)?3:1)),tp=resolveTopic(n);if(!tp&&/(عن|حول)\s/.test(n)&&localStorage.getItem('qa-api-key'))return askAIQuestions(text,cnt);return addCards(cnt,tp)}
+ // ممحاة باليد
+ if(has(/(^|\s)(ممحاه|الممحاه|محايه|المحايه)(\s|$)|امسح بيدي|امسح باصبعي/))return setTool(has(/(اوقف|وقف|اغلق|الغ|اترك|بدون)/)?null:'eraser');
+ // أنوار وزخارف على العنصر
+ const lightW=has(/(^|\s)[وف]?(ال|لل|بال)?(انوار|انوارا|اضواء|اضاءه|زينه|مصابيح|لمبات)(\s|$)/)||has(/(^|\s)(نور|نوري|اضئ|اضيء|انر|ولع)(\s|$)/),ornW=has(/(^|\s)[وف]?(ال|لل|بال)?(زخارف|زخارفا|نقوش|نقوشا)(\s|$)/)||has(/(^|\s)(زخرف|زخرفي|زين|زيني)(\s|$)/);
+ if(lightW||ornW){const DEC=['زخرفة نباتية','سدو','نجمة ثمانية','شبكة هندسية','مشربية'],all=findScenes(n),real=all.filter(m=>!DEC.includes(m.key)),tg=targetBlocks(n).blocks.filter(b=>!DEC.includes(b.key));
+  const sceneOnly=ornW&&!lightW&&all.length&&!real.length&&!/(له|لها|عليه|عليها|للعنصر|للرسمه|للرسم)(\s|$)/.test(n)&&!has(/(^|\s)(ال|لل|بال)?زخارف/);
+  if(!sceneOnly){if(real.length&&!tg.length)return toast('«'+scenes[real[0].key].title+'» ليس على اللوحة. ارسمه أولاً.');const list=tg.length?tg:(has(/(الكل|كل العناصر|كل شي)/)?st.blocks.slice():[activeBlock()]).filter(Boolean);if(!list.length)return toast('ارسم شيئاً أولاً ثم زيّنه.');
+   const off=has(/(^|\s)(احذف|امسح|شيل|ازل|الغ|اطفئ|اطفي|اخف|بدون)(\s|$)/);pushHistory();stopAnimation();stopTimer();if(st.mode!=='normal')backToBoard();
+   for(const b of list){b.step=3;if(lightW)b.lights=!off;if(ornW){if(off)delete b.orn;else b.orn=/سدو/.test(n)?'sadu':/نبات/.test(n)?'plant':/(هندس|معين|نجوم)/.test(n)?'geo':({undefined:'geo',geo:'sadu',sadu:'plant',plant:'geo'})[b.orn]}}
+   st.active=list[0].id;render();if(lightW&&!off){chime();if(!st.bg)showHint('جرّب «خلفية ليل» لتظهر الأنوار أجمل.',4500)}return ok((off?'أزلت ':'أضفت ')+(lightW?'الأنوار':'الزخارف')+(off?' عن ':' إلى ')+list.map(b=>scenes[b.key].title).join(' و'))}}
+ if(has(/(^|\s)(اصلح|رمم|اعد|ارجع)(\s|$)/)&&!has(/(خطوه|مرحله)/)){const b=targetBlocks(n).blocks[0]||(has(/(الجزء|الممسوح|المحذوف|الرسمه)/)?activeBlock():null);if(b&&((b.erased||[]).length||(b.rub||[]).length||b.cut)){pushHistory();delete b.erased;delete b.rub;delete b.cut;render();return ok('أصلحت '+scenes[b.key].title)}}
  // أوضاع العرض
  if(has(/(فعل|شغل|اريد|خل|خلي).*(الرسمه كامله|الرسمه الكامله|الرسم الكامل|الرسم كامل)|رسم كامل دائما/)){st.fullMode=true;localStorage.setItem('qa-full','1');return ok('وضع الرسمة كاملة مفعّل')}
  if(has(/(خطوه بخطوه|خطوه خطوه|بالخطوات|(اوقف|الغ|عطل).*(الرسمه كامله|الرسمه الكامله|الرسم الكامل))/)){st.fullMode=false;localStorage.setItem('qa-full','0');return ok('الرسم خطوة بخطوة')}
@@ -818,7 +870,14 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
  if(has(/(امسح الشاشه|افرغ اللوحه|لوحه نظيفه|امسح الكل|امسح كل|احذف الكل|احذف كل|ابدا من جديد|لوحه جديده)/)||n==='امسح'||n==='مسح')return clearScreen();
  if(has(/(^|\s)(احذف|امسح|شيل|ازل|اشطب|الغ)(\s|$)/)){
   if(has(/خلفيه/))return setBg(null);
-  const {blocks}=targetBlocks(n);if(blocks.length){pushHistory();stopAnimation();blocks.forEach(removeBlock);render();return ok('حذفت '+blocks.map(b=>scenes[b.key].title).join(' و'))}
+  const {blocks}=targetBlocks(n);let pb=null,pidx=null;
+  for(const c of blocks){const p=findPart(c.key,n);if(p!=null){pb=c;pidx=p;break}}
+  if(!pb&&!blocks.length)for(let i=st.blocks.length-1;i>=0&&!pb;i--){const p=findPart(st.blocks[i].key,n);if(p!=null){pb=st.blocks[i];pidx=p}}
+  if(pb){pushHistory();stopAnimation();stopTimer();pb.step=3;pb.erased=[...new Set([...(pb.erased||[]),pidx])];st.active=pb.id;render();return ok('مسحت جزءاً من '+scenes[pb.key].title)}
+  const half=has(/(يمين|ايمن|اليمني)/)?'right':has(/(يسار|ايسر|اليسري)/)?'left':has(/(علوي|العليا|اعلي|فوق)/)?'top':has(/(سفلي|السفلي|اسفل|تحت)/)?'bottom':null;
+  if(half&&has(/(جزء|نصف|جانب|جهه|قسم)/)){const b=blocks[0]||activeBlock();if(!b)return toast('ارسم شيئاً أولاً.');pushHistory();stopAnimation();stopTimer();b.step=3;b.cut=half;st.active=b.id;render();return ok('مسحت جزءاً من '+scenes[b.key].title)}
+  if(has(/(جزء|قطعه)/)&&st.blocks.length)return setTool('eraser');
+  if(blocks.length){pushHistory();stopAnimation();blocks.forEach(removeBlock);render();return ok('حذفت '+blocks.map(b=>scenes[b.key].title).join(' و'))}
   if(has(/(اخر|الاخير|المحدد)/)&&activeBlock()){pushHistory();stopAnimation();const b=activeBlock();removeBlock(b);render();return ok('حذفت '+scenes[b.key].title)}
   return toast('لم أجد هذا العنصر على اللوحة. قل مثلاً: «احذف الشجرة» أو «امسح الشاشة».')}
  if(has(/(اعد الخطوه|ارجع خطوه|السابقه|اعد المرحله)/)){const b=activeBlock();if(!b)return toast('اختر رسمة أولاً.');announce('إعادة الخطوة',900);return setStep(Math.max(0,b.step))}
@@ -883,9 +942,10 @@ function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!te
  if(has(/(^|\s)(كرر|كرري|انسخ|ضاعف)(\s|$)/)){const tg=targetBlocks(n);if(tg.ms.length&&!tg.blocks.length){compose(n);return}const b=tg.blocks[0]||activeBlock();if(!b)return toast('ارسم شيئاً أولاً.');pushHistory();const k=findCount(n)||1;for(let i=0;i<k;i++)addElement(b.key,{color:b.colors[meta(b.key).main||0]});return ok('كرّرت '+scenes[b.key].title)}
  if(has(/(^|\s)(ضع|حط|خل|خلي)(\s|$)/)){if(compose(n,{moveExisting:true}))return;return toast('اكتب مثلاً: ضع الصقر على النخلة.')}
  if(has(/(^|\s)[وف]?(اضف|اضافه|اضيف|ضيف|زد|زيد|اريد|ابغي|ابي)(\s|$)/)){if(compose(n))return;if(bgType)return setBg(bgType);return toast('لم أجد هذا العنصر. افتح «المكتبة» لرؤية كل الرسومات.')}
- if(has(/(ارسم|رسم|اعرض|اظهر|الدرس)/)){if(compose(n,{draw:true}))return;if(bgType)return setBg(bgType);return askAI(text)}
+ if(has(/(^|\s)[وف]?(ارسم|ارسمي|ارسملي|ارسموا|ارسمها|اعرض|اظهر)(\s|$)/)){if(compose(n,{draw:true}))return;if(bgType)return setBg(bgType);return askAI(text)}
  if(compose(n,{draw:true}))return;
  if(bgType)return setBg(bgType);
+ if(voice){showHeard(text,{request:false,ms:1400});return}
  if(localStorage.getItem('qa-api-key'))return askAI(text);
  return toast('لم أفهم. جرّب: «ارسم المحمل»، «أضف شمساً فوق البيت»، «أضف بطاقة»، أو قل «المساعدة».')
 }
@@ -1077,7 +1137,7 @@ $('#modalBody').addEventListener('click',e=>{const b=e.target.closest('[data-dra
   saveApi:()=>{const v=$('#apiKey').value.trim();if(v){localStorage.setItem('qa-api-key',v);toast('حُفظ المفتاح محلياً في هذا المتصفح.')}else toast('أدخل المفتاح أولاً.')},
   removeApi:()=>{localStorage.removeItem('qa-api-key');$('#apiKey').value='';toast('حُذف المفتاح من التخزين المحلي.')}};
  if(acts[a])acts[a]()});
-$('#modalBody').addEventListener('change',e=>{if(e.target.id==='wakeToggle'){st.wake=e.target.checked;localStorage.setItem('qa-wake',st.wake?'1':'0');toast(st.wake?'كلمة المفتاح «طيب» مفعّلة':'كلمة المفتاح متوقفة: تُنفَّذ كل الأوامر الصوتية')}
+$('#modalBody').addEventListener('change',e=>{if(e.target.id==='wakeToggle'){st.wake=e.target.checked;localStorage.setItem('qa-keyword',st.wake?'1':'0');toast(st.wake?'كلمة المفتاح «طيب» مفعّلة':'كلمة المفتاح متوقفة: تُنفَّذ كل الأوامر الصوتية')}
  const tg={fullToggle:['fullMode','qa-full','الرسمة كاملة'],motionToggle:['motion','qa-motion','العناصر المتحركة'],penToggle:['penSound','qa-pen','صوت القلم']}[e.target.id];
  if(tg){st[tg[0]]=e.target.checked;localStorage.setItem(tg[1],e.target.checked?'1':'0');if(tg[0]==='motion')render();if(tg[0]==='penSound'&&!e.target.checked)scratch(false);toast(tg[2]+(e.target.checked?': مفعّل':': متوقف'))}
  if(e.target.id==='voiceToggle'){st.voiceReply=e.target.checked;localStorage.setItem('qa-voice',st.voiceReply?'1':'0');if(!st.voiceReply)window.speechSynthesis?.cancel();toast(st.voiceReply?'الرد الصوتي مفعّل':'الرد الصوتي متوقف')}});
@@ -1087,7 +1147,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.ke
 let wakeLock=null;const keepAwake=async()=>{try{if('wakeLock' in navigator&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}}catch(e){}};
 document.addEventListener('pointerdown',keepAwake,{once:true});document.addEventListener('pointerdown',()=>audio(),{once:true});document.addEventListener('keydown',()=>audio(),{once:true});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')keepAwake()});
 if('speechSynthesis' in window)speechSynthesis.getVoices();
-window.__qaTest={VERSION,scenes,questions,st,normalize,runCommand,drawScene,addElement,setStep,nextStep,fullDrawing,stopAnimation,timer,render,undo,findScenes,rectOf,createConcept,startQuiz,answerQuiz,studentMode,redrawStudent,handwriting,micHelp,testAudioInput,stopAudioTest,toggleMic,sceneMenu,help,addCards,removeCards,lightCards,showHeard,renderCards};
+window.__qaTest={VERSION,scenes,questions,st,normalize,runCommand,drawScene,addElement,setStep,nextStep,fullDrawing,stopAnimation,timer,render,undo,findScenes,rectOf,createConcept,startQuiz,answerQuiz,studentMode,redrawStudent,handwriting,micHelp,testAudioInput,stopAudioTest,toggleMic,sceneMenu,help,addCards,removeCards,lightCards,showHeard,renderCards,setTool};
 render();
 })();
 </script>
