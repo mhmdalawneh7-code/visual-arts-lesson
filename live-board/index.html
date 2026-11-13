@@ -114,7 +114,7 @@ button:disabled{opacity:.5;cursor:default}
 
 <div class="page" dir="rtl" lang="ar">
   <div class="top">
-    <div class="brand">لوحة الشرح الحي</div>
+    <div class="brand">لوحة الشرح الحي <small>نسخة 17</small></div>
     <div class="state" id="state" role="status" aria-live="polite"><span class="dot"></span><span id="stateText">يجهّز الميكروفون</span></div>
   </div>
   <ul class="chips" id="chips" aria-label="أجزاء الرسمة"></ul>
@@ -556,6 +556,9 @@ button:disabled{opacity:.5;cursor:default}
     if(recOn){ recOn=false; try{ rec.stop(); }catch(_){} recUi(); return; }
     note("");
     rec = new SR(); rec.lang="ar-QA"; rec.continuous=true; rec.interimResults=true;
+    rec.onsoundstart = ()=>{ if(recOn){ note(""); setState("يستمع الآن · يصله صوت", true); } };
+    rec.onspeechstart = ()=>{ if(recOn) setState("يستمع الآن · يميّز كلاماً", true); };
+    rec.onsoundend = ()=>{ if(recOn) setState("يستمع الآن · لا صوت", true); };
     rec.onresult = ev=>{
       let interim="";
       for(let i=ev.resultIndex;i<ev.results.length;i++){
@@ -582,7 +585,8 @@ button:disabled{opacity:.5;cursor:default}
       }
     };
     rec.onerror = ev=>{
-      if(ev.error==="no-speech" || ev.error==="aborted") return;
+      if(ev.error==="aborted") return;
+      if(ev.error==="no-speech"){ note("لم يصل أي صوت إلى المتصفح [no-speech]. تأكد أن الميكروفون غير مكتوم وأن Chrome يستخدم الميكروفون الصحيح."); return; }
       recOn=false; recUi();
       if(ev.error==="not-allowed" || ev.error==="service-not-allowed")
         noMic("المتصفح منع الميكروفون عن هذه الصفحة [" + ev.error + "]. اضغط «ابدأ الكلام» للكتابة أو الإملاء من لوحة المفاتيح.");
