@@ -114,7 +114,7 @@ button:disabled{opacity:.5;cursor:default}
 
 <div class="page" dir="rtl" lang="ar">
   <div class="top">
-    <div class="brand">لوحة الشرح الحي <small>نسخة 17</small></div>
+    <div class="brand">لوحة الشرح الحي <small>نسخة 18</small></div>
     <div class="state" id="state" role="status" aria-live="polite"><span class="dot"></span><span id="stateText">يجهّز الميكروفون</span></div>
   </div>
   <ul class="chips" id="chips" aria-label="أجزاء الرسمة"></ul>
@@ -545,7 +545,11 @@ button:disabled{opacity:.5;cursor:default}
   function noMic(msg){ micOff=true; micBtn.disabled=false; micBtn.classList.remove("on"); micBtn.textContent="ابدأ الكلام"; note(msg); }
   /* Fallback: the browser's own speech recognition, when the platform's dictation is absent. */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec=null, recOn=false, interimT=0, lastInterim="", skipFinal=false, donePrefix="";
+  let rec=null, recOn=false, interimT=0, lastInterim="", skipFinal=false, donePrefix="", abortN=0;
+  /* Only the tab in front listens, so copies of the board in other tabs do not take the mic from each other. */
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.hidden && recOn){ recOn=false; try{ rec.stop(); }catch(_){} recUi(); note("توقف الاستماع لأنك غادرت الصفحة. اضغط «ابدأ الكلام» للمتابعة."); }
+  });
   function recUi(){
     micBtn.classList.toggle("on", recOn);
     micBtn.textContent = recOn ? "أوقف الاستماع" : "ابدأ الكلام";
@@ -556,7 +560,7 @@ button:disabled{opacity:.5;cursor:default}
     if(recOn){ recOn=false; try{ rec.stop(); }catch(_){} recUi(); return; }
     note("");
     rec = new SR(); rec.lang="ar-QA"; rec.continuous=true; rec.interimResults=true;
-    rec.onsoundstart = ()=>{ if(recOn){ note(""); setState("يستمع الآن · يصله صوت", true); } };
+    rec.onsoundstart = ()=>{ abortN=0; if(recOn){ note(""); setState("يستمع الآن · يصله صوت", true); } };
     rec.onspeechstart = ()=>{ if(recOn) setState("يستمع الآن · يميّز كلاماً", true); };
     rec.onsoundend = ()=>{ if(recOn) setState("يستمع الآن · لا صوت", true); };
     rec.onresult = ev=>{
@@ -585,7 +589,11 @@ button:disabled{opacity:.5;cursor:default}
       }
     };
     rec.onerror = ev=>{
-      if(ev.error==="aborted") return;
+      if(ev.error==="aborted"){
+        /* Another tab or page took the recognizer: stop fighting over it. */
+        if(++abortN >= 3){ recOn=false; recUi(); note("صفحة أخرى تستخدم الميكروفون الآن [aborted]. أغلق التبويبات الأخرى التي تستمع (نسخ اللوحة الأخرى، بحث Google الصوتي) ثم اضغط «ابدأ الكلام»."); }
+        return;
+      }
       if(ev.error==="no-speech"){ note("لم يصل أي صوت إلى المتصفح [no-speech]. تأكد أن الميكروفون غير مكتوم وأن Chrome يستخدم الميكروفون الصحيح."); return; }
       recOn=false; recUi();
       if(ev.error==="not-allowed" || ev.error==="service-not-allowed")
