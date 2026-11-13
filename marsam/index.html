@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#531126">
+<title>مرسم قطر التفاعلي | دروس الرسم</title>
+<style>
+:root{--wine:#58152d;--wine2:#340d1f;--wine3:#812c4d;--sand:#d7aa74;--cream:#fff9ef;--ink:#3e2930;--gold:#d9a95a;--muted:#916d72;--mint:#24a47c;--warn:#ed9b43;--radius:22px;--font:Tahoma,'Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden}body{font-family:var(--font);background:radial-gradient(ellipse 110% 80% at 50% -30%,#9c4360 0%,var(--wine) 48%,var(--wine2) 100%);color:#fff;direction:rtl}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #f2c969;outline-offset:2px}
+#shell{position:relative;height:100dvh;min-height:380px;display:flex;flex-direction:column;padding:clamp(10px,1.7vh,22px) clamp(12px,2.5vw,38px) calc(12px + env(safe-area-inset-bottom));gap:12px;isolation:isolate}
+#shell:before,#shell:after{content:"";position:absolute;bottom:0;left:0;width:100%;height:28%;z-index:-1;pointer-events:none}#shell:before{background:#925d58;clip-path:polygon(0 75%,19% 37%,38% 70%,57% 28%,82% 75%,100% 42%,100% 100%,0 100%);opacity:.25}#shell:after{background:linear-gradient(0deg,#c39a6d,#b98268);clip-path:polygon(0 78%,13% 62%,30% 82%,46% 52%,62% 70%,81% 51%,100% 81%,100% 100%,0 100%);opacity:.35}
+#artboard{position:relative;flex:1;min-height:0;max-width:1550px;width:100%;margin:auto;border:5px solid rgba(255,236,199,.34);border-radius:var(--radius);background:#fffaf0;box-shadow:0 18px 45px rgba(21,0,10,.30),inset 0 0 0 1px #eee0ce;overflow:hidden;isolation:isolate}
+#artboard:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 30% 10%,rgba(255,255,255,.95),transparent 55%),repeating-linear-gradient(0deg,rgba(125,81,66,.027) 0 1px,transparent 1px 37px),repeating-linear-gradient(90deg,rgba(125,81,66,.02) 0 1px,transparent 1px 37px)}
+#mainSvg{position:absolute;inset:0;width:100%;height:100%;z-index:1;touch-action:none}#mainSvg .guide{stroke-dasharray:10 9;opacity:.5}#mainSvg .pen-trace{filter:drop-shadow(1px 2px 1px #6b33437a)}
+#spoken{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:8;pointer-events:none;padding:4%;text-align:center;font-size:clamp(24px,5.4vw,79px);font-weight:900;line-height:1.48;color:#6c1735;text-shadow:2px 2px 0 #fffaf2,0 5px 15px #fff;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}#spoken.show{opacity:1;transform:none}#spoken span{display:inline-block;padding:.2em .5em;border-radius:16px;background:rgba(255,248,229,.87);box-shadow:0 8px 30px #66423432}
+#lessonHud{position:absolute;top:12px;inset-inline:16px;z-index:5;display:none;align-items:center;gap:8px;flex-wrap:wrap;pointer-events:none}#lessonHud.visible{display:flex}#lessonHud>*{pointer-events:auto}#sceneTitle{background:rgba(88,21,45,.96);color:#fff;padding:10px 16px;border-radius:12px;font-size:clamp(13px,1.7vw,23px);font-weight:bold;box-shadow:0 3px 8px #4c122133}#stepBadge{background:#fff7e6;color:#6d203a;font-weight:800;border-radius:12px;padding:10px 13px;font-size:clamp(12px,1.4vw,19px)}.hudBtn{border:1px solid #dec5a4;background:rgba(255,252,245,.96);color:#6b2943;border-radius:11px;padding:9px 13px;font-weight:800;font-size:clamp(13px,1.5vw,19px)}.hudBtn:hover{background:#f3e5d0}#timerHud{display:none;align-items:center;gap:7px;color:#6f213d;background:#fff4de;border-radius:14px;padding:7px 13px;font-size:clamp(17px,2.2vw,28px);font-weight:900}#timerHud.visible{display:flex}#timerHud button{border:0;background:transparent;font-size:18px;color:#6f213d}#lessonHint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;background:rgba(255,250,237,.94);color:#785b57;font-size:clamp(12px,1.2vw,17px);border-radius:11px;padding:8px 14px;text-align:center;display:none;max-width:90%}#lessonHint.visible{display:block}
+#status{position:absolute;inset-inline-end:11px;top:9px;z-index:6;display:flex;gap:8px;align-items:center}#version{border:1px solid #e2bb82;background:#fff5e9;color:#713550;font:700 12px var(--font);border-radius:999px;padding:5px 10px;opacity:.83}#soundState{display:none;background:#fff8e9;color:#743d4d;border-radius:100px;padding:6px 10px;align-items:center;gap:6px;font-size:12px;font-weight:bold}#soundState.visible{display:flex}#soundDot{width:9px;height:9px;border-radius:50%;background:#ae8c78}#soundState.listening #soundDot{background:#2aaa7e;box-shadow:0 0 0 3px #2aaa7e33}#soundState.hearing #soundDot{background:#ed9e35;animation:pulse .6s infinite}#soundState.decoding #soundDot{background:#8c6dda}#soundState.error #soundDot{background:#d64550;box-shadow:0 0 0 3px #d6455022}@keyframes pulse{50%{transform:scale(1.4)}}
+#toolbar{width:min(100%,1550px);margin:auto;min-height:70px;display:flex;gap:9px;padding:8px;background:rgba(45,8,25,.65);border:1px solid #d9a95a44;border-radius:18px;box-shadow:0 10px 28px #26071180;align-items:center}#toolbar button{flex-shrink:0;white-space:nowrap;min-height:52px;background:rgba(255,246,234,.13);color:#fff;border:1px solid #f3dcb848;border-radius:12px;padding:11px 16px;font-weight:800;font-size:clamp(13px,1.4vw,19px)}#toolbar button:hover,#toolbar button.active{background:#9c4662}#micBtn{width:56px!important;min-width:56px;padding:9px!important;background:linear-gradient(135deg,#a54c67,#76233f)!important}#micBtn.on{background:#266f60!important}#micBtn svg{width:27px;height:27px;display:block;margin:auto}#command{height:52px;flex:1;min-width:70px;color:#452231;border:0;border-radius:12px;padding:0 18px;font-size:clamp(14px,1.6vw,21px);background:#fffaf0;box-shadow:inset 0 2px 5px #7b595321}#sendBtn{font-size:24px!important;padding:0 14px!important;background:#a97151!important}#toolbar .toolText{display:inline}#toolbar button.tool{display:flex;align-items:center;gap:6px}#toolbar button.tool svg{width:20px;height:20px}
+#modalShade{position:fixed;inset:0;background:rgba(30,7,21,.62);z-index:20;display:none;place-items:center;padding:16px;backdrop-filter:blur(5px)}#modalShade.open{display:grid}#modal{width:min(92vw,900px);max-height:min(88dvh,900px);overflow:auto;background:#fffaf1;color:#40212d;border-radius:22px;box-shadow:0 30px 80px #15010c88;padding:clamp(16px,2.5vw,32px)}#modalHeader{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid #e8d6c1;padding-bottom:16px;margin-bottom:20px}#modalTitle{margin:0;color:#64233e;font-size:clamp(22px,2.8vw,34px)}#closeModal{border:0;color:#733047;background:#eadfd2;border-radius:11px;min-width:42px;height:42px;font-size:24px}#modalBody{font-size:18px;line-height:1.8}.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}.tile{min-height:110px;background:white;border:2px solid #ecd7c3;border-radius:14px;color:#4e253a;text-align:center;font-weight:800;font-size:19px;padding:15px 8px;transition:.15s}.tile:hover{transform:translateY(-2px);border-color:#a3516a}.tile small{display:block;font-size:13px;color:#ac7581;font-weight:500}.btn{border:0;background:#6a1e3b;color:white;border-radius:12px;padding:11px 17px;margin:5px;font-weight:800;font-size:16px}.btn.alt{background:#e9d7c5;color:#5c2940}.btn.green{background:#0b8b6a}.field{width:100%;padding:12px 13px;border:2px solid #e1c9bb;border-radius:12px;background:#fff;font-size:18px;color:#3b2230;margin:7px 0 14px}.muted{color:#866b71;font-size:15px}.pill{display:inline-block;background:#f2e2ca;padding:5px 13px;border-radius:30px;margin:3px;font-weight:700;color:#65314b}.quizOption{display:block;width:100%;border:2px solid #ddc7b9;border-radius:14px;padding:14px 18px;text-align:right;background:#fff;color:#42283a;margin:9px 0;font-size:21px;font-weight:750;transition:.2s}.quizOption.good{background:#c7f4df;border-color:#178760;color:#105a3b}.quizOption.bad{background:#ffe0b8;border-color:#d17d2b;color:#86501c}.quizOption:disabled{cursor:default}.quizTitle{font-size:clamp(22px,2.5vw,30px);color:#5f1f3d;font-weight:900}.quizTop{display:flex;justify-content:space-between;flex-wrap:wrap;color:#8e5260;font-weight:800}.criteria{display:grid;gap:10px}.criterion{display:grid;grid-template-columns:1fr auto;gap:14px;background:white;padding:15px;border-radius:12px;border:1px solid #ebd5c1}.bigResult{text-align:center;font-weight:900;font-size:clamp(32px,5vw,66px);color:#137c62}#toast{position:fixed;bottom:104px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:50;background:#542136;color:#fff;padding:13px 20px;border-radius:13px;box-shadow:0 10px 25px #1d031178;max-width:85vw;text-align:center;font-size:17px;transition:.2s}#toast.on{opacity:1;transform:translate(-50%,0)}
+#studentLayer{display:none;position:absolute;inset:0;z-index:3}#studentLayer.open{display:block}#teacherGhost{position:absolute;inset:0;width:100%;height:100%;opacity:.16;pointer-events:none}#studentCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}#studentTools{display:none;position:absolute;z-index:6;bottom:14px;right:50%;transform:translateX(50%);border:1px solid #dec9ae;background:#fff9e9ed;color:#69304b;border-radius:15px;padding:8px;align-items:center;gap:7px;max-width:94%;overflow:auto}#studentTools.open{display:flex}#studentTools button{border:1px solid #e6ceae;border-radius:9px;background:#fff;color:#592c43;padding:8px;font-weight:bold;white-space:nowrap;min-width:42px}#studentTools input[type=color]{width:36px;height:36px;border:0;background:transparent}#studentTools input[type=range]{width:85px;accent-color:#772842}#studentTools label{white-space:nowrap;color:#5f3047;font-size:13px}#studentTools button.active{background:#e4b26b}#conceptLayer{display:none;position:absolute;inset:0;z-index:2;pointer-events:none}#conceptLayer.open{display:block}#conceptSvg{width:100%;height:100%}#conceptCaption{position:absolute;bottom:20px;left:4%;right:4%;text-align:center;color:#60283f;font-size:clamp(16px,2.7vw,32px);font-weight:900;background:#fff9ecea;padding:12px;border-radius:16px}#conceptSvg .interactive{pointer-events:all;cursor:grab}#conceptSvg text{font-family:var(--font)}
+@media(max-width:700px){#shell{padding:8px 7px calc(8px + env(safe-area-inset-bottom));gap:7px}#artboard{border-width:3px;border-radius:14px}#toolbar{border-radius:12px;gap:4px;padding:5px;min-height:53px}#toolbar button{min-height:43px;padding:8px 9px;font-size:12px}#micBtn{min-width:40px!important;width:40px!important}#micBtn svg{width:21px;height:21px}#sendBtn{padding:0 8px!important}#command{height:43px;padding:0 9px;font-size:14px}#toolbar .toolText{display:none}#toolbar button.tool svg{width:22px;height:22px}#lessonHud{top:7px;inset-inline:8px;gap:4px}#status{top:auto;bottom:8px;left:10px;right:auto}#lessonHint{bottom:44px}#sceneTitle,#stepBadge,.hudBtn{padding:6px 8px;border-radius:8px}#studentTools{bottom:7px}#toast{bottom:75px}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:0.001ms!important;transition-duration:0.001ms!important;scroll-behavior:auto!important}}
+#micMeter{height:22px;background:#e9dac9;border-radius:30px;overflow:hidden;border:1px solid #cfb5a2;margin:12px 0}#micMeterFill{height:100%;width:0%;transition:width .12s ease-out;background:linear-gradient(90deg,#328971,#95c76c,#e4b65c)}.micNote{border-right:4px solid #a36d68;background:#f8eddf;padding:12px 14px;border-radius:10px;margin:12px 0;line-height:1.8}.micCode{direction:ltr;unicode-bidi:isolate;font:800 14px monospace;color:#943852}
+@media(prefers-reduced-motion:reduce){#micMeterFill{transition:none}}
+</style>
+</head>
+<body>
+<div id="shell">
+<main id="artboard" aria-label="لوحة الرسم التفاعلية">
+ <svg id="mainSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="الرسم المتحرك">
+  <defs><pattern id="paperdots" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="1" cy="1" r=".7" fill="#cfbaaa" opacity=".22"/></pattern></defs>
+  <rect x="0" y="0" width="1000" height="600" fill="url(#paperdots)"/><g id="paintLayer"></g><g id="inkLayer"></g><g id="penLayer"></g>
+ </svg>
+ <div id="spoken" aria-live="polite"><span id="spokenText"></span></div>
+ <div id="lessonHud"><span id="sceneTitle"></span><span id="stepBadge"></span><button type="button" class="hudBtn" id="prevStep" title="أعد الخطوة">↶ إعادة</button><button type="button" class="hudBtn" id="nextStep" title="الخطوة التالية">التالي ←</button><button type="button" class="hudBtn" id="fullDrawing">الرسمة كاملة</button><span id="timerHud">⏳ <span id="timerText">00:30</span> <button id="timerCancel" title="إيقاف المؤقت">×</button></span></div>
+ <div id="lessonHint" role="status"></div>
+ <div id="status"><span id="version">v1.0.1</span><span id="soundState"><span id="soundDot"></span><span id="soundLabel">الميكروفون متوقف</span></span></div>
+ <div id="conceptLayer"><svg id="conceptSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg><div id="conceptCaption"></div></div>
+ <div id="studentLayer"><svg id="teacherGhost" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg><canvas id="studentCanvas" width="1000" height="600" aria-label="مساحة رسم الطالب"></canvas></div>
+ <div id="studentTools"><label>اللون <input type="color" id="brushColor" value="#60314c"></label><label>السُّمك <input type="range" id="brushWidth" min="1" max="32" value="5"></label><button id="eraserBtn">ممحاة</button><button id="undoBtn">تراجع</button><button id="clearStudentBtn">مسح</button><button id="ghostBtn">إخفاء النموذج</button><button id="mirrorBtn">تماثل</button><button id="exitStudent">إنهاء</button></div>
+</main>
+<footer id="toolbar" aria-label="أوامر المرسم">
+<button type="button" id="micBtn" title="تشغيل الميكروفون" aria-label="تشغيل الميكروفون"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg></button>
+<input id="command" type="text" aria-label="اكتب أمراً للرسم" autocomplete="off" placeholder="قل أو اكتب: ارسم المحمل، الخطوة التالية، المكتبة…">
+<button id="sendBtn" type="button" title="تنفيذ الأمر" aria-label="تنفيذ الأمر">➤</button>
+<button id="questionsBtn" class="tool" title="أسئلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 1 1 5 2.3c-2 1.5-2 2.2-2 3.1M12 17h.01"/></svg><span class="toolText">أسئلة</span></button>
+<button id="clearBtn" class="tool" title="امسح الشاشة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15l9-10 7 7-8 9H7zM12 21h9"/></svg><span class="toolText">امسح الشاشة</span></button>
+<button id="fullBtn" class="tool" title="ملء الشاشة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg><span class="toolText">ملء الشاشة</span></button>
+</footer>
+</div>
+<div id="modalShade" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><section id="modal"><header id="modalHeader"><h2 id="modalTitle"></h2><button id="closeModal" aria-label="إغلاق">×</button></header><div id="modalBody"></div></section></div><div id="toast" role="status"></div>
+<script>
+'use strict';
+(()=>{
+const VERSION='1.0.1', $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg', reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const svg=$('#mainSvg'),ink=$('#inkLayer'),paint=$('#paintLayer'),pen=$('#penLayer');
+const P=(d,c='#573c43',w=5,extra={})=>({d,c,w,...extra}), F=(d,fill)=>({d,fill});
+const L=(title,desc,s1,s2,s3,s4)=>({title,desc,steps:[s1,s2,s3,s4]});
+const palette={dark:'#56313a',brown:'#a87551',brown2:'#be8960',sea:'#3e9ea8',sky:'#99c9c4',gold:'#e4b355',olive:'#6c9568',maroon:'#8a2442',cream:'#fff0d5'};
+const scenes={
+ 'بيت':L('بيت جميل','التعلّم: المربع والمثلث ثم الباب والنوافذ ثم التلوين.',
+ [P('M285 315H725V500H285Z','#bca09a',3,{guide:true}),P('M255 316L505 132L750 316Z','#bca09a',3,{guide:true})],
+ [P('M285 316L505 150L725 316',palette.dark,7),P('M300 316V500H710V316',palette.dark,7),P('M458 500V378Q458 360 477 360H536Q554 360 554 378V500',palette.dark,6)],
+ [P('M341 352H415V415H341Z',palette.dark,5),P('M595 352H670V415H595Z',palette.dark,5),P('M378 352V415M341 385H415M633 352V415M595 385H670',palette.dark,3),P('M534 427h-2',palette.gold,10),P('M360 501H650',palette.brown,7)],
+ [F('M300 316H710V500H300Z','#f2d5ac'),F('M505 150L725 316H285Z','#a84758'),F('M458 378Q458 360 477 360H536Q554 360 554 378V500H458Z','#b78258'),F('M341 352H415V415H341ZM595 352H670V415H595Z','#b8dce5')]),
+ 'شجرة':L('شجرة وارفة','نبني الجذع من المستطيلات، والتاج من الدوائر المتداخلة.',
+ [P('M456 355H547V515H456Z','#bba399',3,{guide:true}),P('M500 260m-135 0a135 120 0 1 0 270 0a135 120 0 1 0-270 0','#bba399',3,{guide:true})],
+ [P('M457 513L465 359Q393 349 392 285Q419 315 469 323L471 250M543 514L534 356Q599 330 612 279Q575 314 533 319L530 248',palette.dark,7),P('M387 344C330 315 352 235 403 219C386 151 454 134 496 163C541 110 607 142 607 190C684 198 698 289 632 331C606 391 537 377 503 354C467 402 405 390 387 344Z',palette.dark,7)],
+ [P('M493 184q-18 24-16 48M579 244q-35 8-47 28M432 312q35-17 53-12',palette.olive,4),P('M334 519Q499 500 672 519',palette.brown,4)],
+ [F('M457 513L465 359L471 250L530 248L534 356L543 514Z','#b78051'),F('M387 344C330 315 352 235 403 219C386 151 454 134 496 163C541 110 607 142 607 190C684 198 698 289 632 331C606 391 537 377 503 354C467 402 405 390 387 344Z','#8ebd74')]),
+ 'سمكة':L('سمكة في البحر','نلاحظ الشكل البيضاوي، والمثلثات للزعانف والذيل.',
+ [P('M282 310a202 113 0 1 0 404 0a202 113 0 1 0-404 0','#c1aba2',3,{guide:true}),P('M675 304L810 220V397Z','#c1aba2',3,{guide:true})],
+ [P('M290 320Q455 130 675 305Q470 488 290 320Z',palette.dark,7),P('M674 304L816 226L797 314L813 397Z',palette.dark,7),P('M457 227L518 135L586 242M457 412L526 486L593 390',palette.dark,6)],
+ [P('M367 301a18 18 0 1 0 36 0a18 18 0 1 0-36 0',palette.dark,4),P('M304 333q30 31 69 22M521 251Q558 316 524 384M560 261Q602 320 563 372M212 228q-20-20-38 0t-38 0M760 150a15 15 0 1 0 30 0a15 15 0 1 0-30 0',palette.sea,4)],
+ [F('M290 320Q455 130 675 305Q470 488 290 320Z','#f0bd67'),F('M674 304L816 226L797 314L813 397Z','#e99567'),F('M457 227L518 135L586 242Z','#e8a264'),F('M457 412L526 486L593 390Z','#e8a264'),F('M375 301a10 10 0 1 0 20 0a10 10 0 1 0-20 0',palette.dark)]),
+ 'زهرة':L('زهرة متفتحة','نوزّع البتلات حول المركز ونراعي التماثل.',
+ [P('M500 315m-50 0a50 50 0 1 0 100 0a50 50 0 1 0-100 0','#c1aaa1',3,{guide:true}),P('M500 365V535','#c1aaa1',3,{guide:true})],
+ [P('M500 268Q422 180 500 147Q579 180 500 268M544 283Q556 155 627 200Q646 275 552 310M548 334Q660 280 660 360Q614 427 536 354M484 361Q405 433 343 379Q324 305 451 328M447 307Q329 298 374 217Q451 171 481 266',palette.dark,5),P('M500 315a45 45 0 1 0 90 0a45 45 0 1 0-90 0',palette.dark,5),P('M499 360V525',palette.dark,7)],
+ [P('M500 462Q437 393 391 437Q404 493 500 483M501 449Q552 386 608 425Q601 486 500 473',palette.dark,5),P('M500 276v-13M500 368v12M452 316h-15M561 315h-15',palette.gold,4)],
+ [F('M500 268Q422 180 500 147Q579 180 500 268M544 283Q556 155 627 200Q646 275 552 310M548 334Q660 280 660 360Q614 427 536 354M484 361Q405 433 343 379Q324 305 451 328M447 307Q329 298 374 217Q451 171 481 266','#e89ca2'),F('M500 315a45 45 0 1 0 90 0a45 45 0 1 0-90 0','#f0bd58'),F('M500 360V525','#51845e'),F('M500 462Q437 393 391 437Q404 493 500 483M501 449Q552 386 608 425Q601 486 500 473','#71aa75')]),
+ 'المحمل':L('المحمل القطري','المحمل قارب خشبي تقليدي ارتبط بالصيد والتجارة والغوص على اللؤلؤ.',
+ [P('M229 380L773 380L696 470H327Z','#bda9a1',3,{guide:true}),P('M470 373V115L724 357Z','#bda9a1',3,{guide:true})],
+ [P('M200 383Q260 479 435 483H650Q773 469 804 383L730 401H255Z',palette.dark,7),P('M469 394V108',palette.dark,8),P('M482 134Q584 188 722 370L481 362Z',palette.dark,6),P('M478 124L435 369M469 140L726 369',palette.dark,3)],
+ [P('M266 420Q500 461 732 420',palette.dark,5),P('M330 403V449M420 412V462M518 414V464M620 412V459M708 404V444',palette.brown,3),P('M470 110L521 124L470 143Z',palette.maroon,4),P('M173 505Q240 488 306 505T441 505T578 505T715 505T852 505',palette.sea,5),P('M170 525Q235 509 300 525T430 525T560 525T690 525T820 525',palette.sea,4)],
+ [F('M200 383Q260 479 435 483H650Q773 469 804 383L730 401H255Z','#a9724a'),F('M482 134Q584 188 722 370L481 362Z','#f5e6c8'),F('M470 110L521 124L470 143Z','#922744')]),
+ 'قلعة الزبارة':L('قلعة الزبارة','قلعة الزبارة المبنية عام 1938 مجاورة لموقع مدينة الزبارة الأثري المسجّل عالمياً.',
+ [P('M243 267H758V505H243Z','#bcaea2',3,{guide:true}),P('M245 267V183H329V267M675 267V183H757V267','#bcaea2',3,{guide:true})],
+ [P('M252 300H744V500H252Z',palette.dark,7),P('M245 270V198Q272 166 314 198V300M671 300V198Q700 166 741 198V270',palette.dark,7),P('M242 260H332M665 260H755',palette.dark,6),P('M439 500V408Q499 355 559 408V500',palette.dark,7)],
+ [P('M276 238h27M694 238h27M362 314h59M577 314h59',palette.dark,6),P('M347 362h33v55h-33zM620 362h33v55h-33zM470 263h59v62h-59z',palette.dark,5),P('M243 342h195M559 342h194M245 462h194M559 462h193',palette.brown,3)],
+ [F('M252 300H744V500H252Z','#d8b98c'),F('M245 270V198Q272 166 314 198V300H245Z','#d4ae7c'),F('M671 300V198Q700 166 741 198V300H671Z','#d4ae7c'),F('M439 500V408Q499 355 559 408V500Z','#83594b'),F('M347 362h33v55h-33zM620 362h33v55h-33zM470 263h59v62h-59z','#786e5c')]),
+ 'الصقر':L('صقر','نُبسّط هيئة الصقر إلى أشكال هندسية قبل رسم الجناح والمنقار.',
+ [P('M440 210Q570 120 666 284L582 457L378 440Z','#bba99e',3,{guide:true}),P('M420 394L258 491L446 450Z','#bba99e',3,{guide:true})],
+ [P('M454 181Q524 138 570 184Q612 196 634 246L616 280Q658 347 614 444L531 473Q470 419 419 421L327 490L356 425Q399 410 420 376Q385 305 412 245Z',palette.dark,7),P('M570 195L667 225L596 254M531 472L516 526M573 467L583 522',palette.dark,6)],
+ [P('M477 208a12 12 0 1 0 24 0a12 12 0 1 0-24 0',palette.dark,4),P('M426 295Q503 309 557 403M441 329Q493 342 526 411M453 365L491 414M528 526h-35M582 522h38',palette.brown,4),P('M612 298Q584 336 575 390',palette.dark,4)],
+ [F('M454 181Q524 138 570 184Q612 196 634 246L616 280Q658 347 614 444L531 473Q470 419 419 421L327 490L356 425Q399 410 420 376Q385 305 412 245Z','#c6a274'),F('M570 195L667 225L596 254Z','#dcb15d'),F('M477 208a12 12 0 1 0 24 0a12 12 0 1 0-24 0',palette.dark)]),
+ 'النخلة':L('النخلة','سعف النخيل إشعاعي، والجذع يضيق قليلاً نحو الأعلى.',
+ [P('M464 244L539 244L560 536H439Z','#b7a199',3,{guide:true}),P('M500 256m-170 0a170 95 0 1 0 340 0a170 95 0 1 0-340 0','#b7a199',3,{guide:true})],
+ [P('M466 531L484 250M548 531L513 250',palette.dark,8),P('M500 240Q400 117 249 240Q385 188 491 264M500 242Q622 102 762 238Q627 189 513 263M506 239Q484 95 506 77Q557 154 514 258',palette.dark,7),P('M503 253Q330 233 289 351Q397 275 499 272M513 255Q688 230 745 348Q620 278 513 277',palette.dark,7)],
+ [P('M467 471L554 459M469 429L544 418M474 392L541 379M476 350L538 340M479 311L532 302',palette.brown,4),P('M485 275q-24 36-3 53M506 273q25 30 15 51',palette.gold,7),P('M389 544Q507 527 609 544',palette.brown,4)],
+ [F('M466 531L484 250L513 250L548 531Z','#ae784e'),F('M500 240Q400 117 249 240Q385 188 491 264M500 242Q622 102 762 238Q627 189 513 263M506 239Q484 95 506 77Q557 154 514 258M503 253Q330 233 289 351Q397 275 499 272M513 255Q688 230 745 348Q620 278 513 277','#75a86a')]),
+ 'مسجد':L('مسجد وقبة','نستخدم الأقواس والمثلثات والمستطيلات لرسم مبنى ذي طابع إسلامي.',
+ [P('M294 293H694V520H294Z','#b7aaa0',3,{guide:true}),P('M388 292Q492 113 600 292','#b7aaa0',3,{guide:true}),P('M724 169H796V519H724Z','#b7aaa0',3,{guide:true})],
+ [P('M295 287H693V520H295Z',palette.dark,6),P('M389 287Q386 196 494 176Q603 196 601 287Z',palette.dark,6),P('M729 168H789V520H729Z',palette.dark,6),P('M717 171Q756 103 802 171Z',palette.dark,5),P('M494 177V144M486 141Q494 129 502 141',palette.dark,4)],
+ [P('M448 520V411Q496 344 542 411V520',palette.dark,5),P('M345 363h63v89h-63zM580 363h63v89h-63z',palette.dark,4),P('M751 248h17v43h-17zM751 320h17v44h-17z',palette.dark,4),P('M277 523H808',palette.brown,6)],
+ [F('M295 287H693V520H295Z','#e1c197'),F('M389 287Q386 196 494 176Q603 196 601 287Z','#87b4a9'),F('M729 168H789V520H729Z','#d5ac7a'),F('M717 171Q756 103 802 171Z','#9e6b7b'),F('M448 520V411Q496 344 542 411V520Z','#805165')]),
+ 'نجمة ثمانية':L('نجمة ثمانية من مربعين','نرسم مربعاً ثانياً مائلاً 45 درجة، ثم نحدد النجمة المكوَّنة من تداخلهما.',
+ [P('M350 155H650V455H350Z','#a39b9a',4,{guide:true})],
+ [P('M350 155H650V455H350Z',palette.dark,6),P('M500 93L712 305L500 517L288 305Z',palette.maroon,6)],
+ [P('M437 155L500 93L563 155L650 155L650 242L712 305L650 368L650 455L563 455L500 517L437 455L350 455L350 368L288 305L350 242L350 155Z',palette.dark,7),P('M500 155V455M350 305H650',palette.gold,3,{dash:true})],
+ [F('M437 155L500 93L563 155L650 155L650 242L712 305L650 368L650 455L563 455L500 517L437 455L350 455L350 368L288 305L350 242L350 155Z','#d8aa5c'),F('M427 228L500 155L573 228L573 382L500 455L427 382Z','#ad4c65')])
+};
+// Additional offline studies use the same staged pen-engine, with concise illustrated geometry.
+const simple=(title,desc,a,b,c,f=[])=>L(title,desc,[P('M250 510H750','#c4b2a9',2,{guide:true})],a.map(x=>P(x,palette.dark,6)),b.map(x=>P(x,palette.brown,4)),f.map(x=>F(...x)).concat(c.map(x=>P(x,palette.sea,4))));
+Object.assign(scenes,{
+'شمس':simple('شمس مشرقة','الدائرة والأشعة المتكررة.', ['M500 270m-95 0a95 95 0 1 0 190 0a95 95 0 1 0-190 0'],['M500 112V75M500 465v-44M348 120l29 34M647 386l30 32M310 269h-43M731 269h-43M345 414l30-32M655 155l30-32'],[],[['M500 270m-95 0a95 95 0 1 0 190 0a95 95 0 1 0-190 0','#f0c15c']]),
+'سيارة':simple('سيارة','المستطيل والدائرتان ثم النوافذ.', ['M245 372L300 286H450L514 213H652L724 285H761V438H243Z','M329 436m-52 0a52 52 0 1 0 104 0a52 52 0 1 0-104 0','M686 436m-52 0a52 52 0 1 0 104 0a52 52 0 1 0-104 0'],['M471 287L527 233H642L692 287Z','M249 398h59M709 398h51'],[],[['M245 372L300 286H450L514 213H652L724 285H761V438H243Z','#d38371'],['M471 287L527 233H642L692 287Z','#afdae3']]),
+'غيمة':simple('غيمة','منحنيات ودوائر متجاورة.', ['M288 354Q241 280 331 240Q348 171 437 192Q505 119 593 178Q716 152 746 259Q824 293 778 371Q739 409 670 396H356Q308 403 288 354Z'],['M388 465l-23 43M501 465l-23 43M615 465l-23 43'],[],[['M288 354Q241 280 331 240Q348 171 437 192Q505 119 593 178Q716 152 746 259Q824 293 778 371Q739 409 670 396H356Q308 403 288 354Z','#b3d7df']]),
+'جبل':simple('جبال','مثلثات متجاورة تُظهر تراكب المشهد.', ['M175 490L378 176L593 490Z','M446 490L680 230L868 490Z'],['M310 281l68 44 61-44M618 300l62 38 65-41'],['M190 523H852'],[['M175 490L378 176L593 490Z','#bba392'],['M446 490L680 230L868 490Z','#9a8b8c']]),
+'طائر':simple('طائر محلّق','أجنحة متوازنة حول الجسم.', ['M500 430Q446 327 248 289Q342 239 467 287L499 202L535 287Q666 227 767 292Q573 328 500 430Z'],['M494 206L513 173L529 207','M499 424L470 475M520 413l32 59'],[],[['M500 430Q446 327 248 289Q342 239 467 287L499 202L535 287Q666 227 767 292Q573 328 500 430Z','#a1b4a9']]),
+'وجه':simple('الوجه ونِسَبه','خطوط العينين والأنف والفم.', ['M500 160C370 160 339 290 360 390C375 474 448 524 500 526C558 522 632 473 640 390C661 282 620 160 500 160Z'],['M375 332H625M500 166V518M405 344q35-18 70 0M531 344q35-18 70 0M500 354l-21 67h38M458 450q44 28 86 0'],[],[['M500 160C370 160 339 290 360 390C375 474 448 524 500 526C558 522 632 473 640 390C661 282 620 160 500 160Z','#efd3b3']]),
+'علم قطر':simple('علم دولة قطر','لون عنابي مع شريط أبيض وتسعة رؤوس مسننة.', ['M270 156H750V463H270Z','M382 156V176L412 191L382 207L412 222L382 238L412 253L382 269L412 284L382 300L412 316L382 332L412 347L382 363L412 379L382 394L412 410L382 426L412 441L382 463'],['M264 141V490'],[],[['M382 156H750V463H382V441L412 426L382 410L412 394L382 379L412 363L382 347L412 332L382 316L412 300L382 284L412 269L382 253L412 238L382 222L412 207L382 191L412 176Z','#8a1538']]),
+'الدلة':simple('الدلّة العربية','جسم إبريق ومقبض وفوهة منحنية.', ['M414 270Q399 335 415 400Q435 456 542 456Q650 451 635 357L601 269Z','M589 288Q687 195 735 270Q734 345 659 371','M408 295Q360 260 315 303L368 324L404 308','M445 268L577 268M455 253Q505 224 567 253','M510 243V188'],['M485 186h52M452 406q70 44 158-8','M470 449L452 484M575 448l24 36'],[],[['M414 270Q399 335 415 400Q435 456 542 456Q650 451 635 357L601 269Z','#dbb06a']]),
+'بيت الشعر':simple('بيت الشعر','خيمة تراثية ذات سقف ممتد وحبال.', ['M223 390L322 233L665 233L785 390Z','M283 387H723V504H283Z','M485 390V504','M223 390L155 486M785 390L845 486'],['M343 274h273M335 431h104M542 431h122'],[],[['M223 390L322 233L665 233L785 390Z','#6c4b48'],['M283 387H723V504H283Z','#b58d77']]),
+'الفنر':simple('الفنر','نتدرّب على رسم مئذنة حلزونية مستوحاة من الفنر.', ['M423 517V410Q464 380 530 353Q600 319 578 284Q545 252 467 275Q427 285 435 251Q448 208 535 213Q575 207 558 170Q540 142 480 160Q439 171 463 126Q487 103 522 110L522 70','M418 520H608'],['M435 421q87-32 134-77M441 319q86-22 128-54'],[],[['M423 517V410Q464 380 530 353Q600 319 578 284Q545 252 467 275Q427 285 435 251Q448 208 535 213Q575 207 558 170Q540 142 480 160Q439 171 463 126Q487 103 522 110L522 70','#e3c390']]),
+'قوس':simple('القوس الإسلامي','تتكرر الأقواس في العمارة الإسلامية.', ['M295 514V294Q295 231 356 209Q424 178 500 131Q579 182 651 209Q705 236 705 294V514','M353 514V310Q353 263 406 239Q451 219 500 188Q550 219 594 239Q648 263 648 310V514'],['M278 516H722','M500 131v55'],[],[['M295 514V294Q295 231 356 209Q424 178 500 131Q579 182 651 209Q705 236 705 294V514H648V310Q648 263 594 239Q550 219 500 188Q451 219 406 239Q353 263 353 310V514Z','#d8b789']]),
+'قبة':simple('القبة','نصف دائرة وقاعدة وزخرفة.', ['M303 395Q306 208 500 172Q694 208 697 395Z','M288 393H713V440H288Z','M499 172V137'],['M332 373Q497 343 668 373M344 410H660'],[],[['M303 395Q306 208 500 172Q694 208 697 395Z','#8cb9b5']]),
+'مئذنة':simple('مئذنة','ارتفاع وتوازن وأشكال أسطوانية.', ['M437 524V248H563V524Z','M415 251H585V279H415Z','M431 248L500 137L568 248Z'],['M461 350h77v64h-77zM472 448h55','M500 137v-35'],[],[['M437 524V248H563V524Z','#d7b98c'],['M431 248L500 137L568 248Z','#a47f8f']]),
+'غوص اللؤلؤ':simple('الغوص على اللؤلؤ','مشهد رمزي مبسّط لغواص وسلة ومحار.', ['M365 197a34 34 0 1 0 68 0a34 34 0 1 0-68 0','M397 230L460 319L535 300M448 314L373 381M456 318L519 395','M602 420Q669 349 734 420Q681 485 602 420Z'],['M732 420q-68-37-130 0M663 420a17 17 0 1 0 34 0a17 17 0 1 0-34 0','M245 510Q500 488 761 510'],[],[['M602 420Q669 349 734 420Q681 485 602 420Z','#e3cbb2']]),
+'سدو':simple('نقوش السدو','زخرفة هندسية متكررة مستوحاة من أنماط السدو.', ['M198 180H802V465H198Z','M198 280L258 202L318 280L378 202L438 280L498 202L558 280L618 202L678 280L738 202L802 280','M198 367L258 444L318 367L378 444L438 367L498 444L558 367L618 444L678 367L738 444L802 367'],['M198 320H802M198 342H802','M198 186H802M198 459H802'],[],[['M198 180H802V465H198Z','#f1e0ce']]),
+'مشربية':simple('مشربية','شبكة داخل إطار هندسي.', ['M273 165H727V498H273Z'],['M340 165V498M406 165V498M472 165V498M538 165V498M604 165V498M670 165V498','M273 242H727M273 320H727M273 398H727'],[],[['M273 165H727V498H273Z','#ecdfc5']]),
+'شبكة هندسية':simple('شبكة هندسية','تكرار المربعات والمعينات.', ['M245 173H755V473H245Z'],['M245 273H755M245 373H755M345 173V473M445 173V473M545 173V473M645 173V473','M345 173L445 273L345 373L245 273L345 173M545 173L645 273L545 373L445 273L545 173'],[],[['M245 173H755V473H245Z','#f3e5cf']]),
+'زخرفة نباتية':simple('زخرفة نباتية','ساق متعرج وأوراق متكررة.', ['M205 468Q350 180 507 335T799 184','M330 332Q258 248 333 230Q382 283 330 332ZM433 302Q465 201 535 233Q525 290 433 302ZM602 336Q580 250 653 233Q702 297 602 336Z'],['M350 360Q290 376 271 433M530 319Q570 366 622 396'],[],[['M330 332Q258 248 333 230Q382 283 330 332Z','#9cbd86'],['M433 302Q465 201 535 233Q525 290 433 302Z','#9cbd86'],['M602 336Q580 250 653 233Q702 297 602 336Z','#9cbd86']]),
+'انسان':simple('شخص واقف','نسب الجسم: رأس ثم جذع ثم أطراف.', ['M500 182m-37 0a37 37 0 1 0 74 0a37 37 0 1 0-74 0','M500 220V370M500 255L411 332M500 255L598 327M500 368L423 506M500 368L578 506'],['M380 526H620'],[],[]),
+'انسان يمشي':simple('شخص يمشي','نُغيّر اتجاه الساقين والذراعين للدلالة على الحركة.', ['M500 182m-37 0a37 37 0 1 0 74 0a37 37 0 1 0-74 0','M500 220L520 373M509 267L403 300M509 267L599 330M520 373L438 497M520 373L624 464'],['M385 526H655'],[],[])
+});
+// Data and application state
+const st={scene:null,blocks:[],step:-1,anim:null,speed:1,scale:1,timer:null,remaining:0,timerEnds:0,mode:'normal',quiz:null,recognizer:null,mic:false,wake:localStorage.getItem('qa-wake')==='1',lastSpeech:'',lastSpeechAt:0,speechTimeout:null,retryTimeout:null,students:JSON.parse(localStorage.getItem('qa-students')||'[]'),studentPaths:[],studentCurrent:null,eraser:false,mirror:false,ghost:true,concept:null};
+const stageNames=['الأشكال الأساسية','الخطوط الخارجية','التفاصيل','التلوين'];
+let speakingTimeout,toastTimeout;st.defaultPause=30;
+function elSvg(tag,attrs={},root){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(root)root.appendChild(n);return n}
+function clear(n){while(n.firstChild)n.removeChild(n.firstChild)}
+function announce(text,ms=1650){const box=$('#spoken'),t=$('#spokenText');clearTimeout(speakingTimeout);t.textContent=text;box.classList.add('show');speakingTimeout=setTimeout(()=>box.classList.remove('show'),ms)}
+function toast(text){clearTimeout(toastTimeout);$('#toast').textContent=text;$('#toast').classList.add('on');toastTimeout=setTimeout(()=>$('#toast').classList.remove('on'),3500)}
+function showHint(text,ms=6500){const h=$('#lessonHint');h.textContent=text;h.classList.add('visible');clearTimeout(h._timeout);h._timeout=setTimeout(()=>h.classList.remove('visible'),ms)}
+function stopAnimation(){if(st.anim){cancelAnimationFrame(st.anim);st.anim=null}clear(pen)}
+function resetVisual(){svg.style.visibility='visible';stopAnimation();$('#conceptLayer').classList.remove('open');st.concept=null;$('#studentLayer').classList.remove('open');$('#studentTools').classList.remove('open');st.mode='normal'}
+function stopTimer(){if(st.timer)clearInterval(st.timer);st.timer=null;st.remaining=0;$('#timerHud').classList.remove('visible')}
+function timer(seconds){stopTimer();seconds=Math.max(1,Math.min(3600,Math.round(seconds)));st.remaining=seconds;st.timerEnds=Date.now()+seconds*1000;const update=()=>{st.remaining=Math.max(0,Math.ceil((st.timerEnds-Date.now())/1000));$('#timerText').textContent=String(Math.floor(st.remaining/60)).padStart(2,'0')+':'+String(st.remaining%60).padStart(2,'0');if(!st.remaining){stopTimer();announce('انتهى الوقت، أحسنتم!',2500)}};$('#timerHud').classList.add('visible');update();st.timer=setInterval(update,250)}
+function sceneMenu(){openModal('مكتبة الرسومات',`<p class="muted">اختر رسمة؛ تُعرض بأربع مراحل. المجموعة الأولى: عشرة نماذج مفصّلة، ثم نماذج تدريبية إضافية.</p><div class="tiles">${Object.entries(scenes).map(([key,v],i)=>`<button class="tile" data-draw="${escapeHtml(key)}">${escapeHtml(v.title)}<small>${i<10?'نموذج مفصّل':'دراسة تدريبية'}</small></button>`).join('')}</div>`)}
+function renderToLayers(visibleSteps=st.step){clear(paint);clear(ink);clear(pen);const paths=[];
+ for(const block of st.blocks){const scene=scenes[block.key];if(!scene)continue;const tr=`translate(${block.dx||0} ${block.dy||0}) scale(${block.scale||1})`;const pg=elSvg('g',{transform:tr},paint),ig=elSvg('g',{transform:tr},ink);
+  for(let i=0;i<=visibleSteps;i++) for(const item of scene.steps[i]||[]){if(item.fill){elSvg('path',{d:item.d,fill:block.key==='المحمل'&&item.d.startsWith('M482 134')&&st.sailColor?st.sailColor:item.fill,stroke:'none',opacity:i===3?'.92':'1'},pg)}else{const path=elSvg('path',{d:item.d,fill:'none',stroke:item.c||palette.dark,'stroke-width':item.w||5,'stroke-linecap':'round','stroke-linejoin':'round',class:item.guide?'guide':''},ig);if(item.dash)path.setAttribute('stroke-dasharray','7 9');if(i===visibleSteps)paths.push({path,block,step:i})}}}
+ return paths;
+}
+function drawScene(key,{add=false}={}){if(!scenes[key])return false;stopTimer();resetVisual();if(!add){st.blocks=[{key,dx:0,dy:0,scale:1}];st.step=-1;st.scale=1}else{st.blocks.push({key,dx:key==='شمس'?215:-185,dy:key==='شمس'?-145:110,scale:.45})}
+ if(!add)st.sailColor=null;st.scene=key;$('#lessonHud').classList.add('visible');$('#sceneTitle').textContent=scenes[key].title;showHint(scenes[key].desc,6000);if(!add)nextStep();else{st.step=3;renderToLayers(3);$('#stepBadge').textContent='رسمة مركّبة';announce('أضفت '+scenes[key].title)}return true}
+function playPaths(paths,done){stopAnimation();if(reduced){done();return}const drawable=paths.filter(x=>x.path.getTotalLength&&x.path.getTotalLength()>0);if(!drawable.length){done();return}const start=performance.now();const lengths=drawable.map(v=>Math.max(1,v.path.getTotalLength()));const durations=lengths.map(n=>Math.max(160,n*1.25)/st.speed);const sum=durations.reduce((a,b)=>a+b,0);
+ drawable.forEach((v,i)=>{v.path.style.strokeDasharray=String(lengths[i]);v.path.setAttribute('stroke-dashoffset',String(lengths[i]))});
+ const tip=elSvg('g',{class:'pen-trace'},pen);elSvg('circle',{r:10,fill:'#b47d54',stroke:'#4e2539','stroke-width':3},tip);elSvg('path',{d:'M-5 0L9 -22L18 -26L21 -15L6 5Z',fill:'#e0b16c',stroke:'#794254','stroke-width':2},tip);elSvg('path',{d:'M9 -22L18 -26L21 -15Z',fill:'#524548'},tip);
+ const tick=now=>{const elapsed=Math.max(0,now-start);let remaining=elapsed;let idx=0;for(;idx<durations.length;idx++){if(remaining<=durations[idx])break;remaining-=durations[idx]};drawable.forEach((v,j)=>v.path.setAttribute('stroke-dashoffset',j<idx?'0':j>idx?lengths[j]:String(lengths[j]*(1-Math.min(1,remaining/durations[j])))));
+ if(idx<drawable.length){const q=drawable[idx],point=q.path.getPointAtLength(lengths[idx]*Math.min(1,remaining/durations[idx]));const b=q.block;tip.setAttribute('transform',`translate(${(point.x*(b.scale||1))+(b.dx||0)} ${(point.y*(b.scale||1))+(b.dy||0)})`)}
+ if(elapsed<sum)st.anim=requestAnimationFrame(tick);else{st.anim=null;clear(pen);drawable.forEach(v=>{v.path.setAttribute('stroke-dashoffset','0');v.path.style.strokeDasharray=v.path.classList.contains('guide')?'10 9':''});done()}};st.anim=requestAnimationFrame(tick);
+}
+function setStep(n){if(!st.scene)return toast('اختر رسمة أولاً: اكتب «المكتبة».');stopAnimation();stopTimer();st.step=Math.min(3,Math.max(0,n));const paths=renderToLayers(st.step);if(st.step===3){paint.querySelectorAll('path').forEach(p=>{p.style.opacity='0';p.style.transition='opacity .75s ease'})}$('#stepBadge').textContent=`المرحلة ${st.step+1} من 4 • ${stageNames[st.step]}`;$('#sceneTitle').textContent=scenes[st.scene].title;
+ const complete=()=>{if(st.step===3)paint.querySelectorAll('path').forEach(p=>p.style.opacity='.92');timer(st.defaultPause);showHint('توقّف القلم؛ دور الطلاب للتقليد. يمكنك تغيير المؤقت بصوتك أو الانتقال إلى الخطوة التالية.',5000)};
+ if(st.step===3){ // reveal colors progressively in tandem with the last outline strokes
+  playPaths(paths,complete);
+ }else playPaths(paths,complete);
+}
+function nextStep(){if(!st.scene)return sceneMenu();if(st.step>=3){return announce('اكتملت الرسمة')}setStep(st.step+1)}
+function fullDrawing(){if(!st.scene)return;stopAnimation();stopTimer();st.step=3;renderToLayers(3);$('#stepBadge').textContent='الرسمة كاملة ✓';showHint('الآن يمكن للطلاب تأمل التفاصيل والألوان.',4500)}
+function clearScreen(){stopTimer();resetVisual();st.scene=null;st.blocks=[];st.step=-1;$('#lessonHud').classList.remove('visible');$('#lessonHint').classList.remove('visible');clear(ink);clear(paint);clear(pen);announce('لوحة نظيفة',950)}
+function zoom(mult){if(!st.blocks.length)return toast('ارسم شيئاً أولاً.');st.blocks[0].scale=Math.max(.5,Math.min(1.55,(st.blocks[0].scale||1)*mult));const s=st.blocks[0].scale;st.blocks[0].dx=500*(1-s);st.blocks[0].dy=300*(1-s);stopAnimation();renderToLayers(Math.max(st.step,0));announce(mult>1?'تكبير':'تصغير')}
+function setColor(obj,color){const b=st.blocks.find(x=>x.key==='المحمل');if(!b)return toast('ارسم المحمل أولاً.');st.step=3;stopAnimation();renderToLayers(3);const sail=paint.querySelector('path[d^="M482 134"]');if(!sail)return toast('تعذّر العثور على الشراع.');st.sailColor=color;sail.setAttribute('fill',color);announce('لوّنت الشراع');}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function openModal(title,body){stopAudioTest();$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalShade').classList.add('open')}
+function closeModal(){stopAudioTest();$('#modalShade').classList.remove('open')}
+const questions={
+'السدو':[['ما العنصر الذي يتكرر في نقوش السدو؟',['الأشكال الهندسية','الصور الفوتوغرافية','الحروف الإنجليزية'],0],['كيف يظهر الإيقاع في زخرفة السدو؟',['بتكرار الأشكال والألوان','بترك الفراغ بلا ترتيب','برسم شكل واحد فقط'],0],['أي الأشكال أكثر حضوراً في الزخارف الهندسية؟',['المثلثات والمعينات','الغيوم الواقعية','الأجسام البشرية'],0],['ما معنى التماثل؟',['تشابه الأجزاء حول محور','تغيير الألوان عشوائياً','طمس التفاصيل'],0],['ما الوسيلة التقليدية لإنتاج السدو؟',['النسيج اليدوي','الطباعة ثلاثية الأبعاد','النحت بالحديد'],0]],
+'الزخارف الإسلامية':[['كيف تتكوّن النجمة الثمانية في الدرس؟',['من مربعين أحدهما مائل','من ثلاث دوائر متلاصقة','من مثلث واحد'],0],['ماذا نعني بالتكرار؟',['إعادة وحدة زخرفية','التلوين دون نظام','رسم أشخاص فقط'],0],['أي مما يلي زخرفة نباتية؟',['أوراق وأغصان مبسّطة','إشارات المرور','الأرقام وحدها'],0],['ما الشكل الذي يشبه المعيّن؟',['مربع مائل','دائرة','خط متعرج'],0],['ما الذي يساعد على انتظام الشبكة الزخرفية؟',['التباعد المتساوي','تغيير حجم كل وحدة عشوائياً','حذف الخطوط الإرشادية قبل البدء'],0]],
+'العمارة الإسلامية':[['ما وظيفة المئذنة التقليدية في المسجد؟',['موضع رفع الأذان','مكان حفظ السفن','مخزن الأصباغ'],0],['ما الشكل الهندسي الذي نستخدمه لتبسيط القبة؟',['نصف دائرة','مربع فقط','خماسي منتظم فقط'],0],['أين يمكن مشاهدة الأقواس؟',['عند المداخل والنوافذ','فوق البحر فقط','داخل الألوان'],0],['ما المشربية؟',['عنصر معماري شبكي','نوع من الأسماك','لون من الألوان'],0],['ما الذي يميز الزخرفة المعمارية؟',['التكرار والتناظر','غياب النظام دائماً','عدم استخدام الأشكال'],0]],
+'الخط العربي':[['أين تقع نقطة الباء المفردة؟',['أسفل الحرف','أعلاه','داخله على اليمين'],0],['ما فائدة نقاط القياس في الخط؟',['ضبط النسب','تغيير لون الورق','حذف التشكيل'],0],['أي خط شائع في نسخ الكتب؟',['النسخ','المسماري','الهيروغليفي'],0],['هل يقتصر الخط العربي على زخرفة الحروف؟',['لا، يعتمد أيضاً على قواعد النسب','نعم، بلا قواعد','لا يستخدم أقلاماً'],0],['بماذا نبدأ عند التدرّب على حرف؟',['ملاحظة اتجاه الحركة','التلوين عشوائياً','رسم الخلفية أولاً'],0]],
+'الفنانون القطريون':[['ماذا يمكن أن يوثّق الفنان القطري في عمله؟',['التراث والبيئة والحياة','الأرقام فقط','الفراغ دون فكرة'],0],['أي أسلوب يساعد على التعبير عن الهوية؟',['توظيف عناصر البيئة المحلية','نسخ الصورة دون فهم','إهمال موضوع اللوحة'],0],['ما السؤال المناسب عند مشاهدة عمل فني؟',['ما عناصر الفن في العمل؟','ما سعر كل لون؟','كم وزن الورق؟'],0],['من عناصر التكوين البصري؟',['الخط والشكل واللون','الصوت وحده','الطعم فقط'],0],['ما السلوك الصحيح تجاه أعمال الفنانين؟',['احترام الحقوق وذكر المصدر','نسب كل الأعمال إلى النفس','إزالة التوقيع'],0]],
+'الألعاب الشعبية القطرية':[['ما فائدة توثيق الألعاب الشعبية في الرسم؟',['المحافظة على الذاكرة الثقافية','منع الحركة','إلغاء العمل الجماعي'],0],['ما الذي يظهر حركة الأطفال في الرسم؟',['اتجاه الأجسام والخطوط','إلغاء الأطراف','لون الخلفية فقط'],0],['ما الذي نتعلّمه من الألعاب الجماعية؟',['التعاون واحترام القواعد','العزلة دائماً','عدم احترام الدور'],0],['أي خلفية تناسب مشهداً تراثياً؟',['الفريج القديم','مدينة خيالية فقط','لا خلفية مطلقاً'],0],['كيف نعبر عن البعد بين الشخصيات؟',['بتغيير الحجم والتداخل','برسم الجميع بمكان واحد','بإلغاء خط الأرض'],0]],
+'التراث القطري':[['بماذا ارتبط المحمل الخشبي التقليدي؟',['الصيد والتجارة والغوص','السفر الجوي','السكك الحديدية'],0],['ما النشاط الذي اشتهرت به الزبارة قديماً؟',['التجارة والغوص على اللؤلؤ','صناعة السيارات','الطيران'],0],['ما اللون الأساسي في علم قطر؟',['العنابي والأبيض','الأزرق والأصفر','الأخضر والأسود'],0],['ما اسم أداة تقديم القهوة العربية؟',['الدلّة','المشبك','المرساة'],0],['ما شكل متكرر في السدو؟',['المعين والمثلث','الغيمة الواقعية','الموجة الصوتية'],0]],
+'عناصر الفن':[['ما الذي يحدّد الشكل في الرسم؟',['الخط الخارجي','الصوت','الرائحة'],0],['ما الألوان الأساسية في مزج الأصباغ المدرسي؟',['الأحمر والأصفر والأزرق','الأخضر والبنفسجي والبرتقالي','الأبيض والأسود والرمادي'],0],['ما الملمس؟',['إحساس السطح أو مظهره','صوت الفرشاة','حجم الورقة'],0],['ما فائدة الظل؟',['إظهار الحجم والاتجاه','حذف الضوء','إخفاء كل الألوان'],0],['ماذا نصنع بخط الأفق ونقطة التلاشي؟',['منظوراً بعمق','زخرفة عشوائية','ملمساً فقط'],0]]
+};
+function quizMenu(){openModal('الأسئلة والتقييم',`<p>اختر وحدة لعرض خمس بطاقات، أو اطلب بالصوت: «اعمل خمسة أسئلة عن السدو».</p><div class="tiles">${Object.keys(questions).map(x=>`<button class="tile" data-quiz="${escapeHtml(x)}">${escapeHtml(x)}<small>٥ أسئلة</small></button>`).join('')}</div><p><button class="btn alt" data-action="criteria">معايير التقييم</button><button class="btn alt" data-action="students">أسماء الطلاب والاختيار</button><button class="btn alt" data-action="settings">الإعدادات</button></p>`)}
+function startQuiz(topic,count=5){if(!questions[topic])return toast('لا يوجد بنك محلي لهذا الموضوع.');st.quiz={topic,items:questions[topic].slice(0,Math.max(1,Math.min(5,count))),index:0,score:0,done:false};showQuizQuestion()}
+function showQuizQuestion(){const q=st.quiz;if(!q)return; if(q.index>=q.items.length){openModal('النتيجة',`<div class="bigResult">${q.score} / ${q.items.length}</div><p style="text-align:center">أحسنتم! راجعوا الإجابات وناقشوا السبب.</p><div style="text-align:center"><button class="btn" data-quiz="${escapeHtml(q.topic)}">إعادة التقييم</button><button class="btn alt" data-action="quizMenu">الوحدات</button></div>`);q.done=true;return}const item=q.items[q.index];q.done=false;openModal('تقييم • '+q.topic,`<div class="quizTop"><span>السؤال ${q.index+1} من ${q.items.length}</span><span>النتيجة الحالية: ${q.score}</span></div><p class="quizTitle">${escapeHtml(item[0])}</p>${item[1].map((v,i)=>`<button class="quizOption" data-answer="${i}">${['أ','ب','ج'][i]}) ${escapeHtml(v)}</button>`).join('')}<p class="muted">المس الإجابة أو قل «الإجابة ألف / باء / جيم».</p><div id="quizFeedback"></div>`)}
+function answerQuiz(n){const q=st.quiz;if(!q||q.done||!Number.isInteger(n)||n<0||n>2)return;const item=q.items[q.index];q.done=true;if(n===item[2])q.score++;document.querySelectorAll('.quizOption').forEach((btn,i)=>{btn.disabled=true;if(i===item[2])btn.classList.add('good');else if(i===n)btn.classList.add('bad')});$('#quizFeedback').innerHTML=`<strong>${n===item[2]?'إجابة صحيحة ✓':'المحاولة القادمة ستكون أفضل'}</strong><p><button class="btn green" data-action="quizNext">${q.index+1===q.items.length?'عرض النتيجة':'السؤال التالي'}</button></p>`}
+function criteria(){openModal('معايير تقييم العمل الفني',`<p>بطاقة مبسّطة مناسبة للصفين الخامس والسادس، كل معيار من ٤ درجات (المجموع ٢٠).</p><div class="criteria">${[['النسب','تناسق أحجام الأجزاء ومواقعها'],['الخطوط','وضوح الرسم والتحكم في الاتجاه'],['التلوين','اختيار الألوان وتنظيم المساحات'],['النظافة','العناية بالورقة والأدوات'],['الإبداع','إضافة فكرة أو معالجة شخصية']].map(([a,b])=>`<div class="criterion"><span><b>${a}</b><br><small>${b}</small></span><b>٤ درجات</b></div>`).join('')}</div>`)}
+function studentNames(){openModal('الاختيار العشوائي للطلاب',`<p>اكتب أسماء طلاب الصف؛ يُحفظ النص محلياً في هذا المتصفح.</p><textarea id="namesField" class="field" rows="7" placeholder="اسم واحد في كل سطر">${escapeHtml(st.students.join('\n'))}</textarea><button class="btn" data-action="saveStudents">حفظ الأسماء</button><button class="btn alt" data-action="pickStudent">اختر طالباً</button>`)}
+function saveStudents(){const v=$('#namesField');if(v){st.students=v.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,80);localStorage.setItem('qa-students',JSON.stringify(st.students));toast('حُفظ '+st.students.length+' اسمًا في هذا المتصفح.')}}
+function pickStudent(){if(!st.students.length){studentNames();return toast('أضف أسماء الطلاب أولاً.')}const name=st.students[Math.floor(Math.random()*st.students.length)];closeModal();announce('المشارك اليوم: '+name,3500)}
+function settings(){openModal('الإعدادات والأدوات',`<p><label><input type="checkbox" id="wakeToggle" ${st.wake?'checked':''}> تفعيل كلمة التنبيه: <b>يا لوحة</b></label></p><p class="muted">عند تفعيلها، لا تنفّذ الأوامر الصوتية إلا إذا بدأت بكلمة «يا لوحة». الكتابة لا تحتاج كلمة تنبيه.</p><p><button class="btn" data-action="library">مكتبة الرسومات</button><button class="btn alt" data-action="studentMode">وضع الطالب</button><button class="btn alt" data-action="studentNames">أسماء الطلاب</button><button class="btn alt" data-action="apiSettings">إعدادات الذكاء الاصطناعي</button><button class="btn green" data-action="micHelp">🎙 فحص الميكروفون</button></p><p class="muted">الإصدار ${VERSION} • جميع الرسومات والأسئلة المحلية داخل هذا الملف. قد تتطلب خدمات التعرّف على الصوت اتصالاً بالإنترنت، بحسب المتصفح.</p><p class="muted">مراجعة التراث: متاحف قطر (موقع الزبارة الأثري)، اليونسكو (الزبارة)، وVisit Qatar (الغوص على اللؤلؤ). الروابط معلوماتية فقط وليست مطلوبة للتشغيل.</p>`)}
+function apiSettings(){const saved=!!localStorage.getItem('qa-api-key');openModal('الذكاء الاصطناعي • اختياري',`<p>لا يلزم مفتاح لتشغيل المكتبة والتقييم ووضع الطالب.</p><label>مفتاح OpenAI API<input class="field" id="apiKey" type="password" autocomplete="off" placeholder="${saved?'مفتاح محفوظ في هذا المتصفح':'أدخل المفتاح إن رغبت'}"></label><button class="btn" data-action="saveApi">حفظ محلي</button><button class="btn alt" data-action="removeApi">حذف المفتاح</button><p class="muted">تنبيه: التخزين المحلي داخل المتصفح لا يوفّر حماية بمستوى الخادم. لا تستخدم مفتاحاً حساساً أو ذا صلاحيات واسعة، ولا تُشارك الملف مع مفتاحك محفوظاً في المتصفح. قد يمنع المتصفح أو الشبكة الاستدعاء الخارجي.</p>`)}
+function studentMode(){closeModal();stopAnimation();stopTimer();svg.style.visibility='hidden';$('#conceptLayer').classList.remove('open');$('#lessonHud').classList.remove('visible');$('#studentLayer').classList.add('open');$('#studentTools').classList.add('open');st.mode='student';fitStudentCanvas();refreshGhost();redrawStudent();announce('وضع الطالب: ابدأ الرسم',1600)}
+function refreshGhost(){const ghost=$('#teacherGhost');ghost.innerHTML='';if(st.scene){const g=elSvg('g',{},ghost);for(const block of st.blocks){const scene=scenes[block.key];const group=elSvg('g',{transform:`translate(${block.dx||0} ${block.dy||0}) scale(${block.scale||1})`},g);for(const step of scene.steps)for(const v of step)if(v.d&&!v.fill)elSvg('path',{d:v.d,stroke:'#78485b','stroke-width':v.w||4,fill:'none','stroke-linecap':'round','stroke-linejoin':'round'},group)}}}
+const canvas=$('#studentCanvas'),ctx=canvas.getContext('2d');
+function fitStudentCanvas(){const b=$('#studentLayer').getBoundingClientRect();const w=Math.min(b.width,b.height*1000/600),h=w*600/1000;Object.assign(canvas.style,{width:w+'px',height:h+'px',left:(b.width-w)/2+'px',top:(b.height-h)/2+'px'})}
+window.addEventListener('resize',()=>{if(st.mode==='student')fitStudentCanvas()});
+function redrawStudent(){ctx.clearRect(0,0,1000,600);for(const stroke of st.studentPaths.concat(st.studentCurrent?[st.studentCurrent]:[])){if(stroke.points.length<1)continue;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=stroke.w;ctx.globalCompositeOperation=stroke.erase?'destination-out':'source-over';ctx.strokeStyle=stroke.erase?'#000':stroke.color;const draw=pts=>{ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);if(pts.length===1)ctx.lineTo(pts[0][0]+.1,pts[0][1]+.1);else for(const p of pts.slice(1))ctx.lineTo(p[0],p[1]);ctx.stroke()};draw(stroke.points);if(stroke.mirror)draw(stroke.points.map(([x,y])=>[1000-x,y]));ctx.restore()}}
+function pCoord(e){const r=canvas.getBoundingClientRect();return[(e.clientX-r.left)*1000/r.width,(e.clientY-r.top)*600/r.height]}
+canvas.addEventListener('pointerdown',e=>{if(st.mode!=='student')return;canvas.setPointerCapture(e.pointerId);st.studentCurrent={points:[pCoord(e)],w:+$('#brushWidth').value,color:$('#brushColor').value,erase:st.eraser,mirror:st.mirror};redrawStudent()});
+canvas.addEventListener('pointermove',e=>{if(!st.studentCurrent)return;st.studentCurrent.points.push(pCoord(e));redrawStudent()});
+function finishStroke(){if(st.studentCurrent){st.studentPaths.push(st.studentCurrent);st.studentCurrent=null;redrawStudent()}}
+canvas.addEventListener('pointerup',finishStroke);canvas.addEventListener('pointercancel',finishStroke);
+function createConcept(type){st.mode='concept';stopAnimation();stopTimer();svg.style.visibility='hidden';$('#lessonHud').classList.remove('visible');$('#studentLayer').classList.remove('open');$('#studentTools').classList.remove('open');$('#conceptLayer').classList.add('open');const s=$('#conceptSvg');s.innerHTML='';const title=$('#conceptCaption');st.concept=type;
+ const tx=(x,y,text,size=27,color='#56283d')=>elSvg('text',{x,y,'text-anchor':'middle','font-size':size,'font-weight':'bold',fill:color},s).textContent=text;
+ if(type==='الألوان'){const cols=['#ef555a','#f18840','#f5c948','#89b76c','#51a3a8','#596bd0','#945eae','#bd5f88'];const cx=500,cy=280,r=183;cols.forEach((c,i)=>{const a=(i*45-90)*Math.PI/180,b=((i+1)*45-90)*Math.PI/180;elSvg('path',{d:`M${cx} ${cy}L${cx+r*Math.cos(a)} ${cy+r*Math.sin(a)}A${r} ${r} 0 0 1 ${cx+r*Math.cos(b)} ${cy+r*Math.sin(b)}Z`,fill:c,stroke:'#fff7ec','stroke-width':4},s)});elSvg('circle',{cx,cy,r:70,fill:'#fffaf0'},s);tx(500,274,'دائرة',26);tx(500,305,'الألوان',25);tx(190,510,'حارة: أحمر، برتقالي، أصفر',22);tx(790,510,'باردة: أزرق، أخضر، بنفسجي',22);title.textContent='الألوان الأساسية (الأحمر، الأصفر، الأزرق)، والثانوية (البرتقالي، الأخضر، البنفسجي). قل «امزج الأحمر والأصفر».'}
+ else if(type==='مزج'){const a=st.mixA||'red',b=st.mixB||'yellow',colors={red:'#ed5455',yellow:'#f4cb4e',blue:'#4676c2',green:'#52ae77',orange:'#f1913c',purple:'#9875bc'},mix={'red-yellow':['orange','برتقالي'],'yellow-red':['orange','برتقالي'],'blue-yellow':['green','أخضر'],'yellow-blue':['green','أخضر'],'red-blue':['purple','بنفسجي'],'blue-red':['purple','بنفسجي']};const result=mix[`${a}-${b}`]||['green','لون ممزوج'];[a,b,result[0]].forEach((x,i)=>elSvg('circle',{cx:240+i*260,cy:290,r:100,fill:colors[x]||colors.green,opacity:.87},s));tx(370,310,'+',58);tx(632,310,'=',58);title.textContent=`نتيجة المزج: ${result[1]} • جرّب: «امزج الأزرق والأصفر»`}
+ else if(type==='الظل'){const defs=elSvg('defs',{},s);const grad=elSvg('radialGradient',{id:'sphereGrad',cx:'34%',cy:'28%',r:'75%'},defs);elSvg('stop',{offset:'0%',id:'brightStop','stop-color':'#fff6ce'},grad);elSvg('stop',{offset:'46%','stop-color':'#e6a25e'},grad);elSvg('stop',{offset:'100%','stop-color':'#5d3351'},grad);elSvg('ellipse',{cx:500,cy:491,rx:175,ry:38,fill:'#4f324b',opacity:.23,id:'shadowShape'},s);elSvg('circle',{cx:500,cy:316,r:147,fill:'url(#sphereGrad)'},s);elSvg('circle',{cx:255,cy:133,r:32,fill:'#ffd26f',stroke:'#d9a34d','stroke-width':3,id:'lightHandle',class:'interactive'},s);elSvg('path',{d:'M280 153L375 222',stroke:'#f2be5f','stroke-width':5,'stroke-dasharray':'9 8',id:'lightRay'},s);title.textContent='حرّك الشمس بإصبعك أو بالفأرة: يتغير موضع الإضاءة والظل.';let active=false;const sun=$('#lightHandle');const redrawLight=(e)=>{if(!active)return;const r=s.getBoundingClientRect(),x=(e.clientX-r.left)*1000/r.width,y=(e.clientY-r.top)*600/r.height;sun.setAttribute('cx',Math.max(50,Math.min(950,x)));sun.setAttribute('cy',Math.max(55,Math.min(520,y)));const dx=(500-x)/600,dy=(316-y)/600;grad.setAttribute('cx',Math.max(8,Math.min(92,50-dx*30))+'%');grad.setAttribute('cy',Math.max(8,Math.min(92,50-dy*30))+'%');$('#shadowShape').setAttribute('cx',500+(500-x)*.17);$('#lightRay').setAttribute('d',`M${x} ${y}L${500+(x-500)*.3} ${316+(y-316)*.3}`)};sun.addEventListener('pointerdown',e=>{active=true;sun.setPointerCapture(e.pointerId)});sun.addEventListener('pointermove',redrawLight);sun.addEventListener('pointerup',()=>active=false)}
+ else if(type==='المنظور'){elSvg('line',{x1:85,y1:250,x2:915,y2:250,stroke:'#8a6981','stroke-width':4,'stroke-dasharray':'13 12'},s);elSvg('circle',{cx:500,cy:250,r:10,fill:'#bd365b'},s);tx(500,218,'نقطة التلاشي',25);tx(170,231,'خط الأفق',22);elSvg('path',{d:'M452 250L116 580M548 250L883 580',stroke:'#5b4050','stroke-width':9,fill:'none'},s);elSvg('path',{d:'M500 255V313M500 350V434M500 482V580',stroke:'#e1ad5b','stroke-width':8,'stroke-dasharray':'20 14'},s);for(const [x,y,w,h] of [[200,375,190,142],[645,330,118,186]]){elSvg('rect',{x,y,width:w,height:h,fill:'#e0c5a2',stroke:'#704350','stroke-width':5},s);elSvg('path',{d:`M${x-15} ${y}L${x+w/2} ${y-h*.39}L${x+w+15} ${y}Z`,fill:'#ad5772',stroke:'#704350','stroke-width':4},s)}title.textContent='خط الأفق ثابت، والخطوط المتوازية تقترب من نقطة التلاشي لتعطي عمقاً.'}
+ else if(type==='النسب'){elSvg('ellipse',{cx:500,cy:295,rx:155,ry:212,fill:'#f1d1ab',stroke:'#75485a','stroke-width':6},s);[202,296,386].forEach(y=>elSvg('line',{x1:320,y1:y,x2:680,y2:y,stroke:'#bd6d72','stroke-width':3,'stroke-dasharray':'10 9'},s));elSvg('line',{x1:500,y1:74,x2:500,y2:517,stroke:'#bd6d72','stroke-width':3,'stroke-dasharray':'10 9'},s);tx(217,205,'العينان',24);tx(217,297,'الأنف',24);tx(217,388,'الفم',24);elSvg('path',{d:'M401 246q44-26 76 0M522 246q44-26 76 0M499 263l-18 91h38M458 411q42 21 84 0',stroke:'#644255','stroke-width':6,fill:'none','stroke-linecap':'round'},s);title.textContent='تقسيم إرشادي للوجه: مواضع العينين والأنف والفم والنصف الرأسي.'}
+ else if(type==='التماثل'){elSvg('line',{x1:500,y1:65,x2:500,y2:532,stroke:'#a35469','stroke-width':4,'stroke-dasharray':'12 9'},s);for(const side of [-1,1]){const g=elSvg('g',{transform:`translate(500 0) scale(${side} 1)`},s);elSvg('path',{d:'M0 445Q95 400 95 335Q180 315 155 260Q100 225 55 260Q90 170 20 148L0 91',stroke:side===1?'#8c3256':'#4c9e9b','stroke-width':12,fill:'none','stroke-linecap':'round'},g);elSvg('path',{d:'M70 349Q170 339 171 411Q117 425 70 349ZM70 238Q154 133 194 198Q175 258 70 238Z',fill:side===1?'#d99e67':'#81b5a9',stroke:'#65394f','stroke-width':4},g)}title.textContent='التماثل: جانبان متناظران حول المحور. والتكرار يولد الإيقاع.'}
+ else if(type==='الخط'){for(const [i,desc,d] of [[0,'مستقيم','M90 175H400'],[1,'منحني','M590 175Q730 48 895 175'],[2,'متكسر','M90 373L182 280L275 373L397 280'],[3,'متموج','M570 350Q643 240 710 350T850 350']]){elSvg('path',{d,stroke:['#8b3458','#429894','#d5a24b','#8b658d'][i],'stroke-width':12,fill:'none','stroke-linecap':'round'},s);tx(i%2?740:245,i<2?225:423,desc,25)}title.textContent='الخط عنصر أساسي؛ تتنوع الخطوط المستقيمة والمنحنية والمتكسرة والمتموجة.'}
+ else if(type==='الشكل'){for(const [x,d,col] of [[260,'M180 230H340V390H180Z','#be7082'],[500,'M500 210L600 385H400Z','#dfb458'],[745,'M745 308m-86 0a86 86 0 1 0 172 0a86 86 0 1 0-172 0','#7ab1b3']])elSvg('path',{d,fill:col,stroke:'#70445a','stroke-width':4},s);title.textContent='الأشكال الأساسية: المربع والمثلث والدائرة؛ منها تتشكل الرسوم المركبة.'}
+ else if(type==='الملمس'){for(let i=0;i<3;i++){const x=225+i*270;elSvg('rect',{x:x-95,y:190,width:190,height:220,rx:18,fill:['#e4c1a6','#b7b7b7','#9cb6a3'][i],stroke:'#765163','stroke-width':3},s);for(let j=0;j<28;j++){const xx=x-76+(j%7)*22,yy=214+Math.floor(j/7)*50;elSvg('path',{d:i===0?`M${xx} ${yy}h14`:i===1?`M${xx} ${yy}l15 14`:`M${xx} ${yy}q8-14 14 0`,stroke:'#8b7770','stroke-width':3,fill:'none'},s)}}title.textContent='الملمس بصرياً: ناعم، خشن، أو منتظم؛ نُظهره بتكرار الخطوط والآثار.'}
+ else if(type==='الفراغ'){elSvg('circle',{cx:350,cy:290,r:125,fill:'#b67a87'},s);elSvg('rect',{x:520,y:198,width:205,height:185,rx:18,fill:'#78a7a3'},s);elSvg('path',{d:'M150 475H845',stroke:'#c9ab9d','stroke-width':5},s);title.textContent='الفراغ المحيط بالأشكال جزء من التكوين، ويساعد على توزيع العناصر.'}
+}
+function normalize(s){return String(s||'').toLowerCase().replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ـ/g,'').replace(/[،؟!,.\u200f\u200e]/g,' ').replace(/\s+/g,' ').trim()}
+const aliases={'محمل':'المحمل','قلعه الزباره':'قلعة الزبارة','الزبارة':'قلعة الزبارة','قلعه الزبيره':'قلعة الزبارة','صقر':'الصقر','نخله':'النخلة','نخلة':'النخلة','دله':'الدلة','دلة':'الدلة','فنر':'الفنر','فنار':'الفنر','بيت شعر':'بيت الشعر','علم قطر':'علم قطر','نجمه ثمانيه':'نجمة ثمانية','نجمه':'نجمة ثمانية','ثمانيه':'نجمة ثمانية','زخرفه نباتيه':'زخرفة نباتية','منظور':'المنظور','غوص':'غوص اللؤلؤ','لؤلؤ':'غوص اللؤلؤ','كف':'انسان','انسان':'انسان','رجل يمشي':'انسان يمشي','شخص يمشي':'انسان يمشي','شمسيه':'شمس'};
+function resolveScene(t){const n=normalize(t);const arr=Object.keys(scenes).sort((a,b)=>normalize(b).length-normalize(a).length);for(const a of arr)if(n.includes(normalize(a)))return a;for(const [a,b] of Object.entries(aliases))if(n.includes(normalize(a)))return b;return null}
+function resolveTopic(t){const n=normalize(t);for(const a of Object.keys(questions))if(n.includes(normalize(a)))return a;if(n.includes('زخرف'))return 'الزخارف الإسلامية';if(n.includes('معمار'))return 'العمارة الإسلامية';if(n.includes('خط عرب')||n.includes('الرقعه')||n.includes('النسخ'))return 'الخط العربي';if(n.includes('فنان'))return 'الفنانون القطريون';if(n.includes('تراث'))return 'التراث القطري';return null}
+function runCommand(raw,{voice=false}={}){let text=String(raw||'').trim();if(!text)return;let n=normalize(text);if(voice&&st.wake){if(!n.startsWith('يا لوحه'))return;n=n.replace(/^يا لوحه\s*/,'').trim();text=text.replace(/^يا\s+لوحة\s*/,'').trim()}if(!n)return;
+ if(voice){const now=Date.now();if(st.lastSpeech===n&&now-st.lastSpeechAt<1800)return;st.lastSpeech=n;st.lastSpeechAt=now}
+ if(st.quiz&&!st.quiz.done&&$('#modalShade').classList.contains('open')&&(/الاجابه|الاختيار|^الف$|^باء$|^جيم$/.test(n))){if(/الف|اول|^ا$/.test(n))return answerQuiz(0);if(/باء|ثاني|^ب$/.test(n))return answerQuiz(1);if(/جيم|ثالث|^ج$/.test(n))return answerQuiz(2)}
+ if(/(امسح الشاشه|افرغ اللوحه|لوحه نظيفه|امسح الكل)/.test(n))return clearScreen();
+ if(/(الخطوه التاليه|المرحله التاليه|التالي|اكمل)/.test(n)){announce('الخطوة التالية',850);return nextStep()}
+ if(/(اعد الخطوه|ارجع خطوه|السابقه|اعد المرحله)/.test(n)){announce('إعادة الخطوة',900);return setStep(Math.max(0,st.step))}
+ if(/(ارهم الرسمه كامله|الرسمه كامله|اكمل الرسمه|اظهر الرسمه)/.test(n)){announce('هذه الرسمة كاملة');return fullDrawing()}
+ if(/(ابطئ|بطيء|بطي|خفف السرعه)/.test(n)){st.speed=Math.max(.3,st.speed*.65);return announce('سرعة القلم أبطأ')}
+ if(/(اسرع|زود السرعه)/.test(n)){st.speed=Math.min(4,st.speed*1.5);return announce('سرعة القلم أسرع')}
+ if(/(كبر|تكبير|كبّر)/.test(n))return zoom(1.2);
+ if(/(صغر|تصغير|صغّر)/.test(n))return zoom(1/1.2);
+ const timerMatch=n.match(/(?:موقت|مؤقت|اضبط الوقت|وقت)(?:\s+لمده)?\s+(\d+|[\u0660-\u0669]+|دقيقه|دقيقتين|نصف دقيقه|ثلاثين|عشرين|عشر|خمس|ستين)(?:\s*(دقائق|دقيقه|ثانيه|ثوان))?/);
+ if(timerMatch){let z=timerMatch[1],value=/\d/.test(z)?Number(z.replace(/[\u0660-\u0669]/g,c=>String(c.charCodeAt(0)-0x660))):({'دقيقه':60,'دقيقتين':120,'نصف دقيقه':30,'ثلاثين':30,'عشرين':20,'عشر':10,'خمس':5,'ستين':60}[z]||30);if(/دقيق/.test(timerMatch[2]||'')&&z!=='دقيقه'&&z!=='دقيقتين')value*=60;st.defaultPause=value;timer(value);return announce(`مؤقت ${value} ثانية`,1000)}
+ if(/(لون|لوّن).*(الشراع)/.test(n)){const col=n.includes('ابيض')?'#fffdfa':n.includes('احمر')?'#e56a67':n.includes('ازرق')?'#72b6d6':n.includes('اخضر')?'#7cae84':n.includes('عنابي')?'#8a1538':n.includes('اصفر')?'#f3d268':'#fffdfa';return setColor('sail',col)}
+ if(/(امزج|اخلط)/.test(n)){const a=n.includes('احمر')?'red':n.includes('ازرق')?'blue':'yellow',b=n.includes('اصفر')?'yellow':n.includes('ازرق')&&a!=='blue'?'blue':n.includes('احمر')&&a!=='red'?'red':'yellow';st.mixA=a;st.mixB=b;createConcept('مزج');return announce('مزج الألوان',900)}
+ if(/(دائره الالوان|الالوان الاساسيه|الالوان الثانويه|الالوان الحاره|الالوان البارده)/.test(n))return createConcept('الألوان');
+ if(/(ظل|نور|تظليل|الاضاءه)/.test(n))return createConcept('الظل');
+ if(/(المنظور|نقطه التلاشي|خط الافق)/.test(n))return createConcept('المنظور');
+ if(/(النسب|تقسيم الوجه)/.test(n))return createConcept('النسب');
+ if(/(التماثل|التكرار|الايقاع)/.test(n))return createConcept('التماثل');
+ if(/(اشرح الخط|انواع الخطوط)/.test(n))return createConcept('الخط');
+ if(/(اشرح الشكل|الاشكال الاساسيه)/.test(n))return createConcept('الشكل');
+ if(/(الملمس)/.test(n))return createConcept('الملمس');
+ if(/(الفراغ)/.test(n))return createConcept('الفراغ');
+ if(/(معايير التقييم|معيار التقييم)/.test(n))return criteria();
+ if(/(اختر طالب|اختيار طالب)/.test(n))return pickStudent();
+ if(/(اسماء الطلاب|اضف طلاب)/.test(n))return studentNames();
+ if(/(وضع الطالب|ارسم بيدي|الطالب يرسم)/.test(n))return studentMode();
+ if(/(المكتبه|الرسومات|الرسومات المتاحه|قائمه الرسومات)/.test(n))return sceneMenu();
+ if(/(الاعدادات|ضبط الصوت|يا لوحه)/.test(n))return settings();
+ if(/(الذكاء الاصطناعي|مفتاح api)/.test(n))return apiSettings();
+ if(/(اسئله|اسئله عن|اختبار|تقييم عن|اعمل .* سؤال)/.test(n)){let topic=resolveTopic(n);let count=(n.match(/\d+/)||[])[0];return topic?startQuiz(topic,count?+count:5):localStorage.getItem('qa-api-key')&&/(عن |حول )/.test(n)?askAIQuestions(text,count?+count:5):quizMenu()}
+ if(/(بالرقعه|بالنسخ|حرف الباء|حرف باء)/.test(n)){return handwriting(n.includes('النسخ')?'نسخ':'رقعة')}
+ if(/(اضف|اضافه)/.test(n)){const key=resolveScene(n);return key?drawScene(key,{add:true}):toast('اكتب: أضف شمساً، أو افتح المكتبة.')}
+ if(/(ارسم|رسم|اعرض|اظهر|الدرس)/.test(n)){const key=resolveScene(n);return key?drawScene(key):askAI(text)}
+ const only=resolveScene(n);if(only)return drawScene(only);
+ return toast('لم أفهم. جرّب: «ارسم المحمل»، «الخطوة التالية»، «اشرح دائرة الألوان»، «المكتبة».')
+}
+function handwriting(kind){resetVisual();svg.style.visibility='hidden';stopTimer();$('#lessonHud').classList.remove('visible');$('#conceptLayer').classList.add('open');st.mode='concept';const s=$('#conceptSvg');s.innerHTML='';st.concept='خط';// pedagogical stylized path: not a certified calligraphic stroke model
+ const d=kind==='نسخ'?'M680 245Q640 372 495 380Q352 385 328 308':'M684 281Q625 363 488 366Q374 369 334 315';
+ for(let i=0;i<5;i++){const yy=110+i*83;elSvg('line',{x1:200,y1:yy,x2:805,y2:yy,stroke:'#dcc6b7','stroke-width':1.4,'stroke-dasharray':'5 10'},s)}
+ const line=elSvg('path',{d,stroke:'#4e263d','stroke-width':24,fill:'none','stroke-linecap':'round'},s);const dot=elSvg('path',{d:'M465 446l33-9 26 8-32 9Z',fill:'#4e263d'},s);const arrow=elSvg('text',{x:730,y:235,'font-size':29,fill:'#923b5d'},s);arrow.textContent='١ ←';$('#conceptCaption').textContent=`حرف الباء • تدريب مبسّط بأسلوب ${kind==='نسخ'?'النسخ':'الرقعة'}: اتبع مسار القلم ثم أضف النقطة. المسار تعليمي تقريبي وليس بديلاً عن نموذج خطاط مختص.`;
+ if(!reduced){const len=line.getTotalLength();line.style.strokeDasharray=len;line.style.strokeDashoffset=len;dot.style.opacity='0';let at=performance.now();const tick=t=>{if(st.mode!=='concept'||st.concept!=='خط')return;const k=Math.min(1,(t-at)/1900);line.style.strokeDashoffset=len*(1-k);if(k<1)requestAnimationFrame(tick);else dot.style.opacity='1'};requestAnimationFrame(tick)}
+}
+async function askAIQuestions(topic,count=5){
+ const key=localStorage.getItem('qa-api-key');if(!key)return quizMenu();
+ announce('إنشاء أسئلة تعليمية',1100);
+ try{const response=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4.1-mini',temperature:.3,response_format:{type:'json_object'},messages:[{role:'system',content:'أعد JSON فقط بصيغة {"questions":[{"q":"...","options":["...","...","..."],"correct":0}]}. اكتب خمسة أسئلة عربية دقيقة ومناسبة لأعمار 10-12 سنة، وثلاث اختيارات لكل سؤال، مع إجابة صحيحة واحدة. تجنب الادعاءات غير الموثوقة.'},{role:'user',content:'خمسة أسئلة عن: '+topic}]})});
+ if(!response.ok){toast(response.status===401?'المفتاح مرفوض (401).':'طلب الأسئلة مرفوض ('+response.status+').');return}
+ const json=await response.json();const obj=JSON.parse(json.choices?.[0]?.message?.content||'{}');const rows=(obj.questions||[]).slice(0,Math.min(5,count)).filter(q=>q&&typeof q.q==='string'&&Array.isArray(q.options)&&q.options.length===3&&Number.isInteger(q.correct)&&q.correct>=0&&q.correct<=2).map(q=>[q.q.slice(0,200),q.options.map(x=>String(x).slice(0,120)),q.correct]);if(!rows.length)throw Error('invalid-data');
+ st.quiz={topic,items:rows,index:0,score:0,done:false};showQuizQuestion();
+ }catch(e){toast(e instanceof TypeError?'تعذّر الاتصال لتوليد الأسئلة (NETWORK/CORS).':'تعذّر قراءة الأسئلة (DATA).')}
+}
+async function askAI(text){const key=localStorage.getItem('qa-api-key');if(!key){toast('الموضوع غير موجود في المكتبة المحلية. يمكن تفعيل الذكاء الاصطناعي من «الإعدادات».');return}closeModal();announce('طلب الرسم الاختياري',1200);try{const response=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4.1-mini',temperature:0.4,response_format:{type:'json_object'},messages:[{role:'system',content:'أنت مساعد لرسم تعليمي بسيط لأطفال 10 إلى 12 سنة. أعد JSON فقط: {"title":"...", "steps":[[{"d":"M100 100L200 200","c":"#633447","w":5}], [...], [...], [...]]}. أربعة مراحل بالضبط، قيم d هي أوامر مسارات SVG بسيطة داخل مساحة 1000x600، لا تتجاوز 15 مساراً لكل مرحلة. لا نصوص، لا كود HTML. المرحلة الأولى خطوط إرشادية ثم محيط ثم تفاصيل ثم اللمسات.'},{role:'user',content:'ارسم موضوعاً مبسطاً: '+text}]})});if(!response.ok){let msg='طلب مرفوض من الخدمة ('+response.status+')';if(response.status===401)msg='المفتاح غير صحيح أو غير مفوّض (401).';if(response.status===429)msg='تم تجاوز حد الاستخدام (429).';return toast(msg)}const raw=await response.json();const data=JSON.parse(raw.choices?.[0]?.message?.content||'{}');if(!Array.isArray(data.steps)||data.steps.length!==4)throw Error('invalid-data');const safe=data.steps.map(step=>Array.isArray(step)?step.slice(0,15).filter(item=>item&&typeof item.d==='string'&&item.d.length<1000&&/^[a-zA-Z0-9 .,+\-]+$/.test(item.d)).map(item=>P(item.d,/^#[0-9a-f]{6}$/i.test(item.c)?item.c:palette.dark,Math.max(1,Math.min(15,Number(item.w)||5)))):[]);const label=String(data.title||'رسمة جديدة').slice(0,60);scenes['__ai__']=L(label,'رسمة مولّدة بالذكاء الاصطناعي: راجع صحة التفاصيل قبل تدريسها.',...safe);drawScene('__ai__');toast('أُنشئت الرسمة. راجعها قبل شرحها للطلاب.')}catch(e){toast(e instanceof TypeError?'تعذّر الاتصال: قد يكون الاتصال محجوباً أو غير متاح (NETWORK/CORS).':'تعذّر فهم الاستجابة من الخدمة (DATA).')}}
+// محرك الصوت الإصدار 1.0.1: لا يخلط بين التقاط الصوت والتعرف على الكلام.
+let micTestStream=null,micTestContext=null,micTestFrame=0;
+function setMicState(state,label){
+ const n=$('#soundState');n.className='visible '+state;$('#soundLabel').textContent=label;
+ const b=$('#micBtn');b.classList.toggle('on',!!st.mic);b.setAttribute('aria-pressed',String(!!st.mic));
+ b.setAttribute('title',st.mic?'إيقاف الميكروفون':'تشغيل الميكروفون');
+}
+const micMessages={
+ 'NO_SPEECH_API':'هذا المتصفح لا يوفّر واجهة التعرف على الكلام. جرّب أحدث إصدار من Chrome أو Edge، أو استخدم إملاء لوحة المفاتيح.',
+ 'INSECURE':'تحتاج صلاحيات الصوت إلى صفحة آمنة HTTPS أو localhost. فتح الملف مباشرة قد يفرض قيوداً مختلفة بحسب المتصفح.',
+ 'not-allowed':'تم رفض إذن الميكروفون. اضغط رمز الأذونات بجانب عنوان الصفحة واسمح بالميكروفون، وتحقق من إعدادات خصوصية الميكروفون في Windows.',
+ 'service-not-allowed':'خدمة تحويل الكلام إلى نص غير متاحة أو محظورة في المتصفح أو شبكة المدرسة. تأكد من Chrome/Edge واتصال الشبكة.',
+ 'audio-capture':'لم يجد المتصفح ميكروفوناً صالحاً، أو أن جهاز التسجيل يستخدمه برنامج آخر. اختر الميكروفون الصحيح من إعدادات Windows.',
+ 'network':'تعذّر الاتصال بخدمة التعرّف على الكلام. قد يعمل الميكروفون نفسه، لكن شبكة المدرسة أو المتصفح تحجب خدمة التعرف الصوتي. الكتابة تظل متاحة.',
+ 'language-not-supported':'التعرف على العربية غير مدعوم من خدمة الصوت الحالية. سيجرب التطبيق لهجة عربية أخرى إن كانت متاحة.',
+ 'no-speech':'لم يتعرف المتصفح على كلام واضح. اقترب من الميكروفون وتحدث بصوت مسموع.',
+ 'aborted':'أوقف المتصفح جلسة التعرف الصوتي.',
+ 'START_FAILED':'تعذّر بدء خدمة التعرف على الكلام في هذا المتصفح. جرّب زر الفحص أدناه لمعرفة هل يلتقط الميكروفون الصوت.',
+ 'RESTART_FAILED':'توقفت خدمة التعرف ولم تنجح إعادة تشغيلها. جرّب Chrome/Edge وتحقق من إذن الميكروفون.',
+ 'EARLY_END':'خدمة التعرف تنهي الجلسة فور تشغيلها، ربما لعدم توفر الخدمة أو بسبب قيود المتصفح أو الشبكة.',
+ 'DEVICE_ERROR':'حدث خطأ أثناء فحص جهاز الميكروفون.'
+};
+function micHelp(code='INFO'){
+ const protocol=location.protocol,secure=window.isSecureContext;
+ const hasSpeech=!!(window.SpeechRecognition||window.webkitSpeechRecognition);
+ const hasAudio=!!navigator.mediaDevices?.getUserMedia;
+ const reason=code==='INFO'?'اضغط «اختبر وصول الصوت» للتمييز بين مشكلة الميكروفون ومشكلة تحويل الكلام إلى نص.':(micMessages[code]||'حدث خطأ غير معروف.');
+ openModal('تشخيص الميكروفون',`<p class="micNote"><b>السبب:</b> ${escapeHtml(reason)} <span class="micCode">${escapeHtml(code)}</span></p>
+ <p><b>واجهة التعرف على الكلام:</b> ${hasSpeech?'موجودة في المتصفح':'غير موجودة'}<br><b>إمكانية اختبار جهاز الصوت:</b> ${hasAudio?'متاحة':'غير متاحة'}<br><b>طريقة فتح الصفحة:</b> <span class="micCode">${escapeHtml(protocol)}</span> ${secure?'(سياق آمن)':'(غير آمن)'}</p>
+ <div id="micMeter" role="progressbar" aria-label="مستوى الصوت" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="micMeterFill"></div></div>
+ <p id="micTestStatus" aria-live="polite">لم يُختبر الميكروفون بعد.</p>
+ <p><button type="button" class="btn green" data-action="micTest">🎙 اختبر وصول الصوت</button><button type="button" class="btn alt" data-action="micStopTest">أوقف الاختبار</button></p>
+ <p class="muted">إذا تحرك المؤشر عند الكلام فالجهاز يلتقط صوتاً. هذا الاختبار لا يثبت أن خدمة التعرف على الكلام تعمل.</p>
+ <p class="muted"><b>على Windows:</b> الإعدادات ← الخصوصية والأمان ← الميكروفون، ثم اسمح بالوصول. في Chrome افتح إعدادات الموقع ← الميكروفون، واختر الجهاز الصحيح.</p>
+ <p class="muted"><b>للإملاء البديل:</b> انقر خانة الكتابة واضغط Windows + H، ثم قل الأمر واضغط Enter. تحويل الكلام عبر المتصفح قد يحتاج الإنترنت ولا يضمن العمل دون اتصال.</p>`);
+}
+function stopAudioTest(notify=false){
+ if(micTestFrame)cancelAnimationFrame(micTestFrame);micTestFrame=0;
+ if(micTestStream){micTestStream.getTracks().forEach(t=>t.stop());micTestStream=null}
+ if(micTestContext){micTestContext.close().catch(()=>{});micTestContext=null}
+ if(notify&&$('#micTestStatus'))$('#micTestStatus').textContent='توقف الاختبار.';
+ if(notify&&$('#micMeterFill'))$('#micMeterFill').style.width='0%';
+}
+async function testAudioInput(){
+ stopAudioTest();let label=$('#micTestStatus');if(!label)return;
+ if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){
+  label.textContent='لا يمكن فحص الجهاز هنا (INSECURE/NO_MEDIA_DEVICES). افتح الصفحة عبر HTTPS أو localhost.';return;
+ }
+ label.textContent='جارٍ طلب إذن الميكروفون…';
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false},video:false});
+  micTestStream=stream;
+  // قد تكون نافذة التشخيص قد أغلقت أثناء طلب الإذن.
+  if(!$('#modalShade').classList.contains('open')||!$('#micMeterFill')){stopAudioTest();return}
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(!Ctx){label.textContent='سُمح باستخدام الميكروفون، لكن عرض مستوى الصوت غير مدعوم (NO_AUDIO_CONTEXT).';return}
+  const context=new Ctx();micTestContext=context;await context.resume();
+  const input=context.createMediaStreamSource(stream),analyser=context.createAnalyser();analyser.fftSize=1024;analyser.smoothingTimeConstant=.5;input.connect(analyser);
+  const data=new Uint8Array(analyser.fftSize);let maxObserved=0,frame=0;
+  label.textContent='المسار الصوتي مفتوح. تحدث الآن لرؤية استجابة المؤشر.';
+  const update=()=>{
+   if(!micTestStream||!$('#micMeterFill')||!$('#modalShade').classList.contains('open'))return;
+   analyser.getByteTimeDomainData(data);let sum=0;for(const x of data){const z=(x-128)/128;sum+=z*z}
+   const rms=Math.sqrt(sum/data.length),level=Math.min(100,Math.round(rms*460));maxObserved=Math.max(level,maxObserved*.95);
+   const meter=$('#micMeterFill');meter.style.width=level+'%';$('#micMeter').setAttribute('aria-valuenow',String(level));
+   if(++frame%10===0){$('#micTestStatus').textContent=maxObserved>=7?'✓ الميكروفون يلتقط الصوت. إذا لم تعمل الأوامر فالمشكلة غالباً في خدمة تحويل الكلام.':'المايك مفتوح؛ تحدث بصوت واضح. إن بقي المؤشر صفراً فتأكد من اختيار جهاز الإدخال.'}
+   micTestFrame=requestAnimationFrame(update);
+  };update();
+ }catch(err){stopAudioTest();const code=String(err?.name||'DEVICE_ERROR');
+  const causes={NotAllowedError:'الإذن مرفوض، تحقق من أذونات الموقع والنظام.',NotFoundError:'لا يوجد ميكروفون متصل أو محدد.',NotReadableError:'تعذر الوصول للميكروفون، قد يستخدمه تطبيق آخر.',SecurityError:'المتصفح حظر الوصول لأسباب أمنية.',OverconstrainedError:'الجهاز لا يطابق إعدادات الإدخال المطلوبة.'};
+  const p=$('#micTestStatus');if(p)p.textContent=(causes[code]||'فشل فحص الجهاز.')+' ('+code+')';
+ }
+}
+function queueSpeechText(text){
+ text=String(text||'').trim();if(!text)return;
+ st.micPending=st.micPending||[];st.micPending.push(text);
+ clearTimeout(st.speechTimeout);
+ st.speechTimeout=setTimeout(()=>{
+  const phrase=st.micPending.join(' ').trim();st.micPending=[];st.micPartial='';
+  if(phrase&&st.mic){announce(phrase,1350);runCommand(phrase,{voice:true});setMicState('listening','يستمع')}
+ },1000);
+}
+function haltMic(){
+ st.mic=false;clearTimeout(st.speechTimeout);clearTimeout(st.retryTimeout);st.micPending=[];st.micPartial='';
+ try{st.recognizer?.stop()}catch(err){};$('#micBtn').classList.remove('on');$('#micBtn').setAttribute('aria-pressed','false');
+}
+function micFatal(code,details=''){
+ if(!st.mic&&code==='aborted')return;
+ st.micFault=code;haltMic();setMicState('error','عطل الميكروفون: '+code);
+ toast('تعذر التعرف على الكلام ('+code+'). افتح فحص الميكروفون لمعرفة السبب.');
+ micHelp(code);
+}
+function initRecognizer(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){micFatal('NO_SPEECH_API');return false}
+ const r=new SR();r.lang='ar-QA';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
+ let finalIndexes=new Set();st.micEndStreak=0;st.micPending=[];st.micPartial='';
+ r.onstart=()=>{finalIndexes.clear();st.micStartedAt=Date.now();if(st.mic){st.micFault='';setMicState('listening','يستمع • العربية')}};
+ r.onaudiostart=()=>{if(st.mic)setMicState('hearing','اتصال الميكروفون جاهز')};
+ r.onsoundstart=()=>{if(st.mic){st.micEndStreak=0;setMicState('hearing','يصل صوت')}};
+ r.onspeechstart=()=>{if(st.mic){st.micEndStreak=0;setMicState('hearing','يلتقط كلاماً')}};
+ r.onspeechend=()=>{
+  if(!st.mic)return;setMicState('decoding','يميّز الكلام');
+  // قد تعود نتيجة مؤقتة فقط في بعض المتصفحات: انتظر النهائي ثم استخدم المؤقتة عند الضرورة.
+  if(st.micPartial){clearTimeout(st.partialTimeout);st.partialTimeout=setTimeout(()=>{
+    if(st.mic&&st.micPartial&&!st.micPending?.length)queueSpeechText(st.micPartial);
+  },1100)}
+ };
+ r.onresult=e=>{
+  if(!st.mic)return;
+  let finals=[],partial='';
+  for(let i=e.resultIndex;i<e.results.length;i++){
+   const result=e.results[i],t=result[0]?.transcript||'';
+   if(result.isFinal){if(!finalIndexes.has(i)){finalIndexes.add(i);finals.push(t)}}else partial+=t;
+  }
+  if(partial){st.micPartial=partial;setMicState('decoding','يميّز: '+partial.slice(0,21))}
+  if(finals.length){st.micEndStreak=0;st.micPartial='';clearTimeout(st.partialTimeout);queueSpeechText(finals.join(' '))}
+ };
+ r.onerror=e=>{
+  const code=String(e.error||'UNKNOWN');
+  if(code==='aborted'&&!st.mic)return;
+  if(code==='no-speech'){if(st.mic)setMicState('listening','يستمع • لم يُسمع كلام واضح');return}
+  if(code==='language-not-supported'&&r.lang==='ar-QA'){
+    r.lang='ar-SA';setMicState('decoding','تجربة العربية ar-SA');toast('تجربة إعداد اللغة العربية البديل (ar-SA).');return;
+  }
+  micFatal(code);
+ };
+ r.onend=()=>{
+  finalIndexes.clear();clearTimeout(st.partialTimeout);
+  if(!st.mic){if(!st.micFault)setMicState('','الميكروفون متوقف');return}
+  const elapsed=Date.now()-(st.micStartedAt||0);
+  st.micEndStreak=elapsed<900?(st.micEndStreak||0)+1:0;
+  if(st.micEndStreak>=4){micFatal('EARLY_END');return}
+  setMicState('decoding','يُعيد الاستماع تلقائياً');clearTimeout(st.retryTimeout);
+  st.retryTimeout=setTimeout(()=>{
+   if(!st.mic)return;
+   try{r.start()}catch(e){
+    if(e?.name==='InvalidStateError'){st.retryTimeout=setTimeout(()=>{if(st.mic){try{r.start()}catch(err){micFatal('RESTART_FAILED')}}},850)}
+    else micFatal('RESTART_FAILED');
+   }
+  },600);
+ };
+ st.recognizer=r;return true;
+}
+function toggleMic(){
+ if(st.mic){st.micFault='';haltMic();setMicState('','الميكروفون متوقف');return}
+ if(!window.isSecureContext){micFatal('INSECURE');return}
+ if(!st.recognizer&&!initRecognizer())return;
+ st.mic=true;st.micFault='';st.micEndStreak=0;
+ setMicState('decoding','يطلب تشغيل الميكروفون…');
+ try{st.recognizer.start()}catch(e){micFatal('START_FAILED')}
+}
+function executeTyped(){const v=$('#command').value;$('#command').value='';runCommand(v)}
+$('#command').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();executeTyped()}});$('#sendBtn').addEventListener('click',executeTyped);$('#micBtn').addEventListener('click',toggleMic);$('#questionsBtn').addEventListener('click',quizMenu);$('#clearBtn').addEventListener('click',clearScreen);$('#fullBtn').addEventListener('click',()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>toast('المتصفح لا يسمح بملء الشاشة'))});$('#prevStep').addEventListener('click',()=>setStep(st.step));$('#nextStep').addEventListener('click',nextStep);$('#fullDrawing').addEventListener('click',fullDrawing);$('#timerCancel').addEventListener('click',stopTimer);
+$('#closeModal').addEventListener('click',closeModal);$('#modalShade').addEventListener('click',e=>{if(e.target===$('#modalShade'))closeModal()});$('#modalBody').addEventListener('click',e=>{const b=e.target.closest('[data-draw],[data-quiz],[data-answer],[data-action]');if(!b)return;if(b.dataset.draw){closeModal();drawScene(b.dataset.draw)}if(b.dataset.quiz)startQuiz(b.dataset.quiz);if(b.dataset.answer!==undefined)answerQuiz(Number(b.dataset.answer));if(b.dataset.action){const a=b.dataset.action;if(a==='criteria')criteria();if(a==='students'||a==='studentNames')studentNames();if(a==='settings')settings();if(a==='quizNext'){st.quiz.index++;showQuizQuestion()}if(a==='quizMenu')quizMenu();if(a==='saveStudents')saveStudents();if(a==='pickStudent')pickStudent();if(a==='library')sceneMenu();if(a==='studentMode')studentMode();if(a==='apiSettings')apiSettings();if(a==='micHelp')micHelp();if(a==='micTest')testAudioInput();if(a==='micStopTest')stopAudioTest(true);if(a==='saveApi'){const v=$('#apiKey').value.trim();if(v){localStorage.setItem('qa-api-key',v);toast('حُفظ المفتاح محلياً في هذا المتصفح.')}else toast('أدخل المفتاح أولاً.')}if(a==='removeApi'){localStorage.removeItem('qa-api-key');$('#apiKey').value='';toast('حُذف المفتاح من التخزين المحلي.')}}});$('#modalBody').addEventListener('change',e=>{if(e.target.id==='wakeToggle'){st.wake=e.target.checked;localStorage.setItem('qa-wake',st.wake?'1':'0');toast(st.wake?'كلمة التنبيه مفعّلة':'كلمة التنبيه غير مفعّلة')}});
+$('#eraserBtn').addEventListener('click',()=>{st.eraser=!st.eraser;$('#eraserBtn').classList.toggle('active',st.eraser)});$('#undoBtn').addEventListener('click',()=>{st.studentPaths.pop();redrawStudent()});$('#clearStudentBtn').addEventListener('click',()=>{st.studentPaths=[];st.studentCurrent=null;redrawStudent()});$('#ghostBtn').addEventListener('click',()=>{st.ghost=!st.ghost;$('#teacherGhost').style.display=st.ghost?'':'none';$('#ghostBtn').textContent=st.ghost?'إخفاء النموذج':'إظهار النموذج'});$('#mirrorBtn').addEventListener('click',()=>{st.mirror=!st.mirror;$('#mirrorBtn').classList.toggle('active',st.mirror)});$('#exitStudent').addEventListener('click',()=>{$('#studentLayer').classList.remove('open');$('#studentTools').classList.remove('open');st.mode='normal';svg.style.visibility='visible';if(st.scene)$('#lessonHud').classList.add('visible')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='F8'){e.preventDefault();sceneMenu()}if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();$('#command').focus()}});
+window.__qaTest={VERSION,scenes,questions,st,normalize,runCommand,drawScene,setStep,fullDrawing,stopAnimation,timer,createConcept,startQuiz,answerQuiz,studentMode,redrawStudent,handwriting,micHelp,testAudioInput,stopAudioTest,toggleMic};
+showHint('اكتب «المكتبة» لعرض الرسومات، أو «ارسم المحمل» لبدء الدرس.',3800);
+})();
+</script>
+</body>
+</html>
