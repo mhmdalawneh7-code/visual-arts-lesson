@@ -196,6 +196,9 @@ circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.0
 .xpanel{position:absolute;z-index:7;top:clamp(8px,2%,20px);bottom:clamp(8px,2%,20px);width:min(47%,680px);display:none;overflow:auto;background:rgba(255,250,240,.97);color:#2a1414;border-radius:18px;padding:14px 18px;box-shadow:0 12px 34px rgba(40,10,20,.35);direction:rtl}
 .xpanel.show{display:block;animation:xpop .35s ease}
 #xObjs{right:clamp(8px,1.5%,20px)}#xArtist{left:clamp(8px,1.5%,20px)}
+#xTalk{right:clamp(8px,1.5%,20px);width:min(40%,560px);background:rgba(255,250,240,.93)}
+#xTalk ol{margin:8px 0 0;padding-inline-start:26px;font-size:clamp(16px,1.9vw,27px);line-height:1.7;font-weight:700}
+#xTalk li{opacity:.28;transition:opacity .4s,color .4s}#xTalk li.on{opacity:1}#xTalk li.cur{color:#8a1538}
 @keyframes xpop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
 .xpanel h2,#xBoard h2{margin:0;color:#6c1735;font-size:clamp(20px,2.6vw,38px);font-weight:900}
 .xobj{display:grid;grid-template-columns:clamp(64px,8vw,116px) 1fr;gap:12px;align-items:center;margin-top:10px;padding:8px 12px;border-radius:14px;border-inline-start:8px solid var(--dc);background:#fff}
@@ -286,6 +289,7 @@ circle.bulb[opacity]{animation-name:bulbGlow}@keyframes bulbGlow{from{opacity:.0
  <aside class="xpanel" id="xArtist" aria-live="polite"></aside>
  <div id="xBoard" aria-live="polite"></div>
  <div id="xPic" aria-live="polite"></div>
+ <aside class="xpanel" id="xTalk" aria-live="polite"></aside>
 </main>
 <footer id="toolbar" aria-label="أوامر المرسم">
 <button type="button" id="micBtn" title="تشغيل الميكروفون" aria-label="تشغيل الميكروفون"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg></button>
@@ -668,7 +672,8 @@ function elSvg(tag,attrs={},root){const n=document.createElementNS(NS,tag);for(c
 function clear(n){while(n.firstChild)n.removeChild(n.firstChild)}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 // الرد الصوتي: يتوقف الاستماع لحظياً حتى لا يسمع التطبيق صوته
-function say(text){if(st.topic&&st.narrating)return;if(!st.voiceReply||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));if(v){u.voice=v;u.lang=v.lang}u.rate=1.02;st.ttsUntil=Date.now()+Math.min(4500,text.length*95+700);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+350};speechSynthesis.speak(u)}catch(e){}}
+function xVoice(){const vs=speechSynthesis.getVoices().filter(x=>/^ar/i.test(x.lang)),sc=v=>(/natural|online|neural/i.test(v.name)?4:0)+(/google/i.test(v.name)?2:0)+(v.localService?0:1);return vs.sort((a,b)=>sc(b)-sc(a))[0]}
+function say(text){if(st.topic&&st.narrating)return;if(!st.voiceReply||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=xVoice();if(v){u.voice=v;u.lang=v.lang}u.rate=1.02;st.ttsUntil=Date.now()+Math.min(4500,text.length*95+700);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+350};speechSynthesis.speak(u)}catch(e){}}
 function announce(text,ms=1650,speak=true){const box=$('#spoken'),t=$('#spokenText');clearTimeout(speakingTimeout);t.textContent=text;box.classList.add('show');speakingTimeout=setTimeout(()=>box.classList.remove('show'),ms);if(speak)say(text)}
 function toast(text){clearTimeout(toastTimeout);$('#toast').textContent=text;$('#toast').classList.add('on');toastTimeout=setTimeout(()=>$('#toast').classList.remove('on'),3500)}
 function showHint(text,ms=6500){const h=$('#lessonHint');h.textContent=text;h.classList.add('visible');clearTimeout(h._timeout);h._timeout=setTimeout(()=>h.classList.remove('visible'),ms)}
@@ -905,15 +910,16 @@ const endRub=()=>{if(rubbing){rubbing=null;render()}};svg.addEventListener('poin
 $('#eraserTool').addEventListener('click',()=>setTool(st.tool==='eraser'?null:'eraser'));
 
 // ===== لوحة الشرح: رسم + ألوان + حقائق تُقرأ بالصوت =====
-function speakThen(text,next){let done=false;const go=()=>{if(done)return;done=true;clearTimeout(tm);next()};let tm=setTimeout(go,text.length*130+3500);
+function speakThen(text,next){if(XT&&XT.pro(text,next,()=>speakThenCore(text,next)))return;speakThenCore(text,next)}
+function speakThenCore(text,next){let done=false;const go=()=>{if(done)return;done=true;clearTimeout(tm);next()};let tm=setTimeout(go,text.length*130+3500);
  if(!st.voiceReply||!('speechSynthesis' in window)){clearTimeout(tm);tm=setTimeout(go,1300+text.length*55);return}
- try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));if(v){u.voice=v;u.lang=v.lang}u.rate=.95;st.ttsUntil=Date.now()+Math.min(16000,text.length*130+2500);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+450;setTimeout(go,260)};speechSynthesis.speak(u)}catch(e){go()}}
-function narrate(){const P=$('#topicPanel'),items=[...P.querySelectorAll('.tpFacts li')],tp=st.topic;if(!tp)return;const token=++st.narr;st.narrating=true;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+ try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';const v=xVoice();if(v){u.voice=v;u.lang=v.lang}u.rate=.95;st.ttsUntil=Date.now()+Math.min(16000,text.length*130+2500);u.onend=u.onerror=()=>{st.ttsUntil=Date.now()+450;setTimeout(go,260)};speechSynthesis.speak(u)}catch(e){go()}}
+function narrate(){const P=$('#topicPanel'),items=[...P.querySelectorAll('.tpFacts li')],tp=st.topic;if(!tp)return;if(XT)XT.stop();const token=++st.narr;st.narrating=true;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
  items.forEach(li=>li.classList.remove('on','cur'));let i=-1;
  const step=()=>{if(token!==st.narr||st.topic!==tp)return;i++;items.forEach((li,k)=>{li.classList.toggle('on',k<=i);li.classList.toggle('cur',k===i)});if(i>=items.length){st.narrating=false;P.classList.add('done');return}const li=items[i];li.scrollIntoView&&li.scrollIntoView({block:'nearest',behavior:'smooth'});speakThen(li.textContent,step)};
  P.classList.remove('done');speakThen(tp.t,step)}
-function closeTopic(){if(!st.topic)return;st.topic=null;st.narr++;st.narrating=false;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}st.ttsUntil=Date.now()+300;$('#topicPanel').classList.remove('open');$('#conceptSvg').setAttribute('viewBox','0 0 1000 600');$('#conceptCaption').style.visibility='';$('#artboard').classList.remove('topicOn')}
-function openTopic(tp){if(!tp)return false;pushHistory();stopTimer();resetVisual();st.cards=[];renderCards();st.blocks=[];st.active=null;st.lesson=false;st.bg=null;$('#lessonHint').classList.remove('visible');$('#stepIntro').classList.remove('show');
+function closeTopic(){if(!st.topic)return;if(XT)XT.stop();st.topic=null;st.narr++;st.narrating=false;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}st.ttsUntil=Date.now()+300;$('#topicPanel').classList.remove('open');$('#conceptSvg').setAttribute('viewBox','0 0 1000 600');$('#conceptCaption').style.visibility='';$('#artboard').classList.remove('topicOn')}
+function openTopic(tp){if(!tp)return false;if(XT)XT.topic();pushHistory();stopTimer();resetVisual();st.cards=[];renderCards();st.blocks=[];st.active=null;st.lesson=false;st.bg=null;$('#lessonHint').classList.remove('visible');$('#stepIntro').classList.remove('show');
  if(tp.concept){render();if(tp.concept==='نسخ')handwriting('نسخ');else createConcept(tp.concept);$('#conceptCaption').style.visibility='hidden'}
  st.topic=tp;
  if(!tp.concept){if(tp.scene&&scenes[tp.scene]){const bb=sceneBox(tp.scene),s=Math.min(1.05,430/bb.w,400/bb.h),b=mk(tp.scene,{cx:265,cy:318,scale:s,step:3});st.blocks=[b];st.active=b.id;enqueue(done=>animateBlock(b,[1,2,3],done,1.25))}else render()}
@@ -1466,7 +1472,7 @@ function drawSouq(){
   pv+=`<circle cx="800" cy="440" r="15" fill="#d9423f" stroke="#fff" stroke-width="4"/>
        <g font-family="Reem Kufi, Tajawal, sans-serif" font-size="38" direction="rtl" paint-order="stroke" stroke="#fff" stroke-width="8" stroke-linejoin="round">
        <text x="800" y="500" text-anchor="middle" fill="#d9423f">نقطة التلاشي</text><text x="250" y="425" text-anchor="middle" fill="#1f5f9c">خط الأفق</text></g>`;
-  return L('sky',sky)+L('sun',sun)+L('minaret',mn)+L('walls',w)+L('doors',d)+L('shops',sh)+L('lanterns',ln)+L('persp',pv);
+  return L('dusk',sky+sun)+L('minaret',mn)+L('walls',w)+L('doors',d)+L('shops',sh)+L('lanterns',ln)+L('persp',pv);
 }
 /* قلعة الزبارة */
 function cren(x,y,w,c){let s='';for(let i=x;i<x+w-20;i+=52)s+=`<rect x="${i}" y="${y-24}" width="28" height="26" fill="${c}"/>`;return s;}
@@ -1535,12 +1541,12 @@ function drawFloral(){
   return s+half+L('sym',`<g transform="translate(1600 0) scale(-1 1)">${half}</g>`)+L('colour',`<path d="M770 850 h60 l14 26 h-88z" fill="#d9a441"/>`);
 }
 
-const SKY=['سماء','=سما'],SUN=['شمس','غروب','شروق'];
+
 const PLACES=[
  {id:'souq',name:'سوق واقف',topic:'سوق واقف',thumb:'t_souq',draw:drawSouq,layers:[
    {id:'walls',keys:['جدران','جدار','=مباني','مبنى','طين','=زقاق','ممر']},{id:'doors',keys:['ابواب','=باب','نوافذ','شبابيك','خشب']},
    {id:'shops',keys:['دكاكين','دكان','محلات','توابل','بهارات','بضائع']},{id:'lanterns',keys:['فوانيس','فانوس','اضاءة','انارة','اضواء','مصابيح','انوار']},
-   {id:'minaret',keys:['مئذنة','منارة','لولبي','الفنار','مسجد']},{id:'sky',keys:SKY},{id:'sun',keys:SUN},
+   {id:'minaret',keys:['مئذنة','منارة','لولبي','الفنار','مسجد']},{id:'dusk',extra:true,keys:['غروب']},
    {id:'persp',extra:true,keys:['منظور','التلاشي','خط الافق','النقطة الواحدة','نقطة واحدة']}]},
  {id:'geo',name:'الزخارف الهندسية',topic:'الزخارف الإسلامية',thumb:'نجمة ثمانية',draw:drawGeo,layers:[
    {id:'circle',keys:['دائرة','دوائر']},{id:'square',keys:['مربع']},{id:'star',keys:['نجمة','مربعين','مربع ثاني','المربع الثاني']},
@@ -1584,7 +1590,7 @@ D.pics.forEach(pc=>pc.keys.forEach(k=>{const p=bare(k);if(p)PICPATS.push({p,pic:
 PICPATS.sort((a,b)=>b.p.length-a.p.length);
 function findPic(t,preferFull){const hits=PICPATS.filter(P=>P.re.test(t)).map(P=>P.pic);if(!hits.length)return null;
   return (preferFull&&hits.find(p=>p.id.startsWith('p_')))||hits[0];}
-function showPic(pc){const p=$('xPic');p.innerHTML=`<div class="xframe">${pc.svg}</div><h3>${esc(pc.title)}</h3>${pc.note?`<p>${esc(pc.note)}</p>`:''}`;p.classList.add('show');}
+function showPic(pc){const p=$('xPic');p.innerHTML=`<div class="xframe">${pc.svg}</div><h3>${esc(pc.title)}</h3>${pc.note?`<p>${esc(pc.note)}</p>`:''}`;p.dataset.pic=pc.id;p.classList.add('show');}
 function closePic(){$('xPic').classList.remove('show');$('xPic').innerHTML='';}
 
 /* ---------- لوحة «الزخارف الإسلامية وأنواعها» ---------- */
@@ -1630,6 +1636,7 @@ function showArtist(a){
    ${a.works.map(w=>`<div class="work"><b>${w[0]}</b> <span>${w[1]}</span><p>${w[2]}</p></div>`).join('')}
    <div class="aimgs">${imgs.map(u=>`<img src="${u}" alt="" loading="lazy">`).join('')}</div>
    <a class="alink" href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent('لوحات الفنان '+a.name)}">ابحث عن لوحاته</a>`;
+  p.dataset.artist=a.id;
   p.querySelectorAll('img').forEach(im=>im.addEventListener('error',()=>im.remove()));
   p.classList.add('show');refreshHomeOnly();
 }
@@ -1700,6 +1707,78 @@ function objectiveCmd(raw,t){
   renderObjs();return true;
 }
 
+
+/* ---------- التعليق الصوتي: لوحة شرح جانبية لا تمسح الرسم ---------- */
+const EXTRA_FACTS={'باب تراثي':['الأبواب القطرية القديمة تُصنع من خشب متين.','تُزيَّن بمسامير نحاسية وزخارف محفورة، هندسية ونباتية.','في الباب الكبير باب صغير يسمى «الخوخة» للدخول اليومي.']};
+const PLACE_TALK={
+ souq:{t:'سوق واقف',facts:['سوق واقف من أقدم أسواق الدوحة وأشهرها.','جدرانه من الطين والحجر، وأسقفه من عوارض خشبية تسمى الدنجل.','أُعيد ترميمه بالطراز القطري القديم.','تتجاور فيه الدكاكين، وتُباع فيه التوابل والأقمشة والحِرف اليدوية.','في منظور النقطة الواحدة تلتقي خطوط الممر في نقطة التلاشي على خط الأفق.']},
+ geo:{t:'الزخرفة الهندسية',facts:['تبدأ الزخرفة الهندسية بدائرة نرسمها بالفرجار.','من مربعين متقاطعين تظهر النجمة الثمانية.','نكرر الوحدة الزخرفية بانتظام فتمتلئ المساحة.']},
+ floral:{t:'الزخرفة النباتية',facts:['الزخرفة النباتية تسمى التوريق.','تتكون من سيقان وأوراق وأزهار بخطوط منحنية ولولبية.','تعتمد على التماثل: نصفها الأيمن صورة مرآة لنصفها الأيسر.']}};
+let talkTok=0,proAudio=null;
+function stopTalk(){talkTok++;if(proAudio){try{proAudio.pause();}catch(_){ }proAudio=null;}try{window.speechSynthesis&&speechSynthesis.cancel();}catch(_){}}
+function closeTalk(){stopTalk();$('xTalk').classList.remove('show');$('xTalk').innerHTML='';}
+function talk(tp){
+  if(!tp||!tp.facts||!tp.facts.length)return false;
+  stopTalk();const tok=talkTok,p=$('xTalk');
+  p.innerHTML=`<h2>${esc(tp.t)}</h2><ol>${tp.facts.map(f=>`<li>${esc(f)}</li>`).join('')}</ol>`;p.classList.add('show');
+  const lis=[...p.querySelectorAll('li')];let i=-1;
+  const step=()=>{if(tok!==talkTok)return;i++;lis.forEach((li,k)=>{li.classList.toggle('on',k<=i);li.classList.toggle('cur',k===i);});if(i>=lis.length)return;M.speakThen(lis[i].textContent,step);};
+  M.speakThen(tp.t,step);return true;
+}
+function blockTalk(key){
+  const tp=Object.values(M.TOPICS).find(x=>x.scene===key),sc=M.scenes[key];
+  if(tp)return {t:tp.t,facts:tp.facts};
+  const pc=findPic(bare(key)),facts=(EXTRA_FACTS[key]||[]).slice();
+  if(pc&&pc.note)facts.push(pc.note);
+  if(!facts.length)facts.push(sc.desc);
+  return {t:sc.title,facts};
+}
+function currentTalk(){
+  const pid=$('xPic').dataset.pic;
+  if($('xPic').classList.contains('show')&&PICS[pid])return {t:PICS[pid].title,facts:[PICS[pid].note||PICS[pid].title]};
+  const aid=$('xArtist').dataset.artist,a=ARTISTS.find(x=>x.id===aid);
+  if($('xArtist').classList.contains('show')&&a)return {t:a.name,facts:a.facts.concat(a.works.map(w=>w[0]+': '+w[2]))};
+  if(place)return PLACE_TALK[place.id];
+  const bs=M.st.blocks;if(bs.length)return blockTalk((bs.find(b=>b.id===M.st.active)||bs[bs.length-1]).key);
+  return null;
+}
+const TALK=/(?:^| )(?:و|ف)?(?:تكلم\S*|حدثن\S*|اشرح\S*|احك\S*|اخبرن\S*|عرفن\S*|علق\S*|معلومات)(?= |$)/;
+const THIS=/(?:^| )(?:هذه|هذا|هذي|هاي|هاذا|هاذي|اللوحه|الرسمه|المشهد)(?= |$)/;
+function talkCmd(raw,t){
+  if(!TALK.test(t))return false;
+  const a=ARTISTS.find(x=>x.res.some(r=>r.test(t)));
+  if(a){showArtist(a);return talk(currentTalk());}
+  if(/(?:^| )(?:و|ب|في|عن)?(?:ال)?سوق(?= |$)/.test(t)){if(place!==PLACES[0])openPlace(PLACES[0],true);return talk(PLACE_TALK.souq);}
+  const ms=M.findScenes(M.normalize(raw));
+  if(ms.length){if(M.st.blocks.some(b=>b.key===ms[0].key))return talk(blockTalk(ms[0].key));return false;}
+  if(THIS.test(t)||t.split(' ').length<=2)return talk(currentTalk());
+  return false;
+}
+/* صوت احترافي للتعليق: إن كان مفتاح الذكاء الاصطناعي محفوظاً في الإعدادات نستخدم صوتاً عصبياً، وإلا أفضل صوت عربي في المتصفح */
+const ttsCache=new Map();
+async function ttsUrl(text,key){
+  if(ttsCache.has(text))return ttsCache.get(text);
+  const call=body=>fetch('https://api.openai.com/v1/audio/speech',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
+  let r=await call({model:'gpt-4o-mini-tts',voice:localStorage.getItem('qa-tts-voice')||'onyx',input:text,response_format:'mp3',instructions:'تحدث بالعربية الفصحى بصوت معلّق وثائقي هادئ وواضح ودافئ، وبسرعة مناسبة لطلاب المرحلة الابتدائية.'});
+  if(!r.ok)r=await call({model:'tts-1-hd',voice:'onyx',input:text,response_format:'mp3'});
+  if(!r.ok)throw new Error('tts '+r.status);
+  const u=URL.createObjectURL(await r.blob());ttsCache.set(text,u);return u;
+}
+function pro(text,next,fallback){
+  const key=localStorage.getItem('qa-api-key');
+  if(!key||!M.st.voiceReply||localStorage.getItem('qa-tts')==='0')return false;
+  const tok=talkTok;let ended=false;const finish=()=>{if(ended)return;ended=true;M.st.ttsUntil=Date.now()+450;setTimeout(next,260);};
+  M.st.ttsUntil=Date.now()+8000;
+  ttsUrl(text,key).then(u=>{
+    if(tok!==talkTok)return;
+    const a=new Audio(u);proAudio=a;
+    a.onloadedmetadata=()=>{M.st.ttsUntil=Date.now()+(isFinite(a.duration)?a.duration*1000:6000)+600;};
+    a.onended=finish;a.onerror=()=>{if(!ended){ended=true;fallback();}};
+    a.play().catch(()=>{if(!ended){ended=true;fallback();}});
+  }).catch(()=>{if(tok===talkTok)fallback();});
+  return true;
+}
+
 /* ---------- بنوك الأسئلة من كل المشاريع السابقة ---------- */
 const Q=M.questions,addQ=(name,list)=>{Q[name]=Q[name]||[];list.forEach(q=>{if(!Q[name].some(x=>x[0]===q[0]))Q[name].push(q);});};
 Object.entries(D.xq).forEach(([name,list])=>addQ(name,list));
@@ -1719,7 +1798,12 @@ function resolve(text,core){
   if(/محمل|محامل|سفن|مراكب/.test(t))return 'المحامل التقليدية';
   if(/الغاز|لغز|صوره/.test(t))return 'سؤال وصورة';
   if(/الوان|لون|فنون بصريه/.test(t))return 'اختبار الفنون البصرية';
-  return core||(place?place.topic:null);
+  if(core)return core;
+  if(/(?:^| )(?:ال)?(?:باب|ابواب)(?= |$)/.test(t))return 'العمارة الإسلامية';
+  if(place)return place.topic;
+  const bs=M.st.blocks;
+  if(bs.length){const k=(bs.find(b=>b.id===M.st.active)||bs[bs.length-1]).key,c=M.meta(k).cat;return M.SCENE_TOPIC[k]||(c===0?'التراث القطري':c===1?'العمارة الإسلامية':null);}
+  return null;
 }
 
 /* ---------- التقاط الأوامر الجديدة قبل أوامر المرسم ---------- */
@@ -1729,8 +1813,8 @@ const CLOSE=/(?:^| )(?:اغلق\S*|اقفل\S*|سكر\S*|اخف\S*|كفي|خلا
 const DRAW=/(?:^| )(?:و|ف)?(?:ارسم\S*|نرسم|اضف\S*|اضيف\S*|ضيف\S*|زد|زيد\S*|حط\S*|هات\S*|اعرض\S*|اظهر\S*|سوي\S*|ورني|ورينا)(?= |$)/;
 const OTHERVERB=/(?:^| )(?:زين\S*|زخرف|زخرفي|لون\S*|ضع|خل|خلي|اجعل\S*|كبر\S*|صغر\S*|حرك\S*|انقل|كرر\S*|انسخ|اقلب|اعكس)(?= |$)/;
 let lastT='',lastAt=0;
-function anyOpen(){return ['xObjs','xArtist','xPic','xBoard'].some(id=>$(id).classList.contains('show'));}
-function closeAll(){objs.length=0;renderObjs();closeArtist();closePic();closeBoard();}
+function anyOpen(){return ['xObjs','xArtist','xPic','xBoard','xTalk'].some(id=>$(id).classList.contains('show'));}
+function closeAll(){objs.length=0;renderObjs();closeArtist();closePic();closeBoard();closeTalk();}
 function pre(raw,opt){
   const t=norm(raw);if(!t)return false;
   const tokens=t.split(' '),done=()=>{M.showHeard(String(raw).trim());return true;};
@@ -1739,11 +1823,24 @@ function pre(raw,opt){
   if(/امسح الشاشه|امسح الكل|امسح كل|احذف الكل|احذف كل|لوحه نظيفه|لوحه جديده|ابدا من جديد/.test(t)||t==='امسح'||t==='مسح'){closeAll();closePlace();return false;}
   if(objectiveCmd(raw,t))return done();
   if(CLOSE.test(t)&&anyOpen()){
-    if(/اهداف|هدف/.test(t)){objs.length=0;renderObjs();}else if(/فنان/.test(t))closeArtist();else if(/صوره|لوحه/.test(t))closePic();else if(/زخارف|زخرف/.test(t))closeBoard();else closeAll();
+    if(/شرح|تعليق|كلام/.test(t))closeTalk();else if(/اهداف|هدف/.test(t)){objs.length=0;renderObjs();}else if(/فنان/.test(t))closeArtist();else if(/صوره|لوحه/.test(t))closePic();else if(/زخارف|زخرف/.test(t))closeBoard();else closeAll();
     return done();
   }
   if(ERASE.test(t)&&/فنان/.test(t)&&$('xArtist').classList.contains('show')){closeArtist();return done();}
   if(ERASE.test(t)&&/صوره|لوحه/.test(t)&&$('xPic').classList.contains('show')){closePic();return done();}
+  if(/(?:^| )(?:اسكت|توقف|قف|كفي|خلاص)(?= |$)/.test(t)&&$('xTalk').classList.contains('show')){closeTalk();return done();}
+  if(talkCmd(raw,t))return done();
+  // السماء طبقة مستقلة: «سماء زرقاء»، «ليل»، «امسح السماء»
+  const skyW=/(?:^| )(?:ال)?(?:سماء|سما|ليل|نهار|خلفيه)(?= |$)/.test(t);
+  if(ERASE.test(t)&&(skyW||/غروب/.test(t))){
+    let d=false;if(place){const l=place.layers.find(x=>x.id==='dusk');if(l&&shown.has('dusk')){hide(l);d=true;}}
+    if(M.st.bg){M.setBg(null);d=true;}
+    if(d)return done();
+  }
+  // «امسح الغيوم»: يحذف الطبقة كلها، أي كل العناصر من هذا النوع
+  if(ERASE.test(t)){const pl=M.findScenes(M.normalize(fix(raw))).filter(m=>m.plural&&M.st.blocks.some(b=>b.key===m.key));
+    if(pl.length){M.pushHistory();pl.forEach(m=>M.st.blocks.filter(b=>b.key===m.key).forEach(M.removeBlock));M.render();return done();}}
+  if(skyW&&place&&!ERASE.test(t)){const l=place.layers.find(x=>x.id==='dusk');if(l)hide(l);return false;}
   if(!ERASE.test(t)&&artistCmd(t))return done();
   const verb=DRAW.test(t)||OTHERVERB.test(t)||ERASE.test(t);
   // الزخارف الإسلامية وأنواعها
@@ -1775,18 +1872,26 @@ function pre(raw,opt){
     const pc=findPic(t,wantPic);
     if(pc&&(wantPic||!M.findScenes(M.normalize(raw)).length)){showPic(pc);return done();}
   }
+  // الرسم طبقة فوق طبقة: العنصر الجديد يُضاف ولا يستبدل ما قبله
+  if(M.st.lesson&&M.st.blocks.length&&M.st.blocks.every(b=>b.step>=3)&&!/جديد|درس|خطوه|بالخطوات/.test(t))M.st.lesson=false;
   return false;
 }
-const fix=raw=>String(raw).replace(/(^|\s)[اإ]مح[يو]?(?=\s|$)/g,'$1امسح');
+const fix=raw=>{
+  let r=String(raw).replace(/(^|\s)[اإ]مح[يو]?(?=\s|$)/g,'$1امسح');const t=norm(r);
+  // فوق مشهد أو خلفية: أول عنصر يُضاف بحجم المشهد ولا يُرسم كدرس يملأ اللوحة
+  if((place||M.st.bg)&&!M.st.blocks.length&&!ERASE.test(t)&&!OTHERVERB.test(t)&&!CARDW.test(t)&&!TALK.test(t)&&M.findScenes(M.normalize(r)).length)
+    r='اضف '+r.replace(/(^|\s)[وف]?(?:[اأ]رسم\S*|نرسم|سوي\S*)(?=\s|$)/g,' ').trim();
+  return r;
+};
 document.addEventListener('click',e=>{
   const x=e.target.closest('[data-close]');if(x){closeArtist();return;}
   const r=e.target.closest('[data-a]');if(r){showArtist(ARTISTS.find(a=>a.id===r.dataset.a));return;}
   if(e.target.closest('#xPic'))closePic();
   if(e.target.closest('#xBoard'))closeBoard();
 });
-M.setExt({pre,fix,resolve,clear(){closeAll();closePlace();}});
+M.setExt({pre,fix,resolve,pro,stop:stopTalk,topic(){closeAll();closePlace();},clear(){closeAll();closePlace();}});
 window.__xt={pre,PLACES,objs,get place(){return place;},shown};
-})({scenes,questions,st,normalize,findScenes,findTopic,openTopic,TOPICS,showHeard,svg,setExt:x=>{XT=x}});
+})({scenes,questions,st,normalize,findScenes,findTopic,openTopic,TOPICS,showHeard,svg,setBg,meta,SCENE_TOPIC,speakThen,pushHistory,removeBlock,render,setExt:x=>{XT=x}});
 
 window.__qaTest={VERSION,scenes,questions,st,normalize,runCommand,drawScene,addElement,setStep,nextStep,fullDrawing,stopAnimation,timer,render,undo,findScenes,rectOf,createConcept,startQuiz,answerQuiz,studentMode,redrawStudent,handwriting,micHelp,testAudioInput,stopAudioTest,toggleMic,sceneMenu,help,addCards,removeCards,lightCards,showHeard,renderCards,setTool,openTopic,closeTopic,TOPICS,findTopic,ambient,fixHeard};
 $('#xMore').addEventListener('click',()=>$('#toolbar').classList.toggle('xfull'));
