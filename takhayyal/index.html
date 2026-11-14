@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تخيّل أنك في المكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* عالم بصري واحد: خلفية عنابية، لوحة المشهد في الوسط، كل شيء آخر صغير وهادئ */
+  --maroon:#5c0f26; --maroon-deep:#33061a; --sand:#e8cfa1; --gold:#e2b24c;
+  --paper:#f6ecd8; --ink:#2a1414; --teal:#1f6f78;
+  --display:"Reem Kufi","Tajawal",Tahoma,sans-serif;
+  --body:"Tajawal",Tahoma,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(120% 90% at 50% 0%,var(--maroon) 0%,var(--maroon-deep) 100%);color:var(--paper);font-family:var(--body);overflow:hidden}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.app{height:100%;display:flex;flex-direction:column;gap:8px;padding:10px 16px 12px}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;min-height:2.6em}
+.top h1{font-family:var(--display);font-weight:700;color:var(--gold);font-size:clamp(20px,3.2vw,40px);margin:0;text-wrap:balance}
+.cap{font-size:clamp(15px,2vw,26px);color:var(--sand);flex:1;min-width:200px}
+.cap b{color:#fff}
+
+.stage{position:relative;flex:1;min-height:0;border-radius:18px;overflow:hidden;background:rgba(0,0,0,.18)}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.layer{opacity:0;transform:translateY(18px);transition:opacity .9s ease,transform .9s ease}
+.layer.on{opacity:1;transform:none}
+.leaf,.petal,.heart,.geo-fill{transition:fill .9s ease}
+
+/* الزخرفة النباتية: خطوط أولاً ثم ألوان */
+.leaf{fill:#f6ecd8;stroke:#2f6b3a;stroke-width:2.5}
+.petal{fill:#f6ecd8;stroke:#8a1538;stroke-width:2.5}
+.heart{fill:#f6ecd8;stroke:#8a1538;stroke-width:2.5}
+.has-colour .leaf{fill:#3f8f4f}
+.has-colour .petal{fill:#c2415a}
+.has-colour .heart{fill:#e2b24c}
+
+.home{position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:16px;align-content:center}
+.home p{grid-column:1/-1;margin:0 0 4px;text-align:center;font-size:clamp(16px,2.2vw,28px);color:var(--sand)}
+.place{border:2px solid rgba(226,178,76,.55);background:rgba(246,236,216,.07);border-radius:16px;padding:clamp(14px,3vw,34px) 12px;text-align:center}
+.place:hover{background:rgba(246,236,216,.14)}
+.place strong{display:block;font-family:var(--display);font-size:clamp(20px,3.4vw,44px);color:#fff}
+.place span{display:block;margin-top:6px;font-size:clamp(13px,1.6vw,20px);color:var(--sand)}
+
+.cards{position:absolute;top:12px;inset-inline:12px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;pointer-events:none;max-height:calc(100% - 24px);overflow:auto}
+.card{pointer-events:auto;width:min(360px,100%);border-radius:16px;padding:14px 16px;background:var(--paper);color:var(--ink);box-shadow:0 10px 28px rgba(0,0,0,.4);border:0;text-align:start;animation:pop .45s ease;transition:background .5s,color .5s}
+.card .n{font-family:var(--display);font-size:15px;opacity:.75}
+.card .q{font-size:clamp(17px,1.9vw,25px);font-weight:700;margin:4px 0 0;line-height:1.5}
+.card .a{margin:10px 0 0;padding-top:10px;border-top:2px dashed currentColor;font-size:clamp(16px,1.7vw,22px);line-height:1.5;display:none}
+.card.open .a{display:block}
+.card.open{box-shadow:0 0 0 4px var(--gold),0 10px 28px rgba(0,0,0,.4)}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+
+.heard{min-height:1.9em;text-align:center;font-size:clamp(17px,2.3vw,30px);font-weight:500;color:#fff}
+.heard.partial{color:var(--sand);opacity:.8}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{border:1.5px solid rgba(232,207,161,.45);background:transparent;border-radius:999px;padding:4px 14px;font-size:clamp(13px,1.4vw,18px);color:var(--sand)}
+.chip.on{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700}
+
+.bar{display:flex;gap:8px;align-items:center}
+.mic{flex:none;width:52px;height:52px;border-radius:50%;border:2px solid var(--gold);background:transparent;display:grid;place-items:center}
+.mic svg{width:24px;height:24px;fill:var(--gold)}
+.mic.live{background:var(--gold);animation:pulse 1.6s infinite}
+.mic.live svg{fill:var(--maroon-deep)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(226,178,76,.6)}100%{box-shadow:0 0 0 16px rgba(226,178,76,0)}}
+.bar input{flex:1;min-width:0;height:46px;border-radius:999px;border:1.5px solid rgba(232,207,161,.4);background:rgba(0,0,0,.2);padding:0 18px;font-size:16px}
+.bar input::placeholder{color:rgba(232,207,161,.6)}
+.btn{flex:none;height:46px;border-radius:999px;border:1.5px solid rgba(232,207,161,.4);background:transparent;padding:0 16px;font-size:15px;color:var(--sand)}
+.note{font-size:14px;color:var(--sand);text-align:center;min-height:1.2em}
+
+.help{position:absolute;inset:0;background:rgba(51,6,26,.96);padding:18px 20px;overflow:auto;display:none;z-index:5}
+.help.show{display:block}
+.help h2{font-family:var(--display);color:var(--gold);margin:0 0 8px;font-size:24px}
+.help dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:clamp(15px,1.6vw,20px);line-height:1.6}
+.help dt{color:#fff;font-weight:700}
+.help dd{margin:0;color:var(--sand)}
+@media (max-width:520px){.home{grid-template-columns:1fr}.help dl{grid-template-columns:1fr}.btn{padding:0 12px}}
+@media (prefers-reduced-motion:reduce){.layer,.card,.mic.live{transition:none;animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <h1 id="title">تخيّل أنك في المكان</h1>
+    <div class="cap" id="cap">قل اسم المكان، ثم اذكر التفاصيل وهي تظهر أمام الطلاب.</div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="home" id="home"></div>
+    <div id="scene"></div>
+    <div class="cards" id="cards" aria-live="polite"></div>
+    <div class="help" id="help">
+      <h2>الأوامر الصوتية</h2>
+      <dl>
+        <dt>سوق واقف · قلعة الزبارة · الزخارف الهندسية · الزخارف النباتية</dt><dd>ينتقل إلى المكان</dd>
+        <dt>اسم أي تفصيل من الشريط السفلي</dt><dd>يُظهره على اللوحة</dd>
+        <dt>التالي</dt><dd>يُظهر التفصيل التالي بالترتيب</dd>
+        <dt>كل التفاصيل</dt><dd>يُظهر المشهد كاملاً</dd>
+        <dt>من جديد</dt><dd>يُخفي التفاصيل ويبدأ المشهد من أوله</dd>
+        <dt>سؤال · زيد بطاقة · ثلاث أسئلة</dt><dd>يضيف بطاقات أسئلة عن المكان</dd>
+        <dt>احذف بطاقة · احذف البطاقة الثانية · احذف كل البطاقات</dt><dd>يحذف</dd>
+        <dt>لوّن البطاقة أخضر · لوّن البطاقة الأولى ذهبي</dt><dd>يغيّر لون البطاقة</dd>
+        <dt>الجواب · جواب البطاقة الثانية</dt><dd>يكشف الإجابة</dd>
+        <dt>الرئيسية</dt><dd>يعود إلى اختيار المكان</dd>
+      </dl>
+      <p style="color:var(--sand)">بدون صوت: اضغط على اللوحة لإظهار التفصيل التالي، أو اكتب الأمر في الخانة.</p>
+      <button class="btn" id="helpClose" type="button">إغلاق</button>
+    </div>
+  </div>
+
+  <div class="heard" id="heard" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <div class="bar">
+    <button class="mic" id="mic" type="button" aria-label="تشغيل الميكروفون أو إيقافه"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15zm6-3.5a1 1 0 0 0-2 0 4 4 0 0 1-8 0 1 1 0 0 0-2 0 6 6 0 0 0 5 5.9V20H8.5a1 1 0 0 0 0 2h7a1 1 0 0 0 0-2H13v-2.6a6 6 0 0 0 5-5.9z"/></svg></button>
+    <form id="form" style="flex:1;display:flex;min-width:0"><input id="typed" type="text" autocomplete="off" placeholder="أو اكتب الأمر هنا ثم Enter" aria-label="اكتب الأمر"></form>
+    <button class="btn" id="homeBtn" type="button">الأماكن</button>
+    <button class="btn" id="helpBtn" type="button">الأوامر</button>
+  </div>
+  <div class="note" id="note">اضغط زر الميكروفون مرة واحدة ثم ابدأ الشرح.</div>
+</div>
+
+<script>
+"use strict";
+/* ---------- أدوات ---------- */
+const $ = id => document.getElementById(id);
+const norm = s => String(s).normalize('NFC')
+  .replace(/[ً-ْٰـ]/g,'')
+  .replace(/[أإآٱ]/g,'ا').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ء/g,'')
+  .replace(/ة/g,'ه').replace(/ى/g,'ي')
+  .replace(/[^؀-ۿ0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+const P = (cx,cy,R,deg) => [cx+R*Math.cos(deg*Math.PI/180), cy+R*Math.sin(deg*Math.PI/180)];
+const poly = pts => pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+const L = (id,inner) => `<g class="layer" data-l="${id}">${inner}</g>`;
+const SVG = inner => `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="img">${inner}</svg>`;
+
+/* ---------- مشهد سوق واقف ---------- */
+function drawSouq(){
+  const B=[{x:60,y:330,w:380,c:'#d9b88a'},{x:440,y:260,w:330,c:'#cfa977'},{x:770,y:360,w:360,c:'#dcc097'},{x:1130,y:290,w:410,c:'#c9a06c'}];
+  const base=710;
+  let s=`<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a3e"/><stop offset=".55" stop-color="#b8563f"/><stop offset="1" stop-color="#f3b56c"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffe29a" stop-opacity=".95"/><stop offset="1" stop-color="#ffe29a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1600" height="720" fill="url(#sky)"/>
+  <circle cx="1280" cy="650" r="95" fill="#ffd9a0" opacity=".75"/>
+  <rect y="${base}" width="1600" height="190" fill="#a87a4f"/>`;
+  for(let i=0;i<5;i++) s+=`<line x1="0" x2="1600" y1="${base+30+i*36}" y2="${base+30+i*36}" stroke="#8f6540" stroke-width="2" opacity=".5"/>`;
+
+  // المئذنة اللولبية (خلف المباني)
+  let m=`<polygon points="905,420 995,420 968,120 932,120" fill="#ead9b8"/>`;
+  for(let i=0;i<9;i++){const y=390-i*30,w=45-i*2.9;m+=`<line x1="${950-w}" y1="${y}" x2="${950+w}" y2="${y-16}" stroke="#b79a6c" stroke-width="7" stroke-linecap="round"/>`;}
+  m+=`<rect x="938" y="92" width="24" height="30" fill="#ead9b8"/><path d="M934 94 Q950 62 966 94Z" fill="#d9a441"/><line x1="950" y1="70" x2="950" y2="48" stroke="#d9a441" stroke-width="4"/>`;
+  s+=L('minaret',m);
+
+  // الجدران الطينية
+  let w='';
+  B.forEach(b=>{
+    w+=`<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${base-b.y}" fill="${b.c}"/>
+        <rect x="${b.x}" y="${b.y}" width="${b.w}" height="20" fill="#00000022"/>
+        <rect x="${b.x+b.w-26}" y="${b.y}" width="26" height="${base-b.y}" fill="#00000018"/>`;
+    for(let x=b.x+26;x<b.x+b.w-20;x+=46) w+=`<rect x="${x}" y="${b.y+50}" width="11" height="26" rx="3" fill="#5a3a22"/><rect x="${x+11}" y="${b.y+58}" width="8" height="18" fill="#00000022"/>`;
+    for(let i=1;i<4;i++) w+=`<line x1="${b.x+14}" x2="${b.x+b.w-40}" y1="${b.y+90+i*70}" y2="${b.y+90+i*70}" stroke="#00000012" stroke-width="3"/>`;
+  });
+  s+=L('walls',w);
+
+  // الأبواب والنوافذ
+  let d='';
+  B.forEach((b,i)=>{
+    const dx=b.x+b.w/2-45;
+    d+= i%2 ? `<path d="M${dx} ${base} V590 Q${dx+45} 520 ${dx+90} 590 V${base}Z" fill="#6b4226" stroke="#3d2412" stroke-width="5"/>`
+            : `<rect x="${dx}" y="540" width="90" height="170" fill="#6b4226" stroke="#3d2412" stroke-width="5"/>`;
+    d+=`<line x1="${dx+45}" x2="${dx+45}" y1="${i%2?560:540}" y2="${base}" stroke="#3d2412" stroke-width="3"/>`;
+    for(let r=0;r<3;r++) for(const cx of [dx+22,dx+68]) d+=`<circle cx="${cx}" cy="${615+r*32}" r="4.5" fill="#d9a441"/>`;
+    for(const wx of [b.x+50,b.x+b.w-130]){
+      d+=`<rect x="${wx}" y="${b.y+115}" width="72" height="95" fill="#4a2d18" stroke="#3d2412" stroke-width="4"/>`;
+      for(let k=1;k<5;k++) d+=`<line x1="${wx+4}" x2="${wx+68}" y1="${b.y+115+k*19}" y2="${b.y+115+k*19}" stroke="#7a5230" stroke-width="3"/>`;
+      d+=`<line x1="${wx+36}" x2="${wx+36}" y1="${b.y+115}" y2="${b.y+210}" stroke="#3d2412" stroke-width="3"/>`;
+    }
+  });
+  s+=L('doors',d);
+
+  // الدكاكين والتوابل
+  let sh='';
+  [B[0],B[2]].forEach(b=>{
+    const x0=b.x+30,x1=b.x+b.w-30,n=8,sw=(x1-x0)/n;
+    for(let k=0;k<n;k++) sh+=`<polygon points="${x0+k*sw},470 ${x0+(k+1)*sw},470 ${x0+(k+1)*sw+ (k+1-n/2)*4},528 ${x0+k*sw+(k-n/2)*4},528" fill="${k%2?'#f1e2c4':'#8a1538'}"/>`;
+    const c=b.x+b.w/2, cols=['#e0a526','#b5321f','#6b4a2a','#5f8a3a'];
+    [c-150,c-80,c+80,c+150].forEach((cx,k)=>{
+      sh+=`<ellipse cx="${cx}" cy="772" rx="38" ry="34" fill="#c9ad84" stroke="#8f7450" stroke-width="3"/><ellipse cx="${cx}" cy="746" rx="31" ry="13" fill="${cols[k]}"/>`;
+    });
+  });
+  s+=L('shops',sh);
+
+  // الفوانيس
+  let ln='';
+  B.forEach(b=>{
+    for(const lx of [b.x+48,b.x+b.w-48]){
+      ln+=`<line x1="${lx}" y1="${b.y+76}" x2="${lx}" y2="${b.y+140}" stroke="#3d2412" stroke-width="3"/>
+           <circle cx="${lx}" cy="${b.y+160}" r="62" fill="url(#glow)"/>
+           <path d="M${lx-12} ${b.y+140} h24 l5 26 l-17 13 l-17 -13z" fill="#ffd77a" stroke="#7a4a1c" stroke-width="3"/>`;
+    }
+    ln+=`<ellipse cx="${b.x+b.w/2}" cy="${base+26}" rx="120" ry="20" fill="#ffe29a" opacity=".28"/>`;
+  });
+  s+=L('lanterns',ln);
+  return SVG(s);
+}
+
+/* ---------- مشهد قلعة الزبارة ---------- */
+function cren(x,y,w,c){let s='';for(let i=x;i<x+w-20;i+=52)s+=`<rect x="${i}" y="${y-24}" width="28" height="26" fill="${c}"/>`;return s;}
+function palm(x,by,h){
+  let s=`<path d="M${x} ${by} Q${x+18} ${by-h/2} ${x+6} ${by-h}" stroke="#7a5230" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+  const tx=x+6,ty=by-h;
+  [[-120,-10],[-90,-70],[-40,-100],[40,-100],[90,-70],[120,-10],[0,-115]].forEach(([dx,dy])=>{
+    s+=`<path d="M${tx} ${ty} Q${tx+dx*.5} ${ty+dy-40} ${tx+dx} ${ty+dy+45}" stroke="#2f6b3a" stroke-width="9" fill="none" stroke-linecap="round"/>`;
+  });
+  return s;
+}
+function drawZubarah(){
+  let s=`<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6bb7e2"/><stop offset="1" stop-color="#f6e2b8"/></linearGradient>
+    <linearGradient id="round" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b08e62"/><stop offset=".45" stop-color="#ead0a6"/><stop offset="1" stop-color="#b08e62"/></linearGradient>
+  </defs>
+  <rect width="1600" height="740" fill="url(#sky)"/>
+  <circle cx="1380" cy="130" r="70" fill="#fff3c4"/>
+  <path d="M0 700 Q400 640 800 700 T1600 690 V740 H0Z" fill="#ecd3a3"/>
+  <rect y="730" width="1600" height="170" fill="#e3c48f"/>`;
+
+  s+=L('walls',`<rect x="540" y="440" width="520" height="290" fill="#d8b98c"/><rect x="540" y="440" width="520" height="16" fill="#00000018"/>${cren(540,440,520,'#d8b98c')}
+     <ellipse cx="800" cy="734" rx="330" ry="14" fill="#00000022"/>`);
+  s+=L('towers',`<rect x="350" y="370" width="190" height="360" fill="url(#round)"/><ellipse cx="445" cy="370" rx="95" ry="15" fill="#ead0a6"/>${cren(350,366,190,'#c9a878')}
+     <rect x="1060" y="350" width="190" height="380" fill="#cdab7c"/><rect x="1210" y="350" width="40" height="380" fill="#00000020"/>${cren(1060,350,190,'#cdab7c')}`);
+  let g=`<path d="M736 730 V588 Q800 520 864 588 V730Z" fill="#f1e2c4"/><path d="M746 730 V592 Q800 534 854 592 V730Z" fill="#6b4226"/><line x1="800" y1="560" x2="800" y2="730" stroke="#3d2412" stroke-width="4"/>`;
+  for(let r=0;r<4;r++) for(const cx of [770,830]) g+=`<circle cx="${cx}" cy="${610+r*30}" r="4.5" fill="#d9a441"/>`;
+  s+=L('gate',g);
+  let sl='';
+  [[600,500],[680,500],[920,500],[1000,500],[440,460],[440,580],[1150,450],[1150,570]].forEach(([x,y])=>{sl+=`<rect x="${x}" y="${y}" width="11" height="48" rx="3" fill="#5b4027"/>`;});
+  s+=L('slits',sl);
+  let teeth='1155,200 1187,200';
+  for(let i=0;i<9;i++) teeth+=` 1203,${(200+(i+.5)*66/9).toFixed(1)} 1187,${(200+(i+1)*66/9).toFixed(1)}`;
+  teeth+=' 1155,266';
+  s+=L('flag',`<line x1="1155" y1="330" x2="1155" y2="192" stroke="#4a3320" stroke-width="6"/><rect x="1155" y="200" width="150" height="66" fill="#8a1538"/><polygon points="${teeth}" fill="#fff"/>`);
+  s+=L('desert',`${palm(170,760,250)}${palm(270,770,170)}${palm(1430,765,230)}<path d="M0 790 Q300 730 620 800 T1220 790 T1600 780 V900 H0Z" fill="#d2ae76"/>
+     <path d="M90 840 q20 -30 40 0 q20 -26 40 0" stroke="#7d8a4a" stroke-width="6" fill="none"/><path d="M1300 850 q20 -30 40 0 q20 -26 40 0" stroke="#7d8a4a" stroke-width="6" fill="none"/>`);
+  s+=L('info',`<g font-family="Reem Kufi, Tajawal, sans-serif" text-anchor="middle">
+     <circle cx="640" cy="170" r="84" fill="#8a1538"/><text x="640" y="186" font-size="50" fill="#fff">1938</text><text x="640" y="296" font-size="34" fill="#4a2d18" direction="rtl">سنة البناء</text>
+     <circle cx="900" cy="170" r="84" fill="#1f6f78"/><text x="900" y="186" font-size="50" fill="#fff">2013</text><text x="900" y="296" font-size="34" fill="#4a2d18" direction="rtl">تراث عالمي · اليونسكو</text></g>`);
+  return SVG(s);
+}
+
+/* ---------- مشهد الزخرفة الهندسية ---------- */
+function star8(cx,cy,R,rot=0){const pts=[];for(let k=0;k<16;k++)pts.push(P(cx,cy,k%2?R*.7654:R,rot+k*22.5));return poly(pts);}
+function ngon(cx,cy,R,n,rot){const pts=[];for(let k=0;k<n;k++)pts.push(P(cx,cy,R,rot+k*360/n));return poly(pts);}
+function drawGeo(){
+  const cx=800,cy=450,R=270;
+  const tiles=[];for(const x of [160,320,1280,1440])for(const y of [130,290,450,610,770])tiles.push([x,y]);
+  let col=`<polygon class="geo-fill" points="${star8(cx,cy,R)}" fill="#d9a441"/><polygon points="${ngon(cx,cy,R*.7654,8,22.5)}" fill="#1f6f78"/><polygon points="${star8(cx,cy,R*.42)}" fill="#f4ead6"/><circle cx="${cx}" cy="${cy}" r="34" fill="#8a1538"/>`;
+  tiles.forEach(([x,y],i)=>{col+=`<polygon points="${star8(x,y,70)}" fill="${i%2?'#1f6f78':'#8a1538'}"/><circle cx="${x}" cy="${y}" r="16" fill="#d9a441"/>`;});
+  let rep='';
+  tiles.forEach(([x,y])=>{rep+=`<polygon points="${star8(x,y,70)}" fill="none" stroke="#2a1414" stroke-width="4"/>`;});
+  for(const x of [240,1360])for(const y of [210,370,530,690])rep+=`<polygon points="${ngon(x,y,24,4,0)}" fill="none" stroke="#2a1414" stroke-width="4"/>`;
+  let s=`<rect x="40" y="30" width="1520" height="840" rx="26" fill="#f4ead6"/><rect x="62" y="52" width="1476" height="796" rx="16" fill="none" stroke="#d9a441" stroke-width="4"/>`;
+  s+=L('colour',col);
+  s+=L('circle',`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#1f6f78" stroke-width="6"/><line x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="#1f6f78" stroke-width="2" stroke-dasharray="10 10"/><line x1="${cx}" y1="${cy-R}" x2="${cx}" y2="${cy+R}" stroke="#1f6f78" stroke-width="2" stroke-dasharray="10 10"/><circle cx="${cx}" cy="${cy}" r="8" fill="#1f6f78"/>`);
+  s+=L('square',`<polygon points="${ngon(cx,cy,R,4,45)}" fill="none" stroke="#8a1538" stroke-width="7" stroke-linejoin="round"/>`);
+  s+=L('star',`<polygon points="${ngon(cx,cy,R,4,0)}" fill="none" stroke="#c2701f" stroke-width="7" stroke-linejoin="round"/><polygon points="${star8(cx,cy,R)}" fill="none" stroke="#2a1414" stroke-width="10" stroke-linejoin="round"/>`);
+  s+=L('repeat',rep);
+  return SVG(s);
+}
+
+/* ---------- مشهد الزخرفة النباتية ---------- */
+function spiral(cx,cy,r0,turns){
+  const pts=[],N=90;
+  for(let i=0;i<=N;i++){const t=i/N,r=r0*(1-.86*t),a=-t*turns*2*Math.PI;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
+  return pts;
+}
+function flower(cx,cy,r){
+  let s='';
+  for(let k=0;k<6;k++) s+=`<ellipse class="petal" cx="${cx}" cy="${cy-r*.58}" rx="${r*.3}" ry="${r*.5}" transform="rotate(${k*60} ${cx} ${cy})"/>`;
+  return s+`<circle class="heart" cx="${cx}" cy="${cy}" r="${r*.26}"/>`;
+}
+function drawFloral(){
+  const sp=[spiral(960,680,110,1.9),spiral(930,450,100,1.9),spiral(880,250,70,1.7)];
+  let stem=`<path d="M800 850 C900 850 1070 800 1070 680 C1070 600 1030 530 1030 450 C1030 380 950 320 950 250" fill="none" stroke="#2f6b3a" stroke-width="8" stroke-linecap="round"/><line x1="800" y1="850" x2="800" y2="225" stroke="#2f6b3a" stroke-width="8" stroke-linecap="round"/>`;
+  let leaves='',flowers='';
+  sp.forEach((pts,j)=>{
+    stem+=`<polyline points="${poly(pts)}" fill="none" stroke="#2f6b3a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const sc=[1,.92,.7][j];
+    [8,20,32,44,58].forEach((i,k)=>{
+      const p=pts[i],q=pts[i+1],ang=Math.atan2(q[1]-p[1],q[0]-p[0])*180/Math.PI+(k%2?60:-60);
+      leaves+=`<path class="leaf" d="M0 0 Q18 -15 42 0 Q18 15 0 0Z" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${sc})"/>`;
+    });
+    const e=pts[pts.length-1];
+    flowers+=flower(e[0],e[1],[34,31,24][j]);
+  });
+  [[800,720,-35],[800,560,-35],[800,400,-35]].forEach(([x,y,a])=>{leaves+=`<path class="leaf" d="M0 0 Q18 -15 42 0 Q18 15 0 0Z" transform="translate(${x} ${y}) rotate(${a})"/>`;});
+  flowers+=flower(800,185,46);
+  const half=L('stem',stem)+L('leaves',leaves)+L('flowers',flowers);
+  let s=`<rect width="1600" height="900" fill="#123c44"/>`;
+  for(let x=60;x<1600;x+=148)for(let y=70;y<900;y+=152)s+=`<polygon points="${star8(x,y,26)}" fill="none" stroke="#1f6f78" stroke-width="3"/>`;
+  s+=L('arch',`<path d="M430 870 V420 Q430 150 800 70 Q1170 150 1170 420 V870Z" fill="#f6ecd8" stroke="#d9a441" stroke-width="16" stroke-linejoin="round"/>
+     <path d="M462 870 V424 Q462 178 800 104 Q1138 178 1138 424 V870" fill="none" stroke="#d9a441" stroke-width="3"/>
+     <rect x="392" y="840" width="90" height="34" fill="#d9a441"/><rect x="1118" y="840" width="90" height="34" fill="#d9a441"/>`);
+  s+=half;
+  s+=L('sym',`<g transform="translate(1600 0) scale(-1 1)">${half}</g>`);
+  s+=L('colour',`<path d="M770 850 h60 l14 26 h-88z" fill="#d9a441"/>`);
+  return SVG(s);
+}
+
+/* ---------- بيانات المشاهد ---------- */
+const SCENES=[
+ {id:'souq',name:'سوق واقف',sub:'جدران الطين والفوانيس',keys:['سوق واقف','السوق'],draw:drawSouq,layers:[
+   {id:'walls',name:'الجدران الطينية',keys:['جدران','جدار','مباني','مبنى','طين','بيوت'],cap:'جدران من الطين والحجر بألوان الرمل، وتبرز منها أطراف عوارض «الدنجل» الخشبية.'},
+   {id:'doors',name:'الأبواب والنوافذ',keys:['ابواب','=باب','نوافذ','شبابيك','خشب'],cap:'أبواب خشبية بمسامير نحاسية ونوافذ بمصاريع. ما الأشكال الهندسية التي تراها؟'},
+   {id:'shops',name:'الدكاكين والتوابل',keys:['دكاكين','دكان','محلات','توابل','بهارات','بضائع'],cap:'مظلات مخططة وأكياس توابل ملوّنة: أصفر الكركم وأحمر الفلفل.'},
+   {id:'lanterns',name:'الفوانيس',keys:['فوانيس','فانوس','اضاءة','انارة','اضواء','مصابيح'],cap:'عند الغروب تضيء الفوانيس فتتحول ألوان الجدران إلى ذهبي دافئ.'},
+   {id:'minaret',name:'المئذنة اللولبية',keys:['مئذنة','منارة','لولبي','الفنار','مسجد'],cap:'خلف السوق ترتفع مئذنة «الفنار» اللولبية. خط حلزوني يصعد نحو السماء.'}],
+  qs:[['من أي مواد بُنيت جدران سوق واقف؟','من الطين والحجر والخشب.'],
+      ['ما الأعمدة الخشبية البارزة أعلى الجدران؟','أطراف عوارض «الدنجل» التي تحمل السقف.'],
+      ['ما الألوان الغالبة على مباني السوق؟','ألوان الرمل والطين الدافئة مع بنّي الخشب.'],
+      ['ما الأشكال الهندسية في الأبواب والنوافذ؟','مستطيلات وأقواس ودوائر صغيرة (المسامير).'],
+      ['كيف يتغيّر لون الجدران عند إضاءة الفوانيس؟','تميل إلى الأصفر والذهبي وتظهر الظلال.']]},
+ {id:'zubarah',name:'قلعة الزبارة',sub:'الأسوار والأبراج',keys:['زبارة','قلعة'],draw:drawZubarah,layers:[
+   {id:'walls',name:'الأسوار',keys:['اسوار','=سور','جدران','جدار'],cap:'أسوار سميكة عالية تعلوها شرفات، ومسقط القلعة مربع الشكل.'},
+   {id:'towers',name:'الأبراج',keys:['ابراج','=برج'],cap:'للقلعة أربعة أبراج: ثلاثة دائرية وواحد مستطيل.'},
+   {id:'gate',name:'البوابة',keys:['بوابة','=باب','مدخل'],cap:'بوابة خشبية واحدة يعلوها قوس.'},
+   {id:'slits',name:'الفتحات',keys:['فتحات','مزاغل','نوافذ','شبابيك'],cap:'فتحات ضيقة طولية في الأسوار والأبراج للمراقبة والحماية.'},
+   {id:'flag',name:'العلم',keys:['=علم','راية'],cap:'علم دولة قطر: عنابي وأبيض بتسعة رؤوس.'},
+   {id:'desert',name:'الصحراء والنخيل',keys:['صحراء','نخيل','نخل','رمال','كثبان'],cap:'القلعة وسط الصحراء شمال غرب قطر، قرب الساحل.'},
+   {id:'info',name:'التاريخ',keys:['يونسكو','تاريخ','بنيت','تراث عالمي'],cap:'بُنيت القلعة عام 1938، وأُدرج موقع الزبارة في قائمة التراث العالمي عام 2013.'}],
+  qs:[['في أي عام بُنيت قلعة الزبارة؟','عام 1938.'],
+      ['كم برجاً للقلعة وما أشكالها؟','أربعة أبراج: ثلاثة دائرية وواحد مستطيل.'],
+      ['ما الشكل الهندسي لمسقط القلعة؟','المربع.'],
+      ['متى أُدرجت الزبارة في قائمة التراث العالمي لليونسكو؟','عام 2013.'],
+      ['لماذا بُنيت الأسوار سميكة وعالية؟','للحماية، ولتبقى القلعة باردة من الداخل.']]},
+ {id:'geo',name:'الزخارف الهندسية',sub:'من الدائرة إلى النجمة',keys:['هندسي'],draw:drawGeo,layers:[
+   {id:'circle',name:'الدائرة',keys:['دائرة','دوائر'],cap:'كل زخرفة هندسية تبدأ بدائرة نرسمها بالفرجار.'},
+   {id:'square',name:'المربع',keys:['مربع'],cap:'نرسم مربعاً رؤوسه على محيط الدائرة.'},
+   {id:'star',name:'النجمة الثمانية',keys:['نجمة','مربعين','مربع ثاني','المربع الثاني'],cap:'مربع ثانٍ مُدار 45 درجة، ومن تقاطع المربعين تظهر النجمة الثمانية.'},
+   {id:'repeat',name:'التكرار',keys:['تكرار','كرر','متكرر'],cap:'نكرر الوحدة الزخرفية بانتظام فتمتلئ المساحة.'},
+   {id:'colour',name:'الألوان',keys:['الوان','تلوين','=لون','نلون','لونها'],cap:'ألوان متبادلة: ذهبي وعنابي وفيروزي.'}],
+  qs:[['ما الأدوات التي نرسم بها الزخرفة الهندسية؟','المسطرة والفرجار.'],
+      ['كيف نرسم النجمة الثمانية؟','بمربعين متقاطعين، أحدهما مُدار 45 درجة.'],
+      ['ما معنى التكرار في الزخرفة؟','إعادة الوحدة الزخرفية نفسها بانتظام.'],
+      ['اذكر ثلاثة أشكال تُبنى منها الزخارف الهندسية.','الدائرة والمربع والمثلث.'],
+      ['أين نشاهد الزخارف الهندسية؟','في المساجد والأبواب والنوافذ والنقوش الجصية.']]},
+ {id:'floral',name:'الزخارف النباتية',sub:'محراب بالسيقان والأزهار',keys:['نباتي','توريق'],draw:drawFloral,layers:[
+   {id:'arch',name:'القوس',keys:['=قوس','محراب','اقواس','=عقد'],cap:'قوس مدبّب مثل محراب المسجد، يحيط بالزخرفة.'},
+   {id:'stem',name:'السيقان',keys:['=ساق','سيقان','غصن','اغصان','فرع','فروع','لولب','حلزون'],cap:'سيقان بخطوط منحنية ولولبية تنمو من الأسفل إلى الأعلى.'},
+   {id:'leaves',name:'الأوراق',keys:['اوراق','ورقة','ورق'],cap:'أوراق تتوزع على جانبي الساق بالتبادل.'},
+   {id:'flowers',name:'الأزهار',keys:['ازهار','زهرة','زهور','ورود','وردة'],cap:'زهرة في قلب كل لولب، وزهرة كبيرة على المحور.'},
+   {id:'sym',name:'التماثل',keys:['تماثل','تناظر','متماثل','متناظر'],cap:'التماثل: النصف الأيسر صورة مرآة للنصف الأيمن حول المحور.'},
+   {id:'colour',name:'الألوان',keys:['الوان','تلوين','=لون','نلون','لونها'],cap:'أخضر للأوراق وأحمر وردي للأزهار وذهبي للقلب.'}],
+  qs:[['ممّ تتكوّن الزخرفة النباتية؟','من سيقان وأوراق وأزهار.'],
+      ['ما الاسم الآخر للزخرفة النباتية؟','التوريق (الأرابيسك).'],
+      ['ما معنى التماثل؟','أن يتطابق نصفا الشكل حول محور في الوسط.'],
+      ['ما نوع الخطوط في الزخرفة النباتية؟','خطوط منحنية ولولبية.'],
+      ['أين نجد الزخارف النباتية؟','في المحاريب والقباب والأبواب وصفحات المصاحف.']]}
+];
+SCENES.forEach(s=>{s.nk=s.keys.map(norm);s.layers.forEach(l=>l.nk=l.keys.map(k=>k[0]==='='?'='+norm(k.slice(1)):norm(k)));});
+
+/* ---------- الحالة والعرض ---------- */
+let cur=null, shown=new Set(), qi=0;
+const cards=[];
+
+function setCap(html){$('cap').innerHTML=html;}
+function goHome(){
+  cur=null;shown.clear();
+  $('scene').innerHTML='';$('home').style.display='';$('chips').innerHTML='';
+  $('title').textContent='تخيّل أنك في المكان';
+  setCap('قل اسم المكان، ثم اذكر التفاصيل وهي تظهر أمام الطلاب.');
+}
+function goScene(s){
+  if(cur===s)return;
+  cur=s;shown.clear();qi=0;
+  $('home').style.display='none';
+  $('scene').innerHTML=s.draw();
+  $('title').textContent=s.name;
+  setCap('أغمض عينيك… تخيّل أنك في <b>'+s.name+'</b>. ماذا ترى؟');
+  $('chips').innerHTML=s.layers.map(l=>`<button class="chip" type="button" data-l="${l.id}">${l.name}</button>`).join('');
+}
+function reveal(l,quiet){
+  if(!cur||shown.has(l.id))return;
+  shown.add(l.id);
+  $('scene').querySelectorAll('[data-l="'+l.id+'"]').forEach(g=>g.classList.add('on'));
+  const svg=$('scene').firstElementChild; if(svg)svg.classList.add('has-'+l.id);
+  const chip=$('chips').querySelector('[data-l="'+l.id+'"]'); if(chip)chip.classList.add('on');
+  if(!quiet)setCap('<b>'+l.name+':</b> '+l.cap);
+}
+function nextLayer(){ if(!cur)return; const l=cur.layers.find(x=>!shown.has(x.id)); if(l)reveal(l); }
+function revealAll(){ if(!cur)return; cur.layers.forEach(l=>reveal(l,true)); setCap('<b>'+cur.name+'</b> كاملاً. صف ما تراه ثم ارسمه.'); }
+function resetScene(){ if(!cur)return; const s=cur;cur=null;goScene(s); }
+
+/* ---------- البطاقات ---------- */
+const COLOURS=[
+ {k:['احمر','حمرا'],bg:'#c0392b',fg:'#fff'},{k:['ازرق','زرقا'],bg:'#1f5f9c',fg:'#fff'},
+ {k:['اخضر','خضرا'],bg:'#2e7d4f',fg:'#fff'},{k:['اصفر','صفرا'],bg:'#f2c94c',fg:'#2a1414'},
+ {k:['ذهبي'],bg:'#d9a441',fg:'#2a1414'},{k:['عنابي'],bg:'#8a1538',fg:'#fff'},
+ {k:['برتقالي'],bg:'#e07b2e',fg:'#2a1414'},{k:['بنفسجي'],bg:'#6b3fa0',fg:'#fff'},
+ {k:['ابيض','بيضا'],bg:'#f6ecd8',fg:'#2a1414'}];
+const ORD=['الاولي','الثانيه','الثالثه','الرابعه','الخامسه','السادسه','السابعه','الثامنه'];
+function pool(){return cur?cur.qs:SCENES.flatMap(s=>s.qs);}
+function renderCards(){
+  $('cards').innerHTML=cards.map((c,i)=>`<button type="button" class="card${c.open?' open':''}" data-i="${i}" style="background:${c.col.bg};color:${c.col.fg}"><span class="n">بطاقة ${i+1}</span><p class="q">${c.q}</p><p class="a">${c.a}</p></button>`).join('');
+}
+function addCards(n){
+  const p=pool();
+  for(let k=0;k<n&&cards.length<8;k++){
+    let tries=0,q;
+    do{q=p[qi%p.length];qi++;tries++;}while(cards.some(c=>c.q===q[0])&&tries<p.length);
+    if(cards.some(c=>c.q===q[0]))break;
+    cards.push({q:q[0],a:q[1],open:false,col:COLOURS[8],ci:8});
+  }
+  renderCards();
+}
+function pick(i){return i==null?cards.length-1:Math.min(i,cards.length-1);}
+function removeCard(i){if(!cards.length)return;cards.splice(pick(i),1);renderCards();}
+function colourCard(i,col){
+  if(!cards.length)return;const c=cards[pick(i)];
+  if(col){c.col=col;c.ci=COLOURS.indexOf(col);}else{c.ci=(c.ci+1)%COLOURS.length;c.col=COLOURS[c.ci];}
+  renderCards();
+}
+function openCard(i){
+  if(!cards.length)return;
+  let j=i==null?cards.findIndex(c=>!c.open):pick(i); if(j<0)j=cards.length-1;
+  cards[j].open=true;renderCards();
+}
+function countIn(tokens){
+  const d=tokens.find(t=>/^\d+$/.test(t)); if(d)return Math.min(8,+d);
+  const m=[['سوالين',2],['بطاقتين',2],['اثنين',2],['ثلاث',3],['اربع',4],['خمس',5]];
+  for(const [w,n] of m) if(tokens.some(t=>t.startsWith(w)))return n;
+  if(tokens.includes('ست')||tokens.includes('سته'))return 6;
+  return 0;
+}
+const CARD_RE=/بطاق|سوال|اسيل|جواب|اجاب/;
+function cardCmd(t,tokens){
+  const has=(...ks)=>ks.some(k=>t.includes(k));
+  let idx=null; ORD.forEach((o,i)=>{if(t.includes(o))idx=i;}); if(t.includes('الاخيره'))idx=null;
+  if(has('احذف','امسح','شيل','ازل','الغ')){
+    if(tokens.includes('كل')||has('البطاقات','الاسيله','جميع')){cards.length=0;renderCards();}else removeCard(idx);
+    return;
+  }
+  if(has('لون')){const col=COLOURS.find(c=>c.k.some(k=>t.includes(k)));colourCard(idx,col);return;}
+  if(has('جواب','اجاب')){openCard(idx);return;}
+  addCards(countIn(tokens)||(has('اسيله','بطاقات')?3:1));
+}
+
+/* ---------- فهم الكلام ---------- */
+const hit=(t,tokens,k)=>k[0]==='='?(tokens.includes(k.slice(1))||tokens.includes('ال'+k.slice(1))):t.includes(k);
+function sceneCmd(t){
+  let best=null,pos=-1;
+  SCENES.forEach(s=>s.nk.forEach(k=>{const p=t.lastIndexOf(k);if(p>pos){pos=p;best=s;}}));
+  if(best){ if(best!==cur)goScene(best); t=t.slice(pos); }
+  if(!cur)return;
+  const tokens=t.split(' ');
+  if(t.includes('كل التفاصيل')||t.includes('اظهر الكل')||t.includes('الرسمه كامله')){revealAll();return;}
+  cur.layers.forEach(l=>{ if(l.nk.some(k=>hit(t,tokens,k))) reveal(l); });
+}
+let lastFinal='';
+function hear(raw,final){
+  const h=$('heard');h.textContent=raw;h.classList.toggle('partial',!final);
+  const t=norm(raw); if(!t)return;
+  const tokens=t.split(' ');
+  if(CARD_RE.test(t)){ if(final)cardCmd(t,tokens); return; }
+  if(final){
+    if(t.includes('الرييسيه')||t.includes('الاماكن')){goHome();return;}
+    if(t.includes('من جديد')||t.includes('امسح الشاشه')){resetScene();return;}
+    if(tokens.includes('التالي')){nextLayer();return;}
+  }
+  sceneCmd(t);
+}
+
+/* ---------- الميكروفون ---------- */
+let want=false, dict=null, rec=null;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function micUI(on,msg){$('mic').classList.toggle('live',on);if(msg!=null)$('note').textContent=msg;}
+function setupRec(){
+  rec=new SR();rec.lang='ar-QA';rec.continuous=true;rec.interimResults=true;
+  rec.onresult=e=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const r=e.results[i];
+      if(r.isFinal)hear(r[0].transcript,true);else interim+=r[0].transcript;
+    }
+    if(interim)hear(interim,false);
+  };
+  rec.onstart=()=>micUI(true,'أسمعك… تكلّم واشرح.');
+  rec.onerror=e=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){want=false;micUI(false,'الميكروفون غير مسموح هنا. افتح الصفحة في Chrome واسمح بالميكروفون، أو استخدم الكتابة واللمس.');}
+  };
+  rec.onend=()=>{ if(want)setTimeout(()=>{try{rec.start();}catch(_){}} ,250); else micUI(false,'الميكروفون متوقف. اضغط الزر للمتابعة.'); };
+}
+if(window.claude&&typeof window.claude.use==='function'){
+  window.claude.use('dictation').then(d=>{
+    if(!d)return; dict=d;
+    d.onPartial(({text})=>hear(text,false));
+    d.onFinal(({text})=>hear(text,true));
+    d.onState(({state,reason})=>{
+      if(state==='listening'){micUI(true,'أسمعك… تكلّم واشرح.');return;}
+      if(state==='idle'){
+        if(want&&reason!=='viewer_stopped'&&reason!=='stopped'){
+          d.start().catch(()=>{want=false;micUI(false,'توقف الاستماع. اضغط زر الميكروفون للمتابعة.');});
+        }else{want=false;micUI(false,'الميكروفون متوقف. اضغط الزر للمتابعة.');}
+      }
+    });
+  }).catch(()=>{});
+}
+$('mic').addEventListener('click',()=>{
+  if(dict){
+    if(want){want=false;dict.stop().catch(()=>{});}
+    else{want=true;dict.start().catch(()=>{want=false;micUI(false,'لم يُسمح بالميكروفون. استخدم الكتابة أو اللمس.');});}
+    return;
+  }
+  if(!SR){micUI(false,'التعرّف على الصوت يعمل في متصفح Chrome. الآن يمكنك الكتابة أو اللمس.');return;}
+  if(!rec)setupRec();
+  if(want){want=false;try{rec.stop();}catch(_){}}
+  else{want=true;try{rec.start();}catch(_){}}
+});
+
+/* ---------- اللمس والكتابة ---------- */
+$('home').innerHTML='<p>قل اسم المكان أو اضغط عليه</p>'+SCENES.map(s=>`<button class="place" type="button" data-s="${s.id}"><strong>${s.name}</strong><span>${s.sub}</span></button>`).join('');
+$('home').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)goScene(SCENES.find(s=>s.id===b.dataset.s));});
+$('chips').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(b&&cur)reveal(cur.layers.find(l=>l.id===b.dataset.l));});
+$('scene').addEventListener('click',nextLayer);
+$('cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(b){const c=cards[+b.dataset.i];c.open=!c.open;renderCards();}});
+$('form').addEventListener('submit',e=>{e.preventDefault();const v=$('typed').value.trim();if(v){hear(v,true);$('typed').value='';}});
+$('homeBtn').addEventListener('click',goHome);
+$('helpBtn').addEventListener('click',()=>$('help').classList.toggle('show'));
+$('helpClose').addEventListener('click',()=>$('help').classList.remove('show'));
+document.addEventListener('keydown',e=>{
+  if(e.target===$('typed'))return;
+  if(e.key==='ArrowLeft'||e.key==='PageDown'){nextLayer();e.preventDefault();}
+});
+goHome();
+</script>
+</body>
+</html>
