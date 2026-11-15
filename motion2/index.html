@@ -61,10 +61,14 @@ button{cursor:pointer}
 .pal{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center}
 .pal span{display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,.28);border-radius:999px;padding:4px 16px 4px 6px;animation:pop .45s ease backwards;font-size:.9em}
 .pal i{width:1.5em;height:1.5em;border-radius:50%;border:2px solid #fff;display:block}
-.art{display:flex;gap:14px;justify-content:center;align-items:flex-end;flex-wrap:wrap}
-.art figure{margin:0;animation:pop .5s ease}
-.art img{max-height:46vh;max-width:min(44vw,640px);border-radius:10px;border:6px solid var(--paper);box-shadow:0 14px 40px rgba(0,0,0,.5);display:block}
-.art figcaption{font-size:clamp(12px,1.4vw,17px);color:var(--sand);margin-top:4px}
+.art{position:relative;display:grid;place-items:center}
+.art::after{content:attr(data-n);position:absolute;top:8px;inset-inline-end:8px;background:rgba(40,5,18,.8);color:#fff;border-radius:999px;padding:1px 12px;font-size:clamp(12px,1.5vw,18px);font-variant-numeric:tabular-nums}
+.art[data-n=""]::after{display:none}
+.art figure{margin:0;display:none}
+.art figure.on{display:block;animation:pop .5s ease}
+.art img{max-height:52vh;max-width:min(88vw,900px);border-radius:10px;border:6px solid var(--paper);box-shadow:0 14px 40px rgba(0,0,0,.5);display:block}
+.art figcaption{font-size:clamp(13px,1.6vw,20px);color:var(--sand);margin-top:6px;text-align:center}
+.afacts{margin:0;padding:clamp(10px,2vh,22px) clamp(28px,4vw,54px) clamp(10px,2vh,22px) clamp(14px,2vw,28px);text-align:start;background:var(--paper);color:var(--ink);border-radius:22px;font-size:clamp(15px,2vw,26px);line-height:1.7;font-weight:700;max-width:min(92vw,1000px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
 .alink{color:var(--gold);font-weight:700;font-size:clamp(14px,1.8vw,22px)}
 #timer{position:fixed;top:14px;inset-inline-start:14px;z-index:7;width:clamp(96px,16vh,170px);aspect-ratio:1;display:none;place-items:center}
 #timer.show{display:grid}
@@ -243,25 +247,27 @@ const PERSP1={k:'p1',id:'p1',title:'منظور النقطة الواحدة',fact
  ['black','اسود سوداء سودا'],['white','ابيض بيضاء بيضا'],['pink','وردي ورديه زهري'],['maroon','عنابي'],['gold','ذهبي ذهبيه'],['turq','فيروزي سماوي'],['grey','رمادي']
 ].forEach(([id,ws])=>{const e={k:'col',id:'col:'+id,title:C[id][0],hex:C[id][1]};ws.split(' ').forEach(w=>add(w,e));});
 const WM=f=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(f)+'?width=1000';
-const ARTX={
- 'فنسنت فان جوخ':{img:[{src:WM('Van Gogh - Starry Night - Google Art Project.jpg'),cap:'ليلة النجوم، 1889 · الصورة: ويكيميديا كومنز'},{src:WM('Vincent van Gogh - Sunflowers - VGM F458.jpg'),cap:'عبّاد الشمس · الصورة: ويكيميديا كومنز'}]},
- 'ليوناردو دافنشي':{img:[{src:WM('Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg'),cap:'الموناليزا · متحف اللوفر · الصورة: ويكيميديا كومنز'}]},
- 'جاسم زيني':{loc:'zaini',link:'https://collections.qm.org.qa/en/objects/features-from-qatar-mat200713313'},
- 'حسن بوجسوم':{loc:'bujassoum',link:'https://www.raya.com/2020/07/09/%D8%AA%D8%B1%D8%A7%D8%AB%D9%8A%D8%A7%D8%AA-12-%D9%84%D9%88%D8%AD%D8%A9-%D8%AA%D8%B1%D9%88%D9%8A-%D8%AC%D9%85%D8%A7%D9%84%D9%8A%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%88%D8%B1%D9%88%D8%AB'},
- 'يوسف أحمد':{loc:'yousef',link:'https://mathaf.org.qa/en/encyclopedia/artists-biographies/yousef-ahmad/'},
- 'وفيقة سلطان العيسى':{loc:'wafika',link:'https://mathaf.org.qa/en/encyclopedia/artists-biographies/wafika-sultan-said-al-essa/'},
- 'حسن الملا':{loc:'mulla'},'بابلو بيكاسو':{loc:'picasso'}};
-// 4) الفنانون
-[[['جاسم زيني','زيني','ملامح قطرية'],'جاسم زيني',['أبو الفن القطري الحديث (1943–2012).','من لوحاته «ملامح قطرية» عام 1973.','وثّق حياة الناس في قطر وتحوّلاتها.']],
- [['حسن بوجسوم','بوجسوم','بو جسوم'],'حسن بوجسوم',['فنان قطري يرسم التراث وحياة الأجداد.','من معارضه «الزمن الجميل» و«تراثيات» في كتارا.']],
- [['يوسف احمد'],'يوسف أحمد',['من روّاد الفن الحديث في قطر.','يستلهم الحرف العربي ويصنع ورقه من سعف النخيل.']],
- [['وفيقة سلطان','وفيقة'],'وفيقة سلطان العيسى',['أول فنانة تشكيلية قطرية محترفة.','ألوانها قوية ودرجاتها ذهبية.']],
- [['حسن الملا'],'حسن الملا',['من روّاد التصوير الزيتي في قطر.','يرسم ذكريات الطفولة والتراث بأسلوب سريالي.']],
- [['فان جوخ','فان كوخ','فان غوخ','فانكوخ','فنسنت'],'فنسنت فان جوخ',['رسّام هولندي (1853–1890).','ضربات فرشاة قصيرة وظاهرة، وألوان قوية.','من لوحاته «ليلة النجوم» و«عبّاد الشمس».']],
- [['دافنشي','ليوناردو','الموناليزا'],'ليوناردو دافنشي',['فنان من عصر النهضة.','صاحب لوحة «الموناليزا».']],
- [['بيكاسو','بابلو بيكاسو'],'بابلو بيكاسو',['رسّام إسباني (1881–1973).','في بعض أعماله التكعيبية يبسّط الموضوع إلى أشكال هندسية ويعرضه من زوايا متعددة.','ليست كل أعماله تكعيبية؛ نحلل العمل المحدد الذي نراه.']],
- [['دا فنشي','دافينشي','دا فينشي'],'ليوناردو دافنشي',['فنان من عصر النهضة.','صاحب لوحة «الموناليزا».']]
-].forEach(([keys,title,facts])=>{const e=Object.assign({k:'txt',id:'a:'+title,title,facts,tag:'فنان'},ARTX[title]||{});keys.forEach(k=>add(k,e));});
+const WE=f=>'https://en.wikipedia.org/wiki/Special:FilePath/'+encodeURIComponent(f);
+/* صور اللوحات: الملك العام من ويكيميديا؛ أما الأعمال المحمية فيضيفها المعلّم بنفسه (ملفات في مجلد img أو روابط يكتبها) */
+const ARTISTS=[
+ {keys:['جاسم زيني','جاسم الزيني','الزيني','زيني','ملامح قطرية','ملامح من قطر'],title:'جاسم زيني',loc:'zaini',link:'https://collections.qm.org.qa/en/objects/features-from-qatar-mat200713313',
+  facts:['وُلد في الدوحة عام 1943 وتوفي عام 2012.','يُلقَّب بأبي الفن القطري الحديث.','أول فنان قطري يحصل على شهادة جامعية في الفنون الجميلة، من أكاديمية الفنون في بغداد عام 1968.','كان في صغره يراقب والده وهو يزيّن جدران البيوت بالأزرق والبرتقالي.','وصف أسلوبه بأنه «واقعية متطورة»، ووثّق في لوحاته الناس والعادات وتحوّلات قطر.','من أشهر لوحاته «ملامح قطرية»: فتاة بالبخنق تخيط زرّاً في ثوب أخيها الذي يلبس الغترة والعقال.','حوّلت كتارا لوحة «ملامح قطرية» عام 2019 إلى جدارية من 1060 قطعة سيراميك.','سُمّيت باسمه قاعة في وزارة الثقافة بعد وفاته.']},
+ {keys:['حسن بوجسوم','بوجسوم','بو جسوم','حسن بو جسوم'],title:'حسن بوجسوم',loc:'bujassoum',link:'https://www.raya.com/2020/07/09/%D8%AA%D8%B1%D8%A7%D8%AB%D9%8A%D8%A7%D8%AA-12-%D9%84%D9%88%D8%AD%D8%A9-%D8%AA%D8%B1%D9%88%D9%8A-%D8%AC%D9%85%D8%A7%D9%84%D9%8A%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%88%D8%B1%D9%88%D8%AB',
+  facts:['فنان تشكيلي قطري يستحضر في لوحاته التراث القطري وذكريات طفولته.','يقول إن علاقته بالتراث حنين إلى الماضي، ورغبة في توثيق تاريخ بلاده بالرسم.','معرض «الزمن الجميل» في كتارا عام 2015: ست وعشرون لوحة عن حياة القطريين قديماً.','معرض «تراثيات» الافتراضي في كتارا عام 2020: اثنتا عشرة لوحة عن الموروث الشعبي القطري.','أنجز بعض لوحات «تراثيات» في فترة الحجر المنزلي.']},
+ {keys:['فان جوخ','فان كوخ','فان غوخ','فانكوخ','فانجوخ','فنسنت','ليلة النجوم'],title:'فنسنت فان جوخ',loc:'vangogh',
+  facts:['رسّام هولندي، وُلد عام 1853 وتوفي عام 1890.','من أشهر فناني ما بعد الانطباعية.','ضربات فرشاته قصيرة وظاهرة، وألوانه قوية خاصة الأصفر والأزرق.','رسم «ليلة النجوم» عام 1889، وفيها تبدو السماء كأنها تدور.','رسم «عبّاد الشمس» عام 1888 بدرجات الأصفر.'],
+  img:[{src:WM('Van Gogh - Starry Night - Google Art Project.jpg'),cap:'ليلة النجوم، 1889'},{src:WM('Vincent Willem van Gogh 127.jpg'),cap:'عبّاد الشمس، 1888'},{src:WM('Vincent van Gogh - Starry Night - Google Art Project.jpg'),cap:'ليلة النجوم فوق نهر الرون، 1888'}],credit:'ويكيميديا كومنز · ملك عام'},
+ {keys:['دافنشي','دا فنشي','دافينشي','دا فينشي','ليوناردو','ليوناردو دافنشي','الموناليزا','موناليزا'],title:'ليوناردو دافنشي',loc:'davinci',
+  facts:['فنان وعالم ومخترع إيطالي من عصر النهضة (1452–1519).','اشتهر بالتدرّج الناعم بين الظل والنور.','«الموناليزا» أشهر لوحة «بورتريه» في العالم، وتُعرض في متحف اللوفر بباريس.','كان يملأ دفاتره برسوم للطبيعة والآلات.'],
+  img:[{src:WM('Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg'),cap:'الموناليزا · متحف اللوفر'},{src:WM('Lady with an Ermine - Leonardo da Vinci - Google Art Project.jpg'),cap:'السيدة مع القاقم'}],credit:'ويكيميديا كومنز · ملك عام'},
+ {keys:['بيكاسو','بابلو بيكاسو'],title:'بابلو بيكاسو',loc:'picasso',
+  facts:['رسّام إسباني، وُلد عام 1881 وتوفي عام 1973.','من مؤسسي التكعيبية مع الفنان جورج براك.','في مرحلته الزرقاء رسم «عازف الغيتار العجوز» (1903–1904).','«الموسيقيون الثلاثة» (1921) مثال على التكعيبية: أشكال هندسية مسطّحة وألوان واضحة.','ليست كل أعماله تكعيبية؛ نحلل العمل المحدد الذي نراه.'],
+  img:[{src:WE('Pablo Picasso, 1921, Nous autres musiciens (Three Musicians), oil on canvas, 204.5 x 188.3 cm, Philadelphia Museum of Art.jpg'),cap:'الموسيقيون الثلاثة، 1921 · متحف فيلادلفيا للفنون'},{src:WE('Old guitarist chicago.jpg'),cap:'عازف الغيتار العجوز، 1903–1904 · معهد شيكاغو للفنون'}],credit:'ويكيبيديا الإنجليزية · نُشرت قبل 1929'},
+ {keys:['يوسف احمد'],title:'يوسف أحمد',loc:'yousef',link:'https://mathaf.org.qa/en/encyclopedia/artists-biographies/yousef-ahmad/',facts:['من روّاد الفن الحديث في قطر، وُلد عام 1955.','تجربته معاصرة وحروفية: يستلهم الحرف العربي.','يصنع ورق لوحاته بنفسه من سعف النخيل.']},
+ {keys:['وفيقة سلطان','وفيقة'],title:'وفيقة سلطان العيسى',loc:'wafika',link:'https://mathaf.org.qa/en/encyclopedia/artists-biographies/wafika-sultan-said-al-essa/',facts:['من رائدات الفن التشكيلي في قطر.','تستلهم الموروث الشعبي القطري من زخارف وحكايات وأغانٍ.','توظّف الزخرفة الإسلامية وجماليات الخط العربي.']},
+ {keys:['حسن الملا'],title:'حسن الملا',loc:'mulla',facts:['وُلد في الدوحة عام 1951، ومن روّاد التصوير الزيتي في قطر.','أسلوبه سريالي، وموضوعاته ذكريات الطفولة والأنشطة التراثية والبيئة.','من الأعضاء المؤسسين للجمعية القطرية للفنون التشكيلية عام 1980.']}];
+ARTISTS.forEach(a=>{const e={k:'txt',id:'a:'+a.title,title:a.title,facts:a.facts,tag:'فنان',loc:a.loc,img:a.img||[],link:a.link,credit:a.credit};a.e=e;a.keys.forEach(k=>add(k,e));});
+{const w={k:'grp',id:'g:world',title:'فنانون عالميون',items:[{txt:'فان جوخ',label:'هولندي'},{txt:'دافنشي',label:'إيطالي'},{txt:'بيكاسو',label:'إسباني'}],facts:['قل «اعرض فان جوخ» لترى لوحاته.']};['فنانين عالميين','الفنانون العالميون','فنانون عالميون','الفنانين العالميين'].forEach(k=>add(k,w));}
 // 4ب) مدارس وأساليب ومفردات فنية من وحدة المعلّم
 [[['الواقعية','المدرسة الواقعية','واقعي'],'الواقعية',['تهتم بملاحظة العالم المرئي ورسمه كما نراه.','يختلف الفنانون في طريقة التلوين والخط والتعبير.']],
  [['التكعيبية','المدرسة التكعيبية','تكعيبي'],'التكعيبية',['في بعض الأعمال التكعيبية يُعرض الموضوع من زوايا متعددة.','يُبسَّط الموضوع إلى مساحات وأشكال هندسية.']],
@@ -422,8 +428,10 @@ function heroBody(e){
   if(e.k==='con')return `<div class="paper big">${conceptSvg(e.cid)}</div>`;
   if(e.k==='mix')return `<div class="eqs">${e.pairs.map((p,i)=>eqHtml(p[0],p[1],i)).join('')}</div>`;
   if(e.k==='p1')return `<div class="canvas"><svg viewBox="0 0 1600 900">${drawStreet()}</svg></div>`;
-  if(e.img||e.loc){const imgs=(e.img||[]).concat(e.loc?[1,2].map(n=>({src:'img/'+e.loc+'-'+n+'.jpg',cap:''})):[]);
-    return `<div class="art">${imgs.map(u=>`<figure><img src="${u.src}" alt="">${u.cap?`<figcaption>${esc(u.cap)}</figcaption>`:''}</figure>`).join('')}</div>${e.link?`<a class="alink" href="${e.link}" target="_blank" rel="noopener">صور أعماله من المصدر الرسمي</a>`:''}`;}
+  if(e.loc){
+    let mine=[];try{mine=JSON.parse(localStorage.getItem('art:'+e.loc)||'[]');}catch(_){}
+    const imgs=(e.img||[]).concat(mine.map(u=>({src:u,cap:''})),[1,2,3,4].map(n=>({src:'img/'+e.loc+'-'+n+'.jpg',cap:''})));
+    return `<div class="art">${imgs.map(u=>`<figure><img src="${esc(u.src)}" alt=""><figcaption>${esc(u.cap||'')}${u.cap&&e.credit&&(e.img||[]).includes(u)?' · '+esc(e.credit):''}</figcaption></figure>`).join('')}</div>${e.link?`<a class="alink" href="${e.link}" target="_blank" rel="noopener">صور أعماله من المصدر الرسمي</a>`:''}`;}
   return '';
 }
 function show(e){
@@ -433,9 +441,11 @@ function show(e){
   hero={key:e.key,x:e.k==='x',col:null};
   const facts=e.facts||[];
   $('hero').innerHTML=heroBody(e)+`<h1${e.k==='col'?` style="color:${e.hex==='#1d1a1c'?'#ddd':e.hex}"`:''}>${esc(e.title)}</h1><div id="fact">${facts.length?`<span>${esc(facts[0])}</span>`:''}</div>`;
-  $('hero').querySelectorAll('.art img').forEach(im=>im.addEventListener('error',()=>{const f=im.closest('figure');if(f)f.remove();}));
+  $('hero').querySelectorAll('.art img').forEach(im=>im.addEventListener('error',()=>{const f=im.closest('figure');if(f)f.remove();artFix();}));artFix();
   FX.list=facts;FX.i=0;FX.title='';
 }
+function artFix(){const figs=[...document.querySelectorAll('#hero .art figure')],box=document.querySelector('#hero .art');if(!box)return;box.style.display=figs.length?'':'none';if(!figs.length&&cur&&cur.loc&&$('fact')){FX.list=[];$('fact').innerHTML=`<ul class="afacts">${cur.facts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`;}if(figs.length&&!figs.some(f=>f.classList.contains('on')))figs[0].classList.add('on');box.dataset.n=figs.length>1?(figs.findIndex(f=>f.classList.contains('on'))+1)+' / '+figs.length:'';}
+function artStep(d){const figs=[...document.querySelectorAll('#hero .art figure')];if(figs.length<2)return false;const i=figs.findIndex(f=>f.classList.contains('on'));figs.forEach(f=>f.classList.remove('on'));figs[(i+d+figs.length)%figs.length].classList.add('on');artFix();return true;}
 function renderHero(){const hp=$('hp');if(!hp||!cur||!hero)return;hp.innerHTML=cur.k==='x'?skylineSvg(hero.col):stSvg(cur.key,false,hero.col);}
 /* اسم اللون بالعربية من قيمته */
 function nameOf(hex){
@@ -835,6 +845,9 @@ function common(t,toks){
   if(!CARDW.test(t)&&/((^| )(افصل|فصل|استخرج|حلل)\S* (ال)?الوان)|الوان (هذه |هذا )?(ال)?(رسمه|لوحه|موجوده|عنصر|مستخدمه)/.test(t)&&paletteCmd(t))return true;
   if(!CARDW.test(t)&&(COLORV.test(t)||SKETCHV.test(t))&&colourCmd(t,toks))return true;
   if(!CARDW.test(t)||/تقويم|تفكير/.test(t)){if(lessonCmd(t))return true;}
+  if(cur&&cur.loc&&/(^| )(السابق|السابقه)( |$)/.test(t)&&artStep(-1))return true;
+  if(cur&&cur.loc&&/(^| )(التالي|التاليه)( |$)/.test(t)&&!/معلومه/.test(t)&&artStep(1))return true;
+  if(/(^| )(احذف|امسح)\S* (ال)?صور/.test(t)){const a=ARTISTS.find(x=>x.keys.some(k=>t.includes(canon(k))||canon(t).includes(canon(k))));if(a){try{localStorage.removeItem('art:'+a.loc);}catch(_){}cur=null;show(a.e);return true;}}
   if(/(^| )(التالي|التاليه)( |$)|معلومه/.test(t)&&nextFact())return true;
   if(SPOT.test(t)){if(SPOTOFF.test(t))spotOff();else spotlight(t,toks);return true;}
   if(CARDW.test(t)){cardCmd(t,toks);return true;}
@@ -960,7 +973,12 @@ $('dot').addEventListener('click',()=>listen(!want));
 $('cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(b)reveal(+b.dataset.i);});
 if('speechSynthesis' in window)speechSynthesis.getVoices();
 $('kb').addEventListener('click',()=>{$('form').classList.toggle('show');if($('form').classList.contains('show'))$('typed').focus();});
-$('form').addEventListener('submit',e=>{e.preventDefault();const v=$('typed').value.trim();if(v){done=0;hear(v,true);$('typed').value='';}});
+$('form').addEventListener('submit',e=>{e.preventDefault();const v=$('typed').value.trim();const um=v.match(/https?:\/\/\S+/);
+  if(um){const c=canon(v.replace(um[0],' ')),a=ARTISTS.find(x=>x.keys.some(k=>c.includes(canon(k))));
+    if(a){let l=[];try{l=JSON.parse(localStorage.getItem('art:'+a.loc)||'[]');}catch(_){}if(!l.includes(um[0]))l.push(um[0]);try{localStorage.setItem('art:'+a.loc,JSON.stringify(l.slice(-6)));}catch(_){}
+      $('typed').value='';painting=false;les=null;cur=null;show(a.e);const n=document.querySelectorAll('#hero .art figure').length;for(let i=0;i<n;i++){const f=document.querySelectorAll('#hero .art figure');if(f[i]&&f[i].querySelector('img').getAttribute('src')===um[0]){f.forEach(x=>x.classList.remove('on'));f[i].classList.add('on');artFix();break;}}return;}
+    msg('اكتب اسم الفنان مع الرابط، مثل: صورة بوجسوم ثم الرابط');setTimeout(()=>msg(''),4000);return;}
+  if(v){done=0;hear(v,true);$('typed').value='';}});
 // خلفية متحركة هادئة
 {const star=r=>{let p='';for(let k=0;k<16;k++){const a=k*22.5*Math.PI/180,R=k%2?r*.765:r;p+=(k?'L':'M')+(50+R*Math.cos(a)).toFixed(1)+' '+(50+R*Math.sin(a)).toFixed(1);}return p+'Z';};
  $('fx').innerHTML=[[4,8,90,0],[78,6,130,-5],[88,58,100,-9],[6,62,140,-3],[44,30,70,-7]].map(([x,y,s,d])=>`<svg viewBox="0 0 100 100" style="left:${x}%;top:${y}%;width:${s}px;animation-delay:${d}s"><path d="${star(46)}"/></svg>`).join('');}
