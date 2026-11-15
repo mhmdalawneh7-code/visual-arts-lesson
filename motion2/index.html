@@ -246,28 +246,29 @@ const PERSP1={k:'p1',id:'p1',title:'منظور النقطة الواحدة',fact
 [['red','احمر حمراء حمرا'],['yellow','اصفر صفراء صفرا'],['blue','ازرق زرقاء زرقا'],['orange','برتقالي برتقاليه'],['green','اخضر خضراء خضرا'],['purple','بنفسجي بنفسجيه'],['brown','بني بنيه'],
  ['black','اسود سوداء سودا'],['white','ابيض بيضاء بيضا'],['pink','وردي ورديه زهري'],['maroon','عنابي'],['gold','ذهبي ذهبيه'],['turq','فيروزي سماوي'],['grey','رمادي']
 ].forEach(([id,ws])=>{const e={k:'col',id:'col:'+id,title:C[id][0],hex:C[id][1]};ws.split(' ').forEach(w=>add(w,e));});
-const WM=f=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(f)+'?width=1000';
+const WM=f=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(f)+'?width=960';
 const WE=f=>'https://en.wikipedia.org/wiki/Special:FilePath/'+encodeURIComponent(f);
 /* صور اللوحات: الملك العام من ويكيميديا؛ أما الأعمال المحمية فيضيفها المعلّم بنفسه (ملفات في مجلد img أو روابط يكتبها) */
 const ARTISTS=[
- {keys:['جاسم زيني','جاسم الزيني','الزيني','زيني','ملامح قطرية','ملامح من قطر'],title:'جاسم زيني',loc:'zaini',link:'https://collections.qm.org.qa/en/objects/features-from-qatar-mat200713313',
+ {keys:['جاسم زيني','جاسم الزيني','الزيني','زيني','جاسم الزين','جاسم زين','جاسم زيناي','جاسم الزيناي','الفنان جاسم','ملامح قطرية','ملامح من قطر'],title:'جاسم زيني',loc:'zaini',link:'https://collections.qm.org.qa/en/objects/features-from-qatar-mat200713313',
   facts:['وُلد في الدوحة عام 1943 وتوفي عام 2012.','يُلقَّب بأبي الفن القطري الحديث.','أول فنان قطري يحصل على شهادة جامعية في الفنون الجميلة، من أكاديمية الفنون في بغداد عام 1968.','كان في صغره يراقب والده وهو يزيّن جدران البيوت بالأزرق والبرتقالي.','وصف أسلوبه بأنه «واقعية متطورة»، ووثّق في لوحاته الناس والعادات وتحوّلات قطر.','من أشهر لوحاته «ملامح قطرية»: فتاة بالبخنق تخيط زرّاً في ثوب أخيها الذي يلبس الغترة والعقال.','حوّلت كتارا لوحة «ملامح قطرية» عام 2019 إلى جدارية من 1060 قطعة سيراميك.','سُمّيت باسمه قاعة في وزارة الثقافة بعد وفاته.']},
- {keys:['حسن بوجسوم','بوجسوم','بو جسوم','حسن بو جسوم'],title:'حسن بوجسوم',loc:'bujassoum',link:'https://www.raya.com/2020/07/09/%D8%AA%D8%B1%D8%A7%D8%AB%D9%8A%D8%A7%D8%AA-12-%D9%84%D9%88%D8%AD%D8%A9-%D8%AA%D8%B1%D9%88%D9%8A-%D8%AC%D9%85%D8%A7%D9%84%D9%8A%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%88%D8%B1%D9%88%D8%AB',
+ {keys:['حسن بوجسوم','بوجسوم','بو جسوم','حسن بو جسوم','بوجاسوم','بو جاسوم','ابو جسوم','حسن ابو جسوم','حسن بوجاسم','حسن بو جاسم','حسن ابو جاسم','بوجسم','بو جسم','بويسوم','بو يسوم','الفنان حسن','حسن بوجسون','بوجسون'],title:'حسن بوجسوم',loc:'bujassoum',link:'https://www.raya.com/2020/07/09/%D8%AA%D8%B1%D8%A7%D8%AB%D9%8A%D8%A7%D8%AA-12-%D9%84%D9%88%D8%AD%D8%A9-%D8%AA%D8%B1%D9%88%D9%8A-%D8%AC%D9%85%D8%A7%D9%84%D9%8A%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%88%D8%B1%D9%88%D8%AB',
   facts:['فنان تشكيلي قطري يستحضر في لوحاته التراث القطري وذكريات طفولته.','يقول إن علاقته بالتراث حنين إلى الماضي، ورغبة في توثيق تاريخ بلاده بالرسم.','معرض «الزمن الجميل» في كتارا عام 2015: ست وعشرون لوحة عن حياة القطريين قديماً.','معرض «تراثيات» الافتراضي في كتارا عام 2020: اثنتا عشرة لوحة عن الموروث الشعبي القطري.','أنجز بعض لوحات «تراثيات» في فترة الحجر المنزلي.']},
- {keys:['فان جوخ','فان كوخ','فان غوخ','فانكوخ','فانجوخ','فنسنت','ليلة النجوم'],title:'فنسنت فان جوخ',loc:'vangogh',
+ {keys:['فان جوخ','فان كوخ','فان غوخ','فانكوخ','فانجوخ','فنسنت','فينسنت','ليلة النجوم','فان غوغ','فان خوخ','فان جوغ','فان كوك','فان جوك','فان قوخ','فان قوق','فان كوغ','فانغوخ','فن كوخ','فن جوخ','فان جوج','فان غو','فان جو','عباد الشمس','دوار الشمس'],title:'فنسنت فان جوخ',loc:'vangogh',
   facts:['رسّام هولندي، وُلد عام 1853 وتوفي عام 1890.','من أشهر فناني ما بعد الانطباعية.','ضربات فرشاته قصيرة وظاهرة، وألوانه قوية خاصة الأصفر والأزرق.','رسم «ليلة النجوم» عام 1889، وفيها تبدو السماء كأنها تدور.','رسم «عبّاد الشمس» عام 1888 بدرجات الأصفر.'],
-  img:[{src:WM('Van Gogh - Starry Night - Google Art Project.jpg'),cap:'ليلة النجوم، 1889'},{src:WM('Vincent Willem van Gogh 127.jpg'),cap:'عبّاد الشمس، 1888'},{src:WM('Vincent van Gogh - Starry Night - Google Art Project.jpg'),cap:'ليلة النجوم فوق نهر الرون، 1888'}],credit:'ويكيميديا كومنز · ملك عام'},
- {keys:['دافنشي','دا فنشي','دافينشي','دا فينشي','ليوناردو','ليوناردو دافنشي','الموناليزا','موناليزا'],title:'ليوناردو دافنشي',loc:'davinci',
+  img:[{src:'img/pd-vangogh-starry.jpg',cap:'ليلة النجوم، 1889'},{src:'img/pd-vangogh-sunflowers.jpg',cap:'عبّاد الشمس، 1889'},{src:'img/pd-vangogh-sunflowers3.jpg',cap:'ثلاث زهرات عبّاد الشمس، 1888'},{src:WM('Vincent van Gogh - Starry Night - Google Art Project.jpg'),cap:'ليلة النجوم فوق نهر الرون، 1888'}],credit:'ملك عام'},
+ {keys:['دافنشي','دا فنشي','دافينشي','دا فينشي','ليوناردو','ليوناردو دافنشي','الموناليزا','موناليزا','دافنتشي','دافينتشي','دا فينتشي','دا فنتشي','دفنشي','دافنش','ليونارد','ليوناردوا','مونا ليزا','المونا ليزا','الموناليزه','موناليزه'],title:'ليوناردو دافنشي',loc:'davinci',
   facts:['فنان وعالم ومخترع إيطالي من عصر النهضة (1452–1519).','اشتهر بالتدرّج الناعم بين الظل والنور.','«الموناليزا» أشهر لوحة «بورتريه» في العالم، وتُعرض في متحف اللوفر بباريس.','كان يملأ دفاتره برسوم للطبيعة والآلات.'],
-  img:[{src:WM('Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg'),cap:'الموناليزا · متحف اللوفر'},{src:WM('Lady with an Ermine - Leonardo da Vinci - Google Art Project.jpg'),cap:'السيدة مع القاقم'}],credit:'ويكيميديا كومنز · ملك عام'},
- {keys:['بيكاسو','بابلو بيكاسو'],title:'بابلو بيكاسو',loc:'picasso',
+  img:[{src:'img/pd-davinci-monalisa.jpg',cap:'الموناليزا · متحف اللوفر'},{src:WM('Lady with an Ermine - Leonardo da Vinci - Google Art Project.jpg'),cap:'السيدة مع القاقم'}],credit:'ويكيميديا كومنز · ملك عام'},
+ {keys:['بيكاسو','بابلو بيكاسو','بيكسو','بكاسو','بيكاسوا','بيكاسه','بابلو','بيكا سو','بي كاسو','بيكازو','عازف الجيتار','عازف الغيتار'],title:'بابلو بيكاسو',loc:'picasso',
   facts:['رسّام إسباني، وُلد عام 1881 وتوفي عام 1973.','من مؤسسي التكعيبية مع الفنان جورج براك.','في مرحلته الزرقاء رسم «عازف الغيتار العجوز» (1903–1904).','«الموسيقيون الثلاثة» (1921) مثال على التكعيبية: أشكال هندسية مسطّحة وألوان واضحة.','ليست كل أعماله تكعيبية؛ نحلل العمل المحدد الذي نراه.'],
-  img:[{src:WE('Pablo Picasso, 1921, Nous autres musiciens (Three Musicians), oil on canvas, 204.5 x 188.3 cm, Philadelphia Museum of Art.jpg'),cap:'الموسيقيون الثلاثة، 1921 · متحف فيلادلفيا للفنون'},{src:WE('Old guitarist chicago.jpg'),cap:'عازف الغيتار العجوز، 1903–1904 · معهد شيكاغو للفنون'}],credit:'ويكيبيديا الإنجليزية · نُشرت قبل 1929'},
+  img:[{src:'img/pd-picasso-guitarist.jpg',cap:'عازف الغيتار العجوز، 1903–1904 · معهد شيكاغو للفنون'},{src:WE('Pablo Picasso, 1921, Nous autres musiciens (Three Musicians), oil on canvas, 204.5 x 188.3 cm, Philadelphia Museum of Art.jpg'),cap:'الموسيقيون الثلاثة، 1921 · متحف فيلادلفيا للفنون'}],credit:'نُشرت قبل 1929'},
  {keys:['يوسف احمد'],title:'يوسف أحمد',loc:'yousef',link:'https://mathaf.org.qa/en/encyclopedia/artists-biographies/yousef-ahmad/',facts:['من روّاد الفن الحديث في قطر، وُلد عام 1955.','تجربته معاصرة وحروفية: يستلهم الحرف العربي.','يصنع ورق لوحاته بنفسه من سعف النخيل.']},
  {keys:['وفيقة سلطان','وفيقة'],title:'وفيقة سلطان العيسى',loc:'wafika',link:'https://mathaf.org.qa/en/encyclopedia/artists-biographies/wafika-sultan-said-al-essa/',facts:['من رائدات الفن التشكيلي في قطر.','تستلهم الموروث الشعبي القطري من زخارف وحكايات وأغانٍ.','توظّف الزخرفة الإسلامية وجماليات الخط العربي.']},
  {keys:['حسن الملا'],title:'حسن الملا',loc:'mulla',facts:['وُلد في الدوحة عام 1951، ومن روّاد التصوير الزيتي في قطر.','أسلوبه سريالي، وموضوعاته ذكريات الطفولة والأنشطة التراثية والبيئة.','من الأعضاء المؤسسين للجمعية القطرية للفنون التشكيلية عام 1980.']}];
 ARTISTS.forEach(a=>{const e={k:'txt',id:'a:'+a.title,title:a.title,facts:a.facts,tag:'فنان',loc:a.loc,img:a.img||[],link:a.link,credit:a.credit};a.e=e;a.keys.forEach(k=>add(k,e));});
-{const w={k:'grp',id:'g:world',title:'فنانون عالميون',items:[{txt:'فان جوخ',label:'هولندي'},{txt:'دافنشي',label:'إيطالي'},{txt:'بيكاسو',label:'إسباني'}],facts:['قل «اعرض فان جوخ» لترى لوحاته.']};['فنانين عالميين','الفنانون العالميون','فنانون عالميون','الفنانين العالميين'].forEach(k=>add(k,w));}
+{const w={k:'grp',id:'g:world',title:'فنانون عالميون',items:[{txt:'فان جوخ',label:'هولندي'},{txt:'دافنشي',label:'إيطالي'},{txt:'بيكاسو',label:'إسباني'}],facts:['قل «اعرض فان جوخ» لترى لوحاته.']};['فنانين عالميين','الفنانون العالميون','فنانون عالميون','الفنانين العالميين','لوحات عالمية','اللوحات العالمية'].forEach(k=>add(k,w));}
+{const w={k:'grp',id:'g:artists',title:'الفنانون',items:[{txt:'جاسم زيني',label:'قطر'},{txt:'حسن بوجسوم',label:'قطر'},{txt:'يوسف أحمد',label:'قطر'},{txt:'وفيقة سلطان',label:'قطر'},{txt:'حسن الملا',label:'قطر'},{txt:'فان جوخ',label:'هولندا'},{txt:'دافنشي',label:'إيطاليا'},{txt:'بيكاسو',label:'إسبانيا'}],facts:['قل اسم الفنان لترى لوحاته ومعلومات عنه.']};['الفنانين','فنانين','الفنانون','فنانون','لوحات الفنانين','اسماء الفنانين','فنانين ولوحاتهم'].forEach(k=>add(k,w));}
 // 4ب) مدارس وأساليب ومفردات فنية من وحدة المعلّم
 [[['الواقعية','المدرسة الواقعية','واقعي'],'الواقعية',['تهتم بملاحظة العالم المرئي ورسمه كما نراه.','يختلف الفنانون في طريقة التلوين والخط والتعبير.']],
  [['التكعيبية','المدرسة التكعيبية','تكعيبي'],'التكعيبية',['في بعض الأعمال التكعيبية يُعرض الموضوع من زوايا متعددة.','يُبسَّط الموضوع إلى مساحات وأشكال هندسية.']],
@@ -890,6 +891,15 @@ let done=0,fired=new Set(),hot=new Set(),sayT=0,quietUntil=0,waitT=0,uHits=0;
 const SHOWV=/(^| )[وف]?(اعرض\S*|ارني|ورني|ورينا|اظهر\S*|بدل\S*|غير\S*|انتقل\S*)( |$)/;
 const SIZE=/(^| )[وف]?(كبر\S*|اكبر|تكبير|صغر\S*|اصغر|تصغير)( |$)/,SKYW=/(^| )(ال)?(ليل|سماء|سما|غروب|نهار|ظلام)( |$)|مظلم/;
 function sayHide(ms){clearTimeout(sayT);sayT=setTimeout(()=>$('say').classList.add('hide'),ms);}
+/* اسم الفنان يفتح بطاقته حتى لو كان على الشاشة شيء آخر: إذا كانت الجملة قصيرة أو كنّا في صفحة الفنانين */
+const ARTG=['g:artists','g:world','g:فنانون قطريون'];
+const isArt=e=>!!e&&(!!e.loc||ARTG.includes(e.id));
+function artSay(toks){
+  if(!(isArt(cur)||toks.length<=4))return false;
+  let hit=null;scan(toks,0,true,r=>{if(!hit&&isArt(r.e))hit=r.e;});
+  if(!hit||hit===cur)return false;
+  painting=false;les=null;cur=null;show(hit);sayHide(700);return true;
+}
 function hear(raw,final,alts){
   const toks=norm(raw).split(' ').filter(Boolean);if(!toks.length)return;
   const isFinal=final===true;
@@ -915,6 +925,7 @@ function hear(raw,final,alts){
       else if(/(^| )[وف]?(ادمج\S*|ندمج\S*|اجمع\S*|نجمع\S*|دمج|ركب\S*)( |$)|لوحه واحده|في لوحه|لوحه جديده/.test(t))startPainting();
       else if(/(^| )(امسح|مسح|نظف)( |$)/.test(t)&&toks.length<=3)clearAll();
       else if(SHOWV.test(t)){let got=false;scan(toks,0,true,r=>{if(!got){got=true;painting=false;les=null;cur=null;show(r.e);drew=true;}});}
+      else if(cur&&!cards.length&&artSay(toks)){drew=true;}
       else if(P_ADD.test(t)||SIZE.test(t)||SKYW.test(t)){
         // نبني على الرسمة الظاهرة: «أضف غيوم»، «سماء مظلمة»، «قمر»، «كبّر الجمل»
         if(base||SKYW.test(t)||SIZE.test(t)){if(base||SKYW.test(t)){startPaintingWith(base);paintFinal(t,toks);}}
@@ -970,6 +981,7 @@ if(window.claude&&typeof window.claude.use==='function'){
 }
 $('go').addEventListener('click',()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();}catch(_){}$('start').classList.add('hide');listen(true);});
 $('dot').addEventListener('click',()=>listen(!want));
+$('hero').addEventListener('click',ev=>{const c=ev.target.closest('.cell');if(!c||!cur||cur.k!=='grp')return;const it=cur.items[[...c.parentNode.children].indexOf(c)];if(!it||!it.txt)return;let hit=null;scan(norm(it.txt).split(' ').filter(Boolean),0,true,r=>{if(!hit)hit=r.e;});if(hit&&hit!==cur){cur=null;show(hit);}});
 $('cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(b)reveal(+b.dataset.i);});
 if('speechSynthesis' in window)speechSynthesis.getVoices();
 $('kb').addEventListener('click',()=>{$('form').classList.toggle('show');if($('form').classList.contains('show'))$('typed').focus();});
