@@ -54,9 +54,9 @@ button{cursor:pointer}
 .lchips{display:flex;flex-wrap:wrap;gap:10px}
 .lchips span{background:#8a1538;color:#fff;border-radius:999px;padding:4px 20px;font-weight:800;font-size:clamp(16px,2.2vw,28px);animation:pop .4s ease}
 .eqs{display:flex;flex-direction:column;gap:clamp(8px,2vh,22px);align-items:center}
-.eq{display:flex;align-items:center;gap:clamp(6px,1.4vw,18px);animation:rise .6s ease backwards;font-family:var(--display);font-size:clamp(16px,2.4vw,32px);color:var(--sand)}
-.eq i{display:block;width:clamp(48px,11vh,110px);aspect-ratio:1;border-radius:46% 54% 52% 48%/50% 46% 54% 50%;box-shadow:0 8px 22px rgba(0,0,0,.4)}
-.eq i.res{animation:pop .7s cubic-bezier(.2,1.4,.4,1) .5s backwards;width:clamp(60px,14vh,140px)}
+.eq{display:flex;align-items:center;max-width:96vw;gap:clamp(3px,1.2vw,18px);animation:rise .6s ease backwards;font-family:var(--display);font-size:clamp(13px,3.1vw,32px);color:var(--sand)}
+.eq i{display:block;flex:none;width:clamp(34px,min(11vh,13vw),110px);aspect-ratio:1;border-radius:46% 54% 52% 48%/50% 46% 54% 50%;box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.eq i.res{animation:pop .7s cubic-bezier(.2,1.4,.4,1) .5s backwards;width:clamp(42px,min(14vh,17vw),140px)}
 .eq b{font-size:1.5em;color:#fff}.eq .rn{color:var(--gold);font-weight:700;font-size:1.25em}
 .pal{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center}
 .pal span{display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,.28);border-radius:999px;padding:4px 16px 4px 6px;animation:pop .45s ease backwards;font-size:.9em}
@@ -85,6 +85,23 @@ button{cursor:pointer}
 .blob{height:min(26vh,26vw);aspect-ratio:1;border-radius:46% 54% 52% 48%/50% 46% 54% 50%;animation:wob 5s ease-in-out infinite alternate;box-shadow:0 14px 40px rgba(0,0,0,.4)}
 .blob.big{height:min(40vh,56vw)}
 @keyframes wob{to{border-radius:54% 46% 47% 53%/46% 54% 46% 54%;transform:rotate(8deg)}}
+@font-face{font-family:CalKufi;src:url(fonts/reem-kufi-arabic-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:CalKufi;src:url(fonts/reem-kufi-arabic-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:CalNaskh;src:url(fonts/amiri-arabic-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:CalNaskh;src:url(fonts/amiri-arabic-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:CalRuqaa;src:url(fonts/aref-ruqaa-arabic-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:CalRuqaa;src:url(fonts/aref-ruqaa-arabic-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+.fk{font-family:CalKufi,'Reem Kufi',sans-serif;font-weight:700;word-spacing:.32em}
+.fn{font-family:CalNaskh,'Amiri','Noto Naskh Arabic','Traditional Arabic',serif;font-weight:400}
+.fr{font-family:CalRuqaa,'Aref Ruqaa',serif;font-weight:400}
+.calp{background:var(--paper);border-radius:28px;padding:clamp(12px,3vh,34px) clamp(16px,4vw,56px);box-shadow:0 18px 50px rgba(0,0,0,.45);max-width:94vw;display:grid;gap:clamp(6px,1.6vh,18px);animation:pop .5s ease}
+.calp.one{min-width:min(60vw,700px);min-height:24vh;place-items:center}
+.calx{display:block;color:#3a1220;line-height:1.75;text-align:center;white-space:nowrap;padding:0 .15em;background:linear-gradient(#c9a55a,#c9a55a) 0 78%/100% 2px no-repeat;animation:wr 1.6s ease-out backwards}
+.calr{display:grid;grid-template-columns:1fr;justify-items:center;animation:rise .5s ease backwards}
+.calr b{font-family:var(--display);font-size:clamp(13px,1.7vw,22px);color:#1f6f78;font-weight:700}
+.calr+.calr{border-top:1px dashed rgba(138,21,56,.25);padding-top:clamp(4px,1vh,12px)}
+@keyframes wr{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
+@media (prefers-reduced-motion:reduce){.calx{animation:none}}
 .cal{font-family:var(--display);font-size:clamp(22px,4.4vw,60px);color:#8a1538;font-weight:700}
 h1{margin:0;font-family:var(--display);font-weight:700;color:var(--gold);font-size:clamp(28px,6vw,84px);line-height:1.15;animation:rise .5s ease;text-wrap:balance}
 #fact{min-height:1.6em;font-size:clamp(16px,2.6vw,36px);font-weight:700;color:#fff;max-width:28em;line-height:1.5;text-wrap:balance}
@@ -233,7 +250,7 @@ const PERSP1={k:'p1',id:'p1',title:'منظور النقطة الواحدة',fact
  [['الألوان الباردة','الوان باردة'],'الألوان الباردة',[col('blue'),col('green'),col('purple')],'تذكّرنا بالماء والسماء والعشب.'],
  [['الألوان','الوان','دائرة الألوان'],'الألوان',[col('red'),col('orange'),col('yellow'),col('green'),col('blue'),col('purple')],'دائرة الألوان: الأساسية والثانوية.'],
  [['الفنانين القطريين','فنانين قطريين','الفنانون القطريون','فنانون قطريون'],'فنانون قطريون',[{txt:'جاسم زيني',label:'رائد الفن الحديث'},{txt:'يوسف أحمد',label:'الحرف وسعف النخيل'},{txt:'وفيقة سلطان',label:'أول فنانة محترفة'},{txt:'حسن بوجسوم',label:'رسّام التراث'}],''],
- [['عناصر الفن','عناصر العمل الفني'],'عناصر الفن',[{txt:'النقطة',label:''},{txt:'الخط',label:''},{txt:'الشكل',label:''},{txt:'اللون',label:''},{txt:'الملمس',label:''}],'']
+ [['عناصر الفن','عناصر العمل الفني','العناصر الفنية','عناصر فنية','عناصر التصميم'],'عناصر الفن',[{txt:'النقطة',label:''},{txt:'الخط',label:''},{txt:'الشكل',label:''},{txt:'اللون',label:''},{txt:'الملمس',label:''}],'']
 ].forEach(([keys,title,items,fact])=>{const e={k:'grp',id:'g:'+title,title,items,facts:Array.isArray(fact)?fact:fact?[fact]:[]};keys.forEach(k=>add(k,e));});
 // 2) مفاهيم برسم متحرك
 [['تماثل',['التماثل','تماثل','التناظر','متماثل'],'التماثل','تشابه أو تقابل أجزاء حول محور أو مركز.'],
@@ -242,10 +259,20 @@ const PERSP1={k:'p1',id:'p1',title:'منظور النقطة الواحدة',fact
  ['lines',['الخطوط','خطوط','انواع الخطوط','الخط المستقيم','خط منحني','خط متعرج'],'أنواع الخطوط','مستقيم، منحنٍ، متعرّج.'],
  ['shade',['الظل والنور','الظل','التظليل','ظل ونور'],'الظل والنور','الجهة المقابلة للضوء فاتحة، والأخرى داكنة.']
 ].forEach(([cid,keys,title,fact])=>{const e={k:'con',id:'c:'+cid,cid,title,facts:[fact]};keys.forEach(k=>add(k,e));});
+// 2ب) العمارة الإسلامية: المقرنصات والأقواس وزخرفة الجدران
+{const mk=(cid,keys,title,facts)=>{const e={k:'con',id:'c:'+cid,cid,title,facts,arch:true};keys.forEach(k=>add(k,e));return e;};
+ mk('muq',['المقرنصات','مقرنصات','المقرنص','مقرنص','مقرنصه','المقرنصه','مقرنسات','المقرنسات'],'المقرنصات',['زخرفة معمارية تشبه خلايا النحل: حنايا صغيرة متراصّة في صفوف فوق بعضها.','نراها تحت القباب، وفوق المداخل والمحاريب، وتحت شرفات المآذن.','تنقل البناء من المربّع إلى الدائرة تحت القبة، وتصنع لعبة جميلة من الظل والنور.']);
+ mk('wall',['الزخرفة على الجدران','الزخرفة الجدران','زخرفة الجدران','الزخارف على الجدران','زخارف الجدران','الزخارف الجدارية','زخارف جدارية','الزخرفة الجدارية','زخرفة جدارية','تزيين الجدران','زخرفة الجدار','جدران المساجد'],'الزخرفة على الجدران',['زيّن الفنان المسلم الجدران بالزخارف الهندسية والنباتية والكتابية.','من خاماتها: الجصّ المحفور، والبلاط الخزفي الملوّن، والفسيفساء، والحجر والخشب المنقوش.','تتكرّر الوحدة الزخرفية بانتظام فتملأ الجدار بإيقاع جميل.']);
+ mk('arc1',['القوس نصف الدائري','قوس نصف دائري','القوس الدائري','قوس دائري'],'القوس نصف الدائري',['قوس على شكل نصف دائرة، وهو أبسط أنواع الأقواس.']);
+ mk('arc2',['القوس المدبب','قوس مدبب','العقد المدبب'],'القوس المدبّب',['قوس يلتقي جانباه في رأس مدبّب، ويكثر في المساجد والمحاريب.']);
+ mk('arc3',['قوس حدوة الفرس','حدوة الفرس','حدوه الحصان','قوس حدوة الحصان'],'قوس حدوة الفرس',['قوس أكبر من نصف دائرة، يشبه حدوة الفرس، واشتهر في عمارة الأندلس والمغرب.']);
+ mk('arc4',['القوس المفصص','قوس مفصص','العقد المفصص'],'القوس المفصّص',['قوس تتكوّن حافّته من فصوص صغيرة متتالية، وهو قوس زخرفي جميل.']);
+ const g={k:'grp',id:'g:arches',title:'الأقواس في العمارة الإسلامية',arch:true,items:[{con:'arc1',label:'نصف دائري'},{con:'arc2',label:'مدبّب'},{con:'arc3',label:'حدوة الفرس'},{con:'arc4',label:'مفصّص'}],facts:['القوس (العَقد) عنصر معماري منحنٍ يحمل ما فوقه، ويزيّن الأبواب والنوافذ والأروقة.','من أنواعه: نصف الدائري، والمدبّب، وحدوة الفرس، والمفصّص.']};
+ ['الاقواس','اقواس','انواع الاقواس','الاقواس الاسلامية','العقود','انواع العقود','اقواس المساجد'].forEach(k=>add(k,g));}
 // 3) الألوان
 [['red','احمر حمراء حمرا'],['yellow','اصفر صفراء صفرا'],['blue','ازرق زرقاء زرقا'],['orange','برتقالي برتقاليه'],['green','اخضر خضراء خضرا'],['purple','بنفسجي بنفسجيه'],['brown','بني بنيه'],
  ['black','اسود سوداء سودا'],['white','ابيض بيضاء بيضا'],['pink','وردي ورديه زهري'],['maroon','عنابي'],['gold','ذهبي ذهبيه'],['turq','فيروزي سماوي'],['grey','رمادي']
-].forEach(([id,ws])=>{const e={k:'col',id:'col:'+id,title:C[id][0],hex:C[id][1]};ws.split(' ').forEach(w=>add(w,e));});
+].forEach(([id,ws])=>{const e={k:'col',id:'col:'+id,title:C[id][0],hex:C[id][1]};ws.split(' ').forEach(w=>{add(w,e);add('اللون '+w,e);add('لون '+w,e);});});
 const WM=f=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(f)+'?width=960';
 const WE=f=>'https://en.wikipedia.org/wiki/Special:FilePath/'+encodeURIComponent(f);
 /* صور اللوحات: الملك العام من ويكيميديا؛ أما الأعمال المحمية فيضيفها المعلّم بنفسه (ملفات في مجلد img أو روابط يكتبها) */
@@ -335,10 +362,31 @@ function conceptSvg(id){
   if(id==='persp'){s=P('M20 200H480','#2468c9',4,0)+P('M250 200L20 380M250 200L480 380M250 200L20 30M250 200L480 30','#d63a2f',4,1)+P('M20 380V30M480 380V30M150 302V110M350 302V110',undefined,7,2)+`<circle cx="250" cy="200" r="10" fill="#d63a2f"/>`;}
   if(id==='lines'){s=P('M40 90H460',undefined,8,0)+P('M40 210C120 130 180 290 250 210S380 130 460 210','#1f6f78',8,1)+P('M40 330L110 280L180 330L250 280L320 330L390 280L460 330','#8a1538',8,2);}
   if(id==='shade'){s=`<defs><radialGradient id="sh" cx=".35" cy=".3"><stop offset="0" stop-color="#fff6d8"/><stop offset="1" stop-color="#6b5a3a"/></radialGradient></defs><ellipse class="f" cx="290" cy="345" rx="150" ry="22" fill="#00000033" style="--o:1;--fd:.9s"/><circle class="f" cx="250" cy="200" r="140" fill="url(#sh)" style="--o:1;--fd:.5s"/>`+P('M250 60A140 140 0 1 0 250.1 60',undefined,6,0)+`<circle cx="70" cy="50" r="26" fill="#f4c430"/>`;}
-  return `<svg class="draw" viewBox="0 0 500 400">${s}</svg>`;
+  const T='#1f6f78',M='#8a1538',G='#b08a4a';
+  if(id==='muq'){
+    s=P('M40 62H460',G,6,0)+P('M40 62V380M460 62V380',G,4,0);
+    [[5,70],[4,145],[3,220],[2,295]].forEach(([n,y],r)=>{const w=76,h=75,x0=250-n*w/2;for(let c=0;c<n;c++){const x=x0+c*w;
+      s+=P(`M${x} ${y+h}V${y+h*.45}Q${x} ${y+3} ${x+w/2} ${y}Q${x+w} ${y+3} ${x+w} ${y+h*.45}V${y+h}`,(r+c)%2?T:M,6,r+1)+P(`M${x+w/2} ${y+22}V${y+h-6}`,G,3,r+1.5);}});
+    s+=P('M236 370L250 392L264 370',M,6,5);
+  }
+  if(id==='wall'){
+    s=P('M40 30H460V370H40Z',G,6,0)+P('M40 100H460M40 300H460',G,4,0.5);
+    let w='M60 66';for(let i=0;i<9;i++)w+=`q11 -26 22 0t22 0`;s+=P(w,T,5,1);
+    [130,250,370].forEach((cx,i)=>{const cy=200,r=44,R=62;s+=P(`M${cx-r} ${cy-r}H${cx+r}V${cy+r}H${cx-r}Z`,M,6,1.5+i*.4)+P(`M${cx} ${cy-R}L${cx+R} ${cy}L${cx} ${cy+R}L${cx-R} ${cy}Z`,T,6,1.7+i*.4)+`<circle class="f" cx="${cx}" cy="${cy}" r="13" fill="${G}" style="--o:1;--fd:${2.4+i*.3}s"/>`;});
+    let d='';for(let x=70;x<=430;x+=45)d+=`M${x} 318L${x+16} 335L${x} 352L${x-16} 335Z`;s+=P(d,M,4,3);
+  }
+  if(/^arc/.test(id)){
+    s=P('M70 380H430',G,5,0);
+    if(id==='arc1')s+=P('M130 380V220A120 120 0 0 1 370 220V380',M,9,.5);
+    if(id==='arc2')s+=P('M130 380V220A205 205 0 0 1 250 50A205 205 0 0 1 370 220V380',M,9,.5);
+    if(id==='arc3')s+=P('M150 380V255A126 126 0 1 1 350 255V380',M,9,.5);
+    if(id==='arc4'){const pt=a=>[250+120*Math.cos(a*Math.PI/180),220-120*Math.sin(a*Math.PI/180)].map(v=>v.toFixed(1)).join(' ');let d='M130 380V220';[144,108,72,36,0].forEach(a=>{d+=`A44 44 0 0 1 ${pt(a)}`;});s+=P(d+'V380',M,9,.5);}
+    s+=P('M112 220H148M352 220H388',T,7,1.4)+(id==='arc3'?'':'');
+  }
+  return `<svg class="draw" viewBox="${/^arc/.test(id)?'55 25 390 375':'0 0 500 400'}">${s}</svg>`;
 }
 function itemHtml(it,i){
-  const inner=it.st?`<div class="paper">${stSvg(it.st,true)}</div>`:it.col?`<div class="blob" style="background:${it.col}"></div>`:`<div class="paper"><span class="cal">${esc(it.txt)}</span></div>`;
+  const inner=it.con?`<div class="paper">${conceptSvg(it.con)}</div>`:it.st?`<div class="paper">${stSvg(it.st,true)}</div>`:it.col?`<div class="blob" style="background:${it.col}"></div>`:`<div class="paper"><span class="cal">${esc(it.txt)}</span></div>`;
   return `<div class="cell" style="animation-delay:${i*.18}s">${inner}${it.label?`<b>${esc(it.label)}</b>`:''}</div>`;
 }
 let cur=null,curAt=0,factT=0,lastQ=null;
@@ -428,6 +476,7 @@ function heroBody(e){
   if(e.k==='x')return `<div class="paper big" id="hp">${skylineSvg(hero.col)}</div>`;
   if(e.k==='con')return `<div class="paper big">${conceptSvg(e.cid)}</div>`;
   if(e.k==='mix')return `<div class="eqs">${e.pairs.map((p,i)=>eqHtml(p[0],p[1],i)).join('')}</div>`;
+  if(e.k==='cal')return calHtml(e);
   if(e.k==='p1')return `<div class="canvas"><svg viewBox="0 0 1600 900">${drawStreet()}</svg></div>`;
   if(e.loc){
     let mine=[];try{mine=JSON.parse(localStorage.getItem('art:'+e.loc)||'[]');}catch(_){}
@@ -435,8 +484,17 @@ function heroBody(e){
     return `<div class="art">${imgs.map(u=>`<figure><img src="${esc(u.src)}" alt=""><figcaption>${esc(u.cap||'')}${u.cap&&e.credit&&(e.img||[]).includes(u)?' · '+esc(e.credit):''}</figcaption></figure>`).join('')}</div>${e.link?`<a class="alink" href="${e.link}" target="_blank" rel="noopener">صور أعماله من المصدر الرسمي</a>`:''}`;}
   return '';
 }
+/* الألوان المختارة: «الأحمر» ثم «الأصفر» يظهران جنباً إلى جنب، و«امزج الألوان» يمزجهما */
+let colSel=[];
+const colsView=ids=>({k:'grp',id:'cols:'+ids.join('+'),title:ids.map(i=>C[i][0]).join(' و'),items:ids.map(i=>({col:C[i][1],label:C[i][0]})),facts:['قل «امزج الألوان» لترى الناتج.'],cols:ids});
+function showX(e){
+  painting=false;les=null;
+  if(e.k==='col'&&cur&&(cur.k==='col'||cur.cols)&&colSel.length){const id=e.id.slice(4);if(!colSel.includes(id)){cur=null;return show(colsView(colSel.concat(id).slice(-3)));}}
+  cur=null;show(e);
+}
 function show(e){
   const now=Date.now();if(cur&&cur.id===e.id&&now-(lastAt[e.id]||0)<5000)return;lastAt[e.id]=now;
+  if(e.k==='col')colSel=[e.id.slice(4)];else if(e.cols)colSel=e.cols.slice();else if(e.k!=='mix')colSel=[];
   if(cur&&cur!==e&&now-curAt>1500){const t=thumbOf(cur),tr=$('trail');if(t&&!(tr.firstElementChild&&tr.firstElementChild.outerHTML===t)){tr.insertAdjacentHTML('afterbegin',t);while(tr.children.length>6)tr.lastElementChild.remove();}}
   cur=e;curAt=now;clearInterval(factT);remember(e);$('hero').classList.remove('hasspot');
   hero={key:e.key,x:e.k==='x',col:null};
@@ -725,7 +783,13 @@ function paletteCmd(t){
 }
 function mixCmd(t,toks){
   const ids=[];toks.forEach(w=>{const c=colEnt(w);if(c){const id=c.id.slice(4);if(!ids.includes(id))ids.push(id);}});
-  if(ids.length<2){if(/مزج|امزج|نمزج|خلط|اخلط/.test(t)){painting=false;les=null;cur=null;show(MIXALL);return true;}return false;}
+  if(ids.length<2){
+    if(!/مزج|امزج|نمزج|خلط|اخلط|دمج (ال)?الوان/.test(t))return false;
+    let pool=colSel.slice();if(ids.length&&!pool.includes(ids[0]))pool.push(ids[0]);pool=pool.slice(-3);
+    let v=MIXALL;
+    if(pool.length>=2){const pairs=[];for(let i=0;i<pool.length;i++)for(let j=i+1;j<pool.length;j++)pairs.push([pool[i],pool[j]]);v={k:'mix',id:'mix:'+pool.join('+'),title:'مزج الألوان',pairs,facts:[]};}
+    else if(pool.length===1){const x=pool[0],P=['red','yellow','blue'],o=P.includes(x)?P.filter(y=>y!==x).concat('white'):['white','black'].filter(y=>y!==x);v={k:'mix',id:'mix:of:'+x,title:'مزج اللون ال'+C[x][0],pairs:o.map(y=>[x,y]),facts:[]};}
+    painting=false;les=null;cur=null;show(v);colSel=pool;return true;}
   if(!/مزج|امزج|نمزج|اخلط|خلط|زايد|يساوي|ينتج/.test(t)&&!(ids.length===2&&toks.length<=4&&/(^| )مع( |$)/.test(t)))return false;
   painting=false;les=null;cur=null;show({k:'mix',id:'mix:'+ids[0]+ids[1],title:'مزج الألوان',pairs:[[ids[0],ids[1]]],facts:[]});return true;
 }
@@ -736,8 +800,9 @@ const QB=[];
  D.lessons.forEach(l=>put(l.name,l.qs));Object.entries(D.q).forEach(([n,qs])=>{if(n!=='سؤال وصورة')put(n,qs);});}
 QB.push({name:'الألوان',i:0,re:[],qs:[['ما الألوان الأساسية؟','الأحمر والأصفر والأزرق'],['ماذا ينتج من مزج الأحمر والأصفر؟','البرتقالي'],['ماذا ينتج من مزج الأزرق والأصفر؟','الأخضر'],['ماذا ينتج من مزج الأحمر والأزرق؟','البنفسجي'],
  ['ما الألوان الثانوية؟','البرتقالي والأخضر والبنفسجي'],['ما الألوان الحارة؟','الأحمر والبرتقالي والأصفر'],['ما الألوان الباردة؟','الأزرق والأخضر والبنفسجي'],['ماذا يحدث للون إذا أضفنا إليه الأبيض؟','يصبح أفتح'],['ماذا يحدث للون إذا أضفنا إليه الأسود؟','يصبح أغمق'],['ماذا ينتج من مزج الأحمر والأبيض؟','الوردي']]});
+{const b=QB.find(x=>x.name==='العمارة الإسلامية');if(b)[['ما المقرنصات؟','زخرفة معمارية تشبه خلايا النحل'],['اذكر نوعين من الأقواس في العمارة الإسلامية.','المدبّب وحدوة الفرس'],['بماذا زُيّنت جدران المساجد؟','بالزخارف الهندسية والنباتية والكتابية'],['أين نرى المقرنصات؟','تحت القباب وفوق المداخل والمحاريب']].forEach(q=>b.qs.push(q));}
 /* كل موضوع لوحده: إذا ذُكر الموضوع في الطلب فالأسئلة منه فقط */
-const TOPICQ=[[/الوان|لون|مزج/,'الألوان'],[/سدو/,'السدو'],[/زخارف|زخرف/,'الزخارف الإسلامية'],[/عماره|مساجد|قباب|ماذن/,'العمارة الإسلامية'],[/خط عربي|الخط العربي|خطاط/,'الخط العربي'],[/فنان/,'الفنانون القطريون'],[/العاب/,'الألعاب الشعبية القطرية'],[/تراث/,'التراث القطري'],[/محمل|محامل|سفن|سفينه/,'المحامل التقليدية'],[/عناصر|منظور|ظل|نور/,'عناصر الفن'],[/وحده|بنك/,'بنك أسئلة الوحدة']];
+const TOPICQ=[[/الوان|لون|مزج/,'الألوان'],[/سدو/,'السدو'],[/زخارف|زخرف/,'الزخارف الإسلامية'],[/عماره|مساجد|قباب|ماذن|مقرنص|اقواس|جدران|جداري/,'العمارة الإسلامية'],[/خط عربي|الخط العربي|خطاط/,'الخط العربي'],[/فنان/,'الفنانون القطريون'],[/العاب/,'الألعاب الشعبية القطرية'],[/تراث/,'التراث القطري'],[/محمل|محامل|سفن|سفينه/,'المحامل التقليدية'],[/عناصر|منظور|ظل|نور/,'عناصر الفن'],[/وحده|بنك/,'بنك أسئلة الوحدة']];
 function topicBank(t){for(const [re,name] of TOPICQ)if(re.test(t)){const b=QB.find(x=>norm(x.name)===norm(name));if(b)return b;}return null;}
 let qr=0,muteUntil=0;
 /* أسئلة عن موضوع الرسمة نفسها */
@@ -777,6 +842,8 @@ function targetBank(toks,t){
   if(!e&&cur&&(cur.k==='st'||cur.k==='x'||cur.k==='grp'))e=cur;
   if(!e&&cur&&cur.k==='col')return topicBank('الوان');
   if(!e&&cur&&cur.k==='mix')return topicBank('الوان');
+  if(!e&&cur&&cur.cal)return topicBank('خط عربي');
+  if(cur&&cur.arch&&!e)return topicBank('عماره');
   if(!e)return null;
   if(e.k==='x')return itemBank('x:towers',e.title);
   if(e.k==='grp')return e.id==='g:mosques'?itemBank('مسجد','المساجد'):(e.items[0].col?topicBank('الوان'):(QB.find(b=>norm(b.name)===norm(e.title))||(e.items[0].st?itemBank(e.items[0].st,e.title):null)));
@@ -838,8 +905,9 @@ function spotlight(t,toks){
   const p=document.querySelector('#hero .paper,#hero .blob');if(p)p.classList.add('spot');
 }
 QB.push({name:'بنك أسئلة الوحدة',qs:UQ,i:0,re:['بنك','وحده']});
-function common(t,toks){
+function common(t,toks,raw){
   if(timerCmd(t,toks))return true;
+  if(!CARDW.test(t)&&calCmd(t,raw||t))return true;
   if(/منظور/.test(t)&&/نقطه|واحد/.test(t)&&!CARDW.test(t)){painting=false;les=null;cur=null;show(PERSP1);return true;}
   if(cur&&cur.k==='p1'&&/خطوط|تلاشي|افق/.test(t)){const g=document.querySelector('#hero [data-l="persp"]');if(g){g.style.display=/(^| )(اخف\S*|احذف\S*|امسح\S*|شيل\S*|بدون)( |$)/.test(t)?'none':'';return true;}}
   if(!CARDW.test(t)&&mixCmd(t,toks))return true;
@@ -888,9 +956,42 @@ function scan(toks,from,final,fn){
   return i;
 }
 let done=0,fired=new Set(),hot=new Set(),sayT=0,quietUntil=0,waitT=0,uHits=0;
-const SHOWV=/(^| )[وف]?(اعرض\S*|ارني|ورني|ورينا|اظهر\S*|بدل\S*|غير\S*|انتقل\S*)( |$)/;
+const SHOWV=/(^| )[وف]?(اعرض\S*|ارني|ورني|ورينا|ورنا|اظهر\S*|بدل\S*|غير\S*|انتقل\S*|اريد|نريد|ابي|نبي|ابغي|ابغا|نبغي|بدي|بدنا|اعطني|اعطينا|عطني|عطنا|طلع\S*|شوف\S*|نشوف|نشاهد|افتح\S*|جيب\S*)( |$)/;
 const SIZE=/(^| )[وف]?(كبر\S*|اكبر|تكبير|صغر\S*|اصغر|تصغير)( |$)/,SKYW=/(^| )(ال)?(ليل|سماء|سما|غروب|نهار|ظلام)( |$)|مظلم/;
 function sayHide(ms){clearTimeout(sayT);sayT=setTimeout(()=>$('say').classList.add('hide'),ms);}
+/* ================= الخطوط العربية: كتابة جملة بالكوفي أو النسخ أو الرقعة ================= */
+const CAL={kufi:{name:'الخط الكوفي',f:'fk',facts:['من أقدم الخطوط العربية، ويُنسب إلى مدينة الكوفة.','حروفه مستقيمة وزواياه حادّة، كأنه أشكال هندسية.','كُتبت به المصاحف الأولى، وزُيّنت به جدران المساجد.']},
+ naskh:{name:'خط النسخ',f:'fn',facts:['خط واضح سهل القراءة، حروفه ليّنة ومستديرة.','سُمّي بالنسخ لأن النُّسّاخ كانوا ينسخون به الكتب.','تُكتب به المصاحف وأغلب الكتب المطبوعة اليوم.']},
+ ruqaa:{name:'خط الرقعة',f:'fr',facts:['خط سريع وبسيط، حروفه قصيرة وقليلة التشكيل.','نستعمله في الكتابة اليومية باليد.','أغلب حروفه تُكتب فوق السطر.']}};
+const CALORD=['kufi','naskh','ruqaa'];
+let calText='الخط العربي فن جميل';
+const CALV=/(^| )[وف]?(اكتب\S*|نكتب|كتابه)( |$)/,CALT=/خطوط (ال)?عربيه|خط (ال)?عربي|خطوط (ال)?ثلاث|انواع (ال)?خط(وط)? (ال)?عربي/;
+const calScripts=t=>CALORD.filter(k=>({kufi:/كوف/,naskh:/نسخ/,ruqaa:/رقع/})[k].test(t));
+function calView(list){
+  const one=list.length===1?CAL[list[0]]:null;
+  return {k:'cal',cal:true,id:'cal:'+list.join('+')+':'+calText,list,text:calText,title:one?one.name:'الخطوط العربية',
+    facts:one?one.facts:['الخط العربي فن الكتابة الجميلة، وله أنواع كثيرة.','لكل خط شكل وشخصية: الكوفي هندسي، والنسخ واضح، والرقعة سريع.','قل: «اكتب … بالخط الكوفي» لتكتب أي جملة.']};
+}
+function calHtml(e){
+  const n=Math.max(6,[...e.text].length);
+  if(e.list.length===1)return `<div class="calp one"><span class="calx ${CAL[e.list[0]].f}" style="font-size:min(17vh,${(165/n).toFixed(2)}vw)">${esc(e.text)}</span></div>`;
+  return `<div class="calp">${e.list.map((k,i)=>`<div class="calr" style="animation-delay:${i*.5}s"><b>${esc(CAL[k].name)}</b><span class="calx ${CAL[k].f}" style="font-size:min(${e.list.length>2?9:12}vh,${(125/n).toFixed(2)}vw);animation-delay:${i*.5}s">${esc(e.text)}</span></div>`).join('')}</div>`;
+}
+function calCmd(t,raw){
+  const sc=calScripts(t),w=CALV.test(t),inCal=!!(cur&&cur.cal);
+  if(!(CALT.test(t)||(sc.length&&(/خط/.test(t)||w||inCal))||(w&&(inCal||/(^| )(جمله|كلمه|عباره)( |$)/.test(t)))))return false;
+  if(w){
+    // الجملة = ما بعد «اكتب» ما عدا اسم الخط
+    const ws=String(raw).trim().split(/\s+/),nw=ws.map(x=>norm(x));let v=nw.findIndex(x=>CALV.test(x));
+    const drop=new Set();nw.forEach((x,i)=>{if(i>v&&/كوف|نسخ|رقع/.test(x)){drop.add(i);let j=i-1;while(j>v&&(/^(و|او|ام|ثم)$/.test(nw[j])||/^[بلو]?(ال)?خط(وط)?$/.test(nw[j]))){drop.add(j);j--;}}});
+    let out=ws.filter((_,i)=>i>v&&!drop.has(i));
+    while(out.length&&/^(لي|لنا|جمله|الجمله|كلمه|الكلمه|عباره|العباره|هذه|هذا|التاليه|مثال|مثالا|بالخطوط|الثلاثه|العربيه)$/.test(norm(out[0])))out.shift();
+    while(out.length&&/^(بالخطوط|الثلاثه|العربيه)$/.test(norm(out[out.length-1])))out.pop();
+    if(out.length)calText=out.join(' ').slice(0,80);
+  }
+  const list=sc.length?sc:(inCal&&w&&!CALT.test(t)?cur.list:CALORD);
+  painting=false;les=null;cur=null;show(calView(list));return true;
+}
 /* اسم الفنان يفتح بطاقته حتى لو كان على الشاشة شيء آخر: إذا كانت الجملة قصيرة أو كنّا في صفحة الفنانين */
 const ARTG=['g:artists','g:world','g:فنانون قطريون'];
 const isArt=e=>!!e&&(!!e.loc||ARTG.includes(e.id));
@@ -900,12 +1001,19 @@ function artSay(toks){
   if(!hit||hit===cur)return false;
   painting=false;les=null;cur=null;show(hit);sayHide(700);return true;
 }
+/* تسمية العنصر مباشرة بجملة قصيرة تعرضه حتى لو كان على الشاشة شيء آخر؛ أما الشرح الطويل فلا يقلّب الشاشة */
+function nameSay(toks){
+  if(toks.length>3)return false;
+  let hit=null,n=0;scan(toks,0,true,r=>{if(!hit){hit=r.e;n=r.n;}});
+  if(!hit||hit===cur||n<toks.length-1)return false;
+  showX(hit);sayHide(700);return true;
+}
 function hear(raw,final,alts){
   const toks=norm(raw).split(' ').filter(Boolean);if(!toks.length)return;
   const isFinal=final===true;
   if(toks.length<done)done=0;
   clearTimeout(waitT);
-  const t=toks.join(' '),cmd=CARDW.test(t)||SPOT.test(t)||SHOWV.test(t)||COLORV.test(t)||/موقت|مزج|امزج|منظور/.test(t)||P_ADD.test(t)||P_ERASE.test(t)||SIZE.test(t)||SKYW.test(t);let drew=false;
+  const t=toks.join(' '),cmd=CALV.test(t)||CALT.test(t)||calScripts(t).length>0||CARDW.test(t)||SPOT.test(t)||SHOWV.test(t)||COLORV.test(t)||/موقت|مزج|امزج|اخلط|منظور/.test(t)||P_ADD.test(t)||P_ERASE.test(t)||SIZE.test(t)||SKYW.test(t);let drew=false;
   CMD=cmd||painting||!!cur;
   const from=Math.max(0,done-1);
   const next=scan(toks,from,!!final,(r,i)=>{const id=r.e.id+'@'+i;if(fired.has(id))return;fired.add(id);uHits++;for(let k=i;k<i+r.n;k++)hot.add(k);if(!painting&&!cmd&&!cards.length&&!cur){show(r.e);drew=true;}});
@@ -920,17 +1028,20 @@ function hear(raw,final,alts){
   if(isFinal){
     CMD=true;
     const base=cur&&(cur.k==='st'||cur.k==='x'||cur.k==='grp')?cur:null,n0=pEls.length,was=painting;
-    if(!common(t,toks)){
-      if(painting)paintFinal(t,toks);
+    if(!common(t,toks,raw)){
+      let out=null;if(painting&&SHOWV.test(t))scan(toks,0,true,r=>{if(!out&&r.e.k!=='st'&&r.e.k!=='x')out=r.e;});
+      if(out){showX(out);drew=true;}
+      else if(painting)paintFinal(t,toks);
       else if(/(^| )[وف]?(ادمج\S*|ندمج\S*|اجمع\S*|نجمع\S*|دمج|ركب\S*)( |$)|لوحه واحده|في لوحه|لوحه جديده/.test(t))startPainting();
       else if(/(^| )(امسح|مسح|نظف)( |$)/.test(t)&&toks.length<=3)clearAll();
-      else if(SHOWV.test(t)){let got=false;scan(toks,0,true,r=>{if(!got){got=true;painting=false;les=null;cur=null;show(r.e);drew=true;}});}
+      else if(SHOWV.test(t)){let got=false;scan(toks,0,true,r=>{if(!got){got=true;showX(r.e);drew=true;}});}
       else if(cur&&!cards.length&&artSay(toks)){drew=true;}
       else if(P_ADD.test(t)||SIZE.test(t)||SKYW.test(t)){
         // نبني على الرسمة الظاهرة: «أضف غيوم»، «سماء مظلمة»، «قمر»، «كبّر الجمل»
         if(base||SKYW.test(t)||SIZE.test(t)){if(base||SKYW.test(t)){startPaintingWith(base);paintFinal(t,toks);}}
         else scan(toks,0,true,r=>{show(r.e);drew=true;});
       }
+      else if(cur&&!cards.length&&nameSay(toks)){drew=true;}
       else if(!uHits&&!cur&&alts&&alts.length){for(const a of alts){const tk=norm(a).split(' ').filter(Boolean);let got=false;scan(tk,0,true,r=>{if(!got){show(r.e);got=true;}});if(got){sayHide(700);break;}}}
     }
     if(pEls.length>n0||(!was&&painting)){quietUntil=Date.now()+2000;sayHide(500);}
