@@ -575,6 +575,7 @@ const SKIPW=/^[وف]?(اعرض\S*|ارني|ورني|ورينا|اظهر\S*|بد�
 /* ================= الرسم ================= */
 const BB={};
 function bbox(key){
+  if(!ST[key])return {x:-150,y:-50,w:300,h:100};
   if(BB[key])return BB[key];
   const m=$('measure');BBMEAS=true;m.innerHTML=marks(key,false);BBMEAS=false;let b;try{b=m.getBBox();}catch(_){b=null;}m.innerHTML='';
   return BB[key]=b&&b.width?{x:b.x-12,y:b.y-12,w:b.width+24,h:b.height+24}:{x:150,y:60,w:700,h:480};
@@ -858,6 +859,7 @@ function renderPainting(newId){
   pEls.forEach(e=>{
     const on=e.id===pSpot,op=pSpot&&!on?' opacity=".22"':'';let g,glow='';
     if(e.x){const k=e.k||1;g=`<g class="${e.id===newId?'pnew':''}"${op} transform="translate(${800-600*k} ${540-600*k}) scale(${1.5*k})"><g${e.col?'':' filter="url(#pencilgray)"'}>${skyline(false)}</g></g>`;if(on)glow=`<ellipse cx="800" cy="290" rx="700" ry="330" fill="url(#pglow)"/>`;if(e.deco)g+=decoSvg(e);}
+    else if(e.t==='text'){const w=e.w,h=e.fs;g=`<g${op} transform="translate(${e.cx.toFixed(0)} ${e.cy.toFixed(0)}) rotate(${e.rot||0})"><rect x="${(-w/2).toFixed(0)}" y="${(-h*.85).toFixed(0)}" width="${w.toFixed(0)}" height="${(h*1.3).toFixed(0)}" fill="transparent"/><text text-anchor="middle" font-size="${e.fs}" fill="${e.fill}" stroke="${e.stroke}" stroke-width="${Math.round(e.fs/14)}" paint-order="stroke" stroke-linejoin="round" style="font-family:${e.font},'Reem Kufi',sans-serif;font-weight:700">${esc(e.txt)}</text></g>`;}
     else{const b=bbox(e.key);g=`<g class="${e.id===newId?'draw':''}"${op} transform="translate(${e.cx} ${e.cy.toFixed(1)})${pCollage?' rotate('+((e.id*7)%13-6)+')':''} scale(${e.sc.toFixed(3)}) translate(${-(b.x+b.w/2)} ${-(b.y+b.h/2)})"><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent"/>${(()=>{PAPER=pCollage;const m=marks(e.key,e.id===newId,pCollage?(e.col||'orig'):e.col);PAPER=false;return m;})()}</g>`;
       if(on)glow=`<circle cx="${e.cx}" cy="${e.cy.toFixed(1)}" r="${(Math.max(b.w,b.h)*e.sc*.85).toFixed(0)}" fill="url(#pglow)"/>`;
       if(e.deco)g+=decoSvg(e);}
@@ -881,7 +883,7 @@ function attachDrag(){
     try{svg.setPointerCapture(ev.pointerId);}catch(_){}
     dr.gs.forEach(q=>q.style.cursor='grabbing');ev.preventDefault();});
   svg.addEventListener('pointermove',ev=>{
-    if(!dr)return;const p=pt(ev);const b=bbox(dr.el.key),hw=b.w*dr.el.sc/2,hh=b.h*dr.el.sc/2;
+    if(!dr)return;const p=pt(ev);const b=dr.el.t?{w:dr.el.w,h:dr.el.fs*1.3}:bbox(dr.el.key),sc0=dr.el.t?1:dr.el.sc,hw=b.w*sc0/2,hh=b.h*sc0/2;
     dr.dx=Math.max(hw-dr.el.cx,Math.min(1600-hw-dr.el.cx,p.x-dr.x0));dr.dy=Math.max(hh-dr.el.cy,Math.min(900-hh-dr.el.cy,p.y-dr.y0));
     dr.gs.forEach(q=>q.setAttribute('transform','translate('+dr.dx.toFixed(1)+' '+dr.dy.toFixed(1)+')'));});
   const end=()=>{if(!dr)return;const d=dr;dr=null;
@@ -1557,7 +1559,7 @@ function xpItems(){
   if(painting&&pEls.length){
     const pick=pSpot?pEls.filter(e=>e.id===pSpot):pEls;const seenK=new Set();
     pick.forEach(e=>{const kk=e.x?'x:towers':e.key;if(seenK.has(kk))return;seenK.add(kk);
-      if(e.x)push(TOWERS.title,TOWERS.facts,null,null,true);else{const en=stEnt(e.key);push(en.title,en.facts,e.key);}});
+      if(e.t)return;if(e.x)push(TOWERS.title,TOWERS.facts,null,null,true);else{const en=stEnt(e.key);push(en.title,en.facts,e.key);}});
     return out;}
   const c=cur;if(!c)return out;
   if(c.k==='st')push(c.title,c.facts,c.key);
@@ -1791,6 +1793,43 @@ function collageCmd(t,toks){
   cur=null;les=null;pEls=[];pid=pg=ps=pw=0;pSpot=0;pSky='day';pGround='sand';painting=true;$('trail').innerHTML='';
   ['مزهرية','ألعاب نارية','شمس','طائر'].forEach(k=>{if(ST[k])pAdd({key:k});});
   pCollage=true;renderPainting(0);return true;}
+
+/* ===== كتابة على اللوحة بخط محدد عند الطلب ===== */
+const PT_VERB=/(^| )[وف]?(اكتب\S*|نكتب|سجل|اضف\S*|ضع\S*|ضيف\S*|حط\S*|زد|اريد)( |$)/,
+      PT_OBJ=/(^| )(كتابه|كتابة|نص|كلمه|كلمة|عباره|عبارة|جمله|جملة|اسم|شعار|عنوان|توقيع|عنوانا)( |$)/;
+const PT_FONTS=[['CalKufi',/كوفي/],['CalNaskh',/نسخ/],['CalRuqaa',/رقعه/],['CalThuluth',/ثلث/],['CalDiwani',/ديواني/],['CalIjaza',/اجازه/],['CalFarsi',/فارسي|نستعليق|فارسى/]];
+const PT_COLS=[[/ذهب/,'#f4c430'],[/ابيض/,'#ffffff'],[/اسود/,'#1d1a1c'],[/احمر/,'#d63a2f'],[/ازرق/,'#2468c9'],[/اخضر/,'#2f9e55'],[/عنابي/,'#8a1538'],[/بنفسج/,'#7b45b5'],[/برتقال/,'#ef7d22'],[/وردي/,'#ee6f9a']];
+function ptStroke(f){return f==='#ffffff'||f==='#f4c430'?'#2a1414':'#ffffff';}
+function paintTextCmd(t,toks,raw){
+  if(!painting)return false;
+  const lastT=[...pEls].reverse().find(q=>q.t==='text');
+  let fontI=-1;PT_FONTS.forEach((f,i)=>{if(f[1].test(t))fontI=i;});
+  let fill=null;PT_COLS.forEach(c=>{if(c[0].test(t))fill=c[1];});
+  // حذف الكتابة
+  if(/(^| )(امح|امسح|احذف|شيل|ازل|الغ)\S* (ال)?(كتابه|نص|كلمه|عباره|جمله|اسم)/.test(t)){if(!lastT)return false;pEls.splice(pEls.indexOf(lastT),1);renderPainting(0);return true;}
+  // تعديل آخر كتابة: خط، لون، حجم
+  if(lastT&&/(^| )(غير|بدل|حول|اجعل|خلي|كبر|صغر|كبّر|صغّر)\S*/.test(t)&&!PT_OBJ.test(t.replace(/(ال)?(كتابه|نص|خط|لون)/g,''))||lastT&&/(^| )(غير|بدل|حول|اجعل|كبر|صغر)\S* (ال)?(كتابه|النص|الخط|خط)/.test(t)){
+    let ch=false;if(fontI>=0){lastT.font=PT_FONTS[fontI][0];ch=true;}if(fill){lastT.fill=fill;lastT.stroke=ptStroke(fill);ch=true;}
+    if(/كبر/.test(t)){lastT.fs=Math.min(260,Math.round(lastT.fs*1.25));ch=true;}if(/صغر/.test(t)){lastT.fs=Math.max(30,Math.round(lastT.fs*.8));ch=true;}
+    if(ch){lastT.w=Math.min(1500,lastT.txt.length*lastT.fs*.55);renderPainting(0);return true;}}
+  if(!PT_VERB.test(t))return false;
+  const hasObj=PT_OBJ.test(t),hasTgt=/(على|في|داخل|ب)(ال)?لوحه|عليها|فيها/.test(t),isWrite=/(^| )[وف]?(اكتب\S*|نكتب|سجل)( |$)/.test(t);
+  if(!(isWrite||hasObj&&hasTgt||/(اضف|ضع|حط)\S* (ال)?(كتابه|نص|كلمه|عباره|جمله|اسم|عنوان)/.test(t)))return false;
+  // استخراج النص من الجملة الأصلية
+  const ws=(raw||t).replace(/[«»"“”]/g,' ').split(/\s+/).filter(Boolean);
+  const SK=/^(اكتب|اكتبي|اكتبو|نكتب|سجل|اضف|اضيف|اضافه|ضع|ضيف|حط|زد|اريد|كلمه|كلمة|عباره|عبارة|جمله|جملة|نص|كتابه|كتابة|اسم|شعار|عنوان|توقيع|على|علي|الى|إلى|في|داخل|اللوحه|اللوحة|لوحه|لوحة|عليها|فيها|بخط|بالخط|خط|بلون|باللون|لون|اعلى|أعلى|فوق|اسفل|أسفل|تحت|يمين|اليمين|يسار|اليسار|وسط|الوسط|المنتصف|في|ب|الى|إلى|اللوحه)$/;
+  const FK=/^(كوفي|الكوفي|نسخ|النسخ|رقعه|الرقعه|ثلث|الثلث|ديواني|الديواني|اجازه|الاجازه|فارسي|الفارسي|نستعليق|النستعليق|ذهبي|الذهبي|ابيض|الابيض|اسود|الاسود|احمر|الاحمر|ازرق|الازرق|اخضر|الاخضر|عنابي|بنفسجي|برتقالي|وردي|والكوفي|بالكوفي|بالنسخ|بالرقعه|بالثلث|بالديواني|بالفارسي|بالاجازه|الاجازة|بالاجازة)$/;
+  const keep=ws.filter(w=>{const n=norm(w);return !SK.test(n)&&!FK.test(n)&&!/^(بالخط|بلون)$/.test(n);});
+  const txt=keep.join(' ').trim();
+  if(!txt)return false;
+  const L=[...txt].length;let fs=L<=6?150:L<=12?120:L<=20?92:66;fs=Math.min(fs,Math.floor(1400/(L*.52)));fs=Math.max(fs,34);
+  const f=fill||'#2a1414',w=Math.min(1500,L*fs*.55);
+  let cx=800,cy=170;
+  if(/تحت|اسفل/.test(t))cy=800;else if(/وسط|منتصف/.test(t))cy=470;
+  if(/يمين/.test(t))cx=Math.max(w/2+30,1600-w/2-60);else if(/يسار/.test(t))cx=Math.min(1600-w/2-30,w/2+60);
+  while(pEls.some(q=>q.t==='text'&&Math.abs(q.cy-cy)<fs*.9)){cy+=fs*1.15;if(cy>860)cy=170+(cy%100);}
+  const el={id:++pid,t:'text',txt,font:PT_FONTS[fontI>=0?fontI:1][0],fill:f,stroke:ptStroke(f),fs,w,cx,cy,sc:1,rot:0};
+  pEls.push(el);pLast=el.id;renderPainting(el.id);return true;}
 function hear(raw,final,alts){
   const toks=norm(raw).split(' ').filter(Boolean);if(!toks.length)return;
   const isFinal=final===true;
@@ -1798,6 +1837,7 @@ function hear(raw,final,alts){
   clearTimeout(waitT);
   const t=toks.join(' ');
   if(/(^| )(اختبر|فحص|افحص|اظهر|اعرض)\S* (ال)?(مايك|ميكروفون|المايك|الميكروفون)( |$)/.test(t)){try{localStorage.setItem('micmeter',meterOn()?'0':'1');}catch(_){}if(meterOn()){micPro(true);msg('شريط مستوى الصوت يعمل. إذا لم يتحرك فالميكروفون لا يصل إليه صوت.');}else{micPro(false);msg('تم إيقاف شريط مستوى الصوت.');}return;}
+  if(isFinal&&paintTextCmd(t,toks,raw))return;
   if(isFinal&&logoCmd(t,toks,raw))return;
   if(isFinal&&styleCmd(t,toks))return;
   if(isFinal&&collageCmd(t,toks))return;
