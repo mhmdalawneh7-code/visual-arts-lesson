@@ -669,6 +669,16 @@ function pMove(el,cx,cy){const dx=cx-el.cx,dy=cy-el.cy;el.cx=cx;el.cy=cy;pEls.fo
 function placeCmd(t,toks,es){
   const r=PL_R.test(t),l=PL_L.test(t),c=PL_C.test(t)&&!/نص (ال)?(ساعه|دقيقه)/.test(t),sea=PL_SEA.test(t)&&/(في|داخل|بداخل|علي|فوق|وسط|ب) ?(ال)?بحر|ماء/.test(t),on=PL_ON.test(t);
   const sts=es.filter(e=>e.k==='st');
+  const fr=/(^| )(امام|قدام|بامام|قبال)( |$)/.test(t),bk=/(^| )(خلف|وراء|ورا|بخلف|ورى)( |$)/.test(t);
+  if((fr||bk)&&sts.length>=2&&sts[0].key!==sts[1].key){
+    const find=key=>[...pEls].reverse().find(q=>q.key===key),get=k=>find(k)||pEls.find(q=>q.id===pAdd({key:k}));
+    const el=get(sts[0].key),a=get(sts[1].key);if(!el||!a)return false;
+    const ab=a.cy+elH(a)/2,aw=elW(a);
+    if(fr){const h=elH(el);pMove(el,a.cx+aw*.3,Math.min(880,ab+28)-h/2);pEls.splice(pEls.indexOf(el),1);pEls.splice(pEls.indexOf(a)+1,0,el);}
+    else{el.sc*=.85;const h=elH(el);pMove(el,a.cx-aw*.3,ab-46-h/2);pEls.splice(pEls.indexOf(el),1);pEls.splice(pEls.indexOf(a),0,el);}
+    const hw=elW(el)/2+16;el.cx=Math.max(hw,Math.min(1600-hw,el.cx));
+    pLast=el.id;renderPainting(0);return true;
+  }
   if(!(r||l||c||sea||(on&&sts.length>=2)))return false;
   // العنصر المقصود والعنصر الذي يوضع عليه
   let target=sts[0]||null,anchor=null;
