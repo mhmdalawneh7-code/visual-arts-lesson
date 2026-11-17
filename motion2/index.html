@@ -1206,7 +1206,7 @@ function showTyping(){$('form').classList.add('show');$('typed').focus();}
 function startRec(){
   if(!rec){
     rec=new SR();rec.lang='ar-SA';rec.interimResults=true;rec.continuous=!MOBILE;rec.maxAlternatives=3;
-    rec.onstart=()=>{running=true;startFails=0;lastEvt=Date.now();msg('');dotUI();};
+    rec.onstart=()=>{running=true;startFails=0;lastEvt=Date.now();msg('');dotUI();mst(gaps?'يستمع ✓ (أُعيد '+gaps+')':'يستمع ✓');setTimeout(()=>{if(running&&Date.now()-lastEvt>0)mst('');},2500);};
     rec.onaudiostart=rec.onsoundstart=rec.onspeechstart=()=>{lastEvt=Date.now();};
     rec.onresult=e=>{lastEvt=Date.now();if(Date.now()<muteUntil)return;let interim='',fin=false;
       for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal){const al=[];for(let k=1;k<r.length;k++)al.push(r[k].transcript);hear(r[0].transcript,true,al);fin=true;}else interim+=r[0].transcript+' ';}
@@ -1214,18 +1214,21 @@ function startRec(){
       if(interim.trim()){hear(interim,false);
         // كلام طويل بلا توقف: نُنهي المقطع ليُعالج ويبدأ الاستماع من جديد فوراً
         if(!MOBILE&&Date.now()-lastFin>12000&&interim.trim().split(/\s+/).length>22){lastFin=Date.now();try{rec.stop();}catch(_){}}}};
-    rec.onerror=e=>{
+    rec.onerror=e=>{lastWhy=e.error;gaps++;mst('توقف: '+(WHY[e.error]||e.error)+' — أعيد…',true);
       if(e.error==='not-allowed'||e.error==='service-not-allowed'){want=false;msg('الميكروفون غير مسموح. اسمح به من إعدادات الموقع في المتصفح ثم اضغط زر الميكروفون.');showTyping();}
       else if(e.error==='network'){netErr=true;msg('الاتصال ضعيف… أحاول الاستماع من جديد.');setTimeout(()=>{if(running)msg('');},4000);}
       else if(e.error==='audio-capture'){want=false;msg('لم أجد ميكروفوناً في هذا الجهاز.');showTyping();}
       else if(e.error==='language-not-supported'){rec.lang='ar';}
     };
-    rec.onend=()=>{running=false;dotUI();if(want)setTimeout(recStart,netErr?900:60);netErr=false;};
+    rec.onend=()=>{running=false;dotUI();const d=lastWhy==='no-speech'?250:netErr?900:60;lastWhy='';if(want){mst('أعيد الاستماع…');setTimeout(recStart,d);}netErr=false;};
   }
   recStart();
 }
 /* تشغيل الاستماع مع إعادة المحاولة، وإنشاء مستمع جديد إذا علق القديم */
-let startFails=0,netErr=false;
+let startFails=0,netErr=false,mstEl=null,gaps=0,lastWhy='';
+function mst(t,bad){if(!mstEl){mstEl=document.createElement('span');mstEl.style.cssText='font:600 12px system-ui,sans-serif;color:#f6d98a;background:#0006;border-radius:10px;padding:3px 9px;max-width:46vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none';document.querySelector('.ctl').prepend(mstEl);}
+  mstEl.textContent=t||'';mstEl.style.display=t?'':'none';mstEl.style.color=bad?'#ff9d9d':'#f6d98a';}
+const WHY={'no-speech':'لم يسمع صوتاً','aborted':'قُطع الاستماع','network':'ضعف الإنترنت','audio-capture':'لا يوجد ميكروفون','not-allowed':'الميكروفون غير مسموح','service-not-allowed':'الخدمة غير مسموحة','language-not-supported':'اللغة غير مدعومة'};
 function recStart(){
   if(!want||running||!rec)return;
   try{rec.start();}catch(err){
@@ -1244,7 +1247,7 @@ setInterval(()=>{
   if(!want||!rec)return;
   if(!running&&Date.now()-lastEvt>1500){lastEvt=Date.now();recStart();}
   // جلسة عالقة: تعمل ولا يصل منها شيء لمدة طويلة، نعيد تشغيلها
-  else if(running&&Date.now()-lastEvt>15000){lastEvt=Date.now();try{rec.abort();}catch(_){}}
+  else if(running&&Date.now()-lastEvt>(MOBILE?25000:40000)){lastEvt=Date.now();try{rec.abort();}catch(_){}}
   if(!wakeLk)keepAwake(true);
 },1500);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want){keepAwake(true);if(rec&&!running)recStart();}});
@@ -1260,7 +1263,7 @@ function listen(on){
 if(window.claude&&typeof window.claude.use==='function'){
   window.claude.use('dictation').then(d=>{if(!d)return;dict=d;
     d.onPartial(({text})=>{if(Date.now()>muteUntil)hear(text,false);});d.onFinal(({text})=>{if(Date.now()>muteUntil)hear(text,true);});
-    d.onState(({state,reason})=>{if(state==='idle'&&want&&reason!=='viewer_stopped'&&reason!=='stopped')d.start().catch(()=>{want=false;dotUI();});if(state==='idle'&&(reason==='viewer_stopped'||reason==='stopped')){want=false;}dotUI();});
+    d.onState(({state,reason})=>{mst(state==='idle'?('توقف'+(reason?': '+reason:'')+' — أعيد…'):'يستمع ✓',state==='idle');if(state!=='idle')setTimeout(()=>mst(''),2500);if(state==='idle'&&want&&reason!=='viewer_stopped'&&reason!=='stopped')d.start().catch(()=>{want=false;dotUI();});if(state==='idle'&&(reason==='viewer_stopped'||reason==='stopped')){want=false;}dotUI();});
   }).catch(()=>{});
 }
 $('go').addEventListener('click',()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();}catch(_){}$('start').classList.add('hide');listen(true);});
