@@ -165,6 +165,14 @@ body.hascards #hero,body.hascards #trail{opacity:.18;transition:opacity .4s}
 #go{border:0;border-radius:999px;background:var(--gold);color:var(--stage);font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,40px);padding:14px 46px}
 #measure{position:absolute;width:0;height:0;overflow:hidden;visibility:hidden}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.draw path.s{stroke-dashoffset:0}.draw path.f{opacity:var(--o)}}
+
+.lnav{display:flex;align-items:center;justify-content:center;gap:0;margin:0 0 12px;flex-wrap:nowrap;overflow-x:auto;padding:4px 2px}
+.ln{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:#6b5a48;font:700 clamp(10px,1.5vw,14px) system-ui,sans-serif;cursor:pointer;min-width:clamp(44px,8vw,86px);padding:0}
+.ln .lni{width:clamp(34px,5vw,52px);height:clamp(34px,5vw,52px);border-radius:50%;display:grid;place-items:center;font-size:clamp(16px,2.6vw,26px);background:#efe3cc;border:2px solid #d8c7a4;transition:.25s}
+.ln.done .lni{background:#cfe9d6;border-color:#2f8f5b}
+.ln.on{color:#7a1230}.ln.on .lni{background:#c9a24b;border-color:#7a1230;transform:scale(1.18);box-shadow:0 0 0 5px #c9a24b44}
+.ln .lns{font-size:.8em;color:#9a6b00}
+.lnl{flex:1 1 12px;min-width:10px;max-width:46px;height:4px;border-radius:3px;background:#d8c7a4;margin-bottom:18px}.lnl.done{background:#7fe08a}
 </style>
 </head>
 <body>
@@ -958,6 +966,12 @@ const LESSONS=[
   note:'حسن بوجسوم يستلهم التراث والذاكرة والحياة الاجتماعية القطرية. يوسف أحمد: تجربة معاصرة وحروفية. اذكر الفنان وعنوان العمل ومصدره.',qs:[7,9,14,15]}];
 let les=null,lsec='idea',lstep=0;
 const SECN={goals:'الأهداف',vocab:'المفردات',steps:'خطوات التنفيذ',diff:'التمايز',ask:'أسئلة التفكير',note:'ملاحظة',out:'الناتج الفني'};
+const SECI={idea:['💡','الفكرة'],goals:['🎯','الأهداف'],vocab:['🔤','المفردات'],steps:['🪜','الخطوات'],diff:['🧩','التمايز'],ask:['❓','التفكير'],out:['🖼️','الناتج'],note:['📌','ملاحظة']};
+const secList=L=>['idea','goals','vocab','steps','diff','ask','out','note'].filter(k=>k==='idea'||k==='steps'||k==='vocab'||k==='out'||k==='note'?(k==='vocab'?L.vocab&&L.vocab.length:k==='out'||k==='note'?L[k]:true):(L[k]&&L[k].length));
+function lessonNav(L){const ks=secList(L),ci=ks.indexOf(lsec);
+  return `<div class="lnav" dir="rtl">${ks.map((k,i)=>`<button class="ln ${k===lsec?'on':''} ${i<ci?'done':''}" onclick="lessonGo('${k}')"><span class="lni">${SECI[k][0]}</span><span class="lnt">${SECI[k][1]}</span>${k==='steps'?`<span class="lns">${Math.min(lstep,L.steps.length)}/${L.steps.length}</span>`:''}</button>${i<ks.length-1?'<i class="lnl '+(i<ci?'done':'')+'"></i>':''}`).join('')}</div>`;}
+window.lessonGo=k=>{if(!les)return;lsec=k;if(k==='steps'&&!lstep)lstep=1;renderLesson();};
+function lessonStepNav(d){const ks=secList(les),i=ks.indexOf(lsec),j=Math.max(0,Math.min(ks.length-1,i+d));lessonGo(ks[j]);}
 function renderLesson(){
   const L=les,th=L.thumb&&ST[L.thumb]?`<div class="paper sm">${stSvg(L.thumb,false)}</div>`:'';let body='';
   const list=(arr,ord,upto)=>`<${ord?'ol':'ul'} class="llist">${arr.map((x,i)=>`<li class="${upto==null||i<upto?'on':''}${upto!=null&&i===upto-1?' cur':''}">${esc(x)}</li>`).join('')}</${ord?'ol':'ul'}>`;
@@ -965,7 +979,7 @@ function renderLesson(){
   else if(lsec==='steps')body=list(L.steps,true,lstep);
   else if(lsec==='note'||lsec==='out')body=`<p class="lp">${esc(L[lsec]||'')}</p>`;
   else if(lsec!=='idea')body=list(L[lsec]||[],false);
-  $('hero').innerHTML=`<div class="lesson"><div class="lhead">${th}<div><small>الدرس ${L.n}</small><h1>${esc(L.title)}</h1></div></div><p class="idea">${esc(L.idea)}</p>${lsec!=='idea'?`<h3>${SECN[lsec]}</h3>`:''}<div class="lbody">${body}</div></div>`;
+  $('hero').innerHTML=`<div class="lesson">${lessonNav(L)}<div class="lhead">${th}<div><small>الدرس ${L.n}</small><h1>${esc(L.title)}</h1></div></div><p class="idea">${esc(L.idea)}</p>${lsec!=='idea'?`<h3>${SECN[lsec]}</h3>`:''}<div class="lbody">${body}</div></div>`;
 }
 function openLesson(n){les=LESSONS[n-1];lsec='idea';lstep=0;painting=false;cur={id:'les:'+n,k:'les',title:les.title};FX.list=[];$('hero').classList.remove('hasspot');renderLesson();}
 function lessonMap(){les=null;painting=false;cur={id:'les:map',k:'map',title:''};FX.list=[];
@@ -980,7 +994,8 @@ function lessonCmd(t){
   if(has(/اهداف|هدف/))lsec=L.goals.length?'goals':'out';
   else if(has(/مفردات|مصطلحات/))lsec='vocab';
   else if(has(/كل الخطوات|جميع الخطوات/)){lsec='steps';lstep=L.steps.length;}
-  else if(has(/(^| )(التالي|التاليه|بعدها|كمل)( |$)/)){if(lsec!=='steps'){lsec='steps';lstep=1;}else lstep=Math.min(L.steps.length,lstep+1);}
+  else if(has(/(^| )(السابق|السابقه|ارجع|رجوع|قبلها|الشريحه السابقه)( |$)/)){if(lsec==='steps'&&lstep>1)lstep--;else lessonStepNav(-1);}
+  else if(has(/(^| )(التالي|التاليه|بعدها|كمل|الشريحه التاليه|الشريحه القادمه)( |$)/)){if(lsec==='steps'&&lstep<L.steps.length)lstep++;else if(lsec!=='steps'&&secList(L).indexOf(lsec)<secList(L).indexOf('steps'))lessonStepNav(1);else if(lsec==='steps'||secList(L).indexOf(lsec)>=secList(L).indexOf('steps'))lessonStepNav(1);}
   else if(has(/خطوات|خطوه|نشاط|تنفيذ/)){lsec='steps';lstep=Math.max(1,lstep);}
   else if(has(/تمايز|فروق|مستويات|مسار/))lsec=L.diff.length?'diff':'steps';
   else if(has(/تقويم|تفكير|تامل|ناقش/))lsec='ask';
