@@ -94,10 +94,10 @@ button{cursor:pointer}
 .fk{font-family:CalKufi,'Reem Kufi',sans-serif;font-weight:700;word-spacing:.32em}
 .fn{font-family:CalNaskh,'Amiri','Noto Naskh Arabic','Traditional Arabic',serif;font-weight:400}
 .fr{font-family:CalRuqaa,'Aref Ruqaa',serif;font-weight:400}
-.calp{background:var(--paper);border-radius:28px;padding:clamp(12px,3vh,34px) clamp(16px,4vw,56px);box-shadow:0 18px 50px rgba(0,0,0,.45);max-width:94vw;display:grid;gap:clamp(6px,1.6vh,18px);animation:pop .5s ease}
-.calp.one{min-width:min(60vw,700px);min-height:24vh;place-items:center}
-.calx{display:block;color:#3a1220;line-height:1.75;text-align:center;white-space:nowrap;padding:0 .15em;background:linear-gradient(#c9a55a,#c9a55a) 0 78%/100% 2px no-repeat;animation:wr 1.6s ease-out backwards}
-.calr{display:grid;grid-template-columns:1fr;justify-items:center;animation:rise .5s ease backwards}
+.calp{width:min(94vw,1100px);box-sizing:border-box;background:var(--paper);border-radius:28px;padding:clamp(12px,3vh,34px) clamp(16px,4vw,56px);box-shadow:0 18px 50px rgba(0,0,0,.45);max-width:94vw;display:grid;gap:clamp(6px,1.6vh,18px);animation:pop .5s ease}
+.calp.one{min-height:24vh;place-items:center}
+.calx{display:inline-block;max-width:none;color:#3a1220;line-height:1.75;text-align:center;white-space:nowrap;padding:0 .15em;background:linear-gradient(#c9a55a,#c9a55a) 0 78%/100% 2px no-repeat;animation:wr 1.6s ease-out backwards}
+.calr{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;width:100%;animation:rise .5s ease backwards}
 .calr b{font-family:var(--display);font-size:clamp(13px,1.7vw,22px);color:#1f6f78;font-weight:700}
 .calr+.calr{border-top:1px dashed rgba(138,21,56,.25);padding-top:clamp(4px,1vh,12px)}
 @keyframes wr{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
@@ -203,6 +203,7 @@ const BLOCK=new Set(['طلاب','اولاد','اشخاص','درس','شكل','ج�
 /* كلمات شائعة في الشرح: لا تُرسم إلا بأمر صريح مثل «ارسم بيت» */
 const SOFT=new Set(['كره','خط','باب','بيت','وجه','يد','عين','علم','كتاب','قلم','مبني','انسان','ولد','بنت','شجره','زهره','نجمه','قلب','دايره','مربع','مثلث','سمكه','قطه']);let CMD=false;
 const PARTS={"المحمل":{"شراع":1,"علم":2,"رايه":2,"هيكل":0,"خشب":0},"قلعة الزبارة":{"باب":3,"بوابه":3,"برج":1,"ابراج":1,"نوافذ":4},"الصقر":{"جناح":5,"صدر":4,"منقار":6,"ذيل":2,"وكر":1},"جمل":{"سرج":3,"ارجل":0},"النخلة":{"جذع":0,"سعف":1},"الدلة":{"غطاء":4,"مقبض":0,"يد":0},"بيت الشعر":{"سقف":0},"الفنر":{"زجاج":0,"شعله":1,"نار":1},"غوص اللؤلؤ":{"لؤلؤه":4},"انسان":{"ثوب":0,"غتره":2,"وجه":3,"حذاء":4},"انسان يمشي":{"ثوب":0,"غتره":2,"وجه":3,"حذاء":4},"مسجد":{"قبه":1,"مئذنه":2,"مناره":2,"باب":4,"جدار":0,"نوافذ":5},"مئذنة":{"قمه":1},"شجرة":{"جذع":0,"ساق":0,"اوراق":1,"ورق":1},"زهرة":{"اوراق":0,"بتلات":1,"مركز":3,"وسط":3},"شمس":{"اشعه":0},"طائر":{"جناح":3,"ذيل":0,"منقار":4},"سمكة":{"ذيل":1,"زعانف":2},"بيت":{"جدار":0,"جدران":0,"حائط":0,"سقف":1,"باب":2,"نوافذ":3,"نافذه":3,"شباك":3},"سيارة":{"نوافذ":1,"زجاج":1,"عجلات":2,"اطارات":2},"صاروخ":{"لهب":0,"نار":0,"زعانف":2,"نافذه":7},"باص":{"نوافذ":1,"عجلات":3},"مبنى":{"نوافذ":1,"باب":2},"فنجان":{"قهوه":2},"برج الهواء":{"باب":4},"صندوق":{"غطاء":2},"سيف":{"مقبض":3},"طبل":{"جلد":1},"فراشة":{"جناح":0},"سلحفاة":{"صدفه":3,"راس":2},"تفاحة":{"ورقه":1}};
+const ENTBYID=id=>{for(const v of ENT.values())if(v.id===id)return v;return null;};
 const add=(phrase,e)=>{const c=canon(phrase);if(c&&!BLOCK.has(c)&&!ENT.has(c))ENT.set(c,e);};
 /* حصان عربي: رسمة جديدة بنفس أسلوب المكتبة */
 ST['حصان']={t:'الحصان العربي',size:.5,sky:0,main:2,f:[
@@ -250,7 +251,6 @@ const PERSP1={k:'p1',id:'p1',title:'منظور النقطة الواحدة',fact
  [['الألوان الباردة','الوان باردة'],'الألوان الباردة',[col('blue'),col('green'),col('purple')],'تذكّرنا بالماء والسماء والعشب.'],
  [['الألوان','الوان','دائرة الألوان'],'الألوان',[col('red'),col('orange'),col('yellow'),col('green'),col('blue'),col('purple')],'دائرة الألوان: الأساسية والثانوية.'],
  [['الفنانين القطريين','فنانين قطريين','الفنانون القطريون','فنانون قطريون'],'فنانون قطريون',[{txt:'جاسم زيني',label:'رائد الفن الحديث'},{txt:'يوسف أحمد',label:'الحرف وسعف النخيل'},{txt:'وفيقة سلطان',label:'أول فنانة محترفة'},{txt:'حسن بوجسوم',label:'رسّام التراث'}],''],
- [['عناصر الفن','عناصر العمل الفني','العناصر الفنية','عناصر فنية','عناصر التصميم'],'عناصر الفن',[{txt:'النقطة',label:''},{txt:'الخط',label:''},{txt:'الشكل',label:''},{txt:'اللون',label:''},{txt:'الملمس',label:''}],'']
 ].forEach(([keys,title,items,fact])=>{const e={k:'grp',id:'g:'+title,title,items,facts:Array.isArray(fact)?fact:fact?[fact]:[]};keys.forEach(k=>add(k,e));});
 // 2) مفاهيم برسم متحرك
 [['تماثل',['التماثل','تماثل','التناظر','متماثل'],'التماثل','تشابه أو تقابل أجزاء حول محور أو مركز.'],
@@ -259,6 +259,31 @@ const PERSP1={k:'p1',id:'p1',title:'منظور النقطة الواحدة',fact
  ['lines',['الخطوط','خطوط','انواع الخطوط','الخط المستقيم','خط منحني','خط متعرج'],'أنواع الخطوط','مستقيم، منحنٍ، متعرّج.'],
  ['shade',['الظل والنور','الظل','التظليل','ظل ونور'],'الظل والنور','الجهة المقابلة للضوء فاتحة، والأخرى داكنة.']
 ].forEach(([cid,keys,title,fact])=>{const e={k:'con',id:'c:'+cid,cid,title,facts:[fact]};keys.forEach(k=>add(k,e));});
+// 2أ) عناصر التصميم وأسس التصميم
+{const DE=[
+ ['dot','النقطة',['النقطة','نقطه','عنصر النقطه'],['النقطة أصغر عنصر في التصميم، ومنها يبدأ كل شيء.','إذا تحرّكت النقطة صنعت خطاً، وإذا تجمّعت صنعت شكلاً أو ملمساً.']],
+ ['lines','الخط',['عنصر الخط','الخط في التصميم','انواع الخط'],['الخط أثر نقطة متحركة.','أنواعه: مستقيم، منحنٍ، متعرّج، أفقي، رأسي، مائل.','الخط الأفقي يعطي هدوءاً، والمائل يعطي حركة.']],
+ ['shape','الشكل',['الاشكال','عنصر الشكل','الشكل الهندسي','الاشكال الهندسيه','الاشكال العضويه','الشكل العضوي','الشكل والهيئه'],['الشكل مساحة مغلقة يحدّها خط.','أشكال هندسية: دائرة ومربع ومثلث، وأشكال عضوية: من الطبيعة كالأوراق والغيوم.']],
+ ['colour','اللون',['عنصر اللون','اللون في التصميم'],['اللون أكثر العناصر جذباً للنظر.','ألوان أساسية وثانوية، وألوان حارة وباردة.']],
+ ['texture','الملمس',['الملمس','ملمس','عنصر الملمس','الملامس'],['الملمس هو إحساس السطح: ناعم أو خشن.','ملمس حقيقي نحسّه باليد، وملمس مرسوم نراه بالعين.']],
+ ['space','المساحة والفراغ',['المساحه','الفراغ','المساحه والفراغ','الفراغ الايجابي','الفراغ السلبي','عنصر المساحه'],['المساحة الإيجابية: ما يشغله الشكل.','المساحة السلبية (الفراغ): ما حول الشكل.','التوازن بينهما يريح العين.']],
+ ['value','القيمة الضوئية',['القيمه الضوئيه','القيمه','درجات اللون','التدرج','تدرج اللون','الفاتح والداكن'],['القيمة الضوئية: درجة فتاحة اللون أو قتامته.','تساعدنا على إظهار الظل والنور والعمق.']]
+],PR=[
+ ['balance','التوازن',['التوازن','توازن','الاتزان','التوازن المتماثل','التوازن غير المتماثل'],['توزيع العناصر في العمل الفني حتى لا يثقل جانب على آخر.','توازن متماثل: الجانبان متشابهان، وغير متماثل: مختلفان لكن متعادلان.']],
+ ['contrast','التباين',['التباين','تباين','التضاد'],['التباين: وضع عناصر مختلفة جنباً إلى جنب لتبرز.','مثل: فاتح وداكن، كبير وصغير، ناعم وخشن.']],
+ ['rhythm','الإيقاع',['الايقاع','ايقاع','الايقاع البصري','التكرار والايقاع'],['الإيقاع: تكرار منتظم للعناصر يجعل العين تنتقل بينها.','قد يكون التكرار متماثلاً أو متناوباً (كبير، صغير، كبير).']],
+ ['unity','الوحدة',['الوحده','الوحده والتنوع','الترابط'],['الوحدة: أن تبدو أجزاء العمل كأنها عائلة واحدة.','نحققها بتكرار الألوان والأشكال المتقاربة.']],
+ ['proportion','التناسب',['التناسب','تناسب','النسبه والتناسب','النسبه','النسب'],['التناسب: علاقة حجم جزء بحجم جزء آخر أو بالعمل كله.','الشكلان متشابهان، ويختلفان في الحجم بنسبة مدروسة.']],
+ ['movement','الحركة',['الحركه','عنصر الحركه','الحركه في الفن'],['الحركة: توجيه عين المشاهد داخل العمل.','الخطوط المنحنية والمائلة توحي بالحركة.']],
+ ['emphasis','السيادة',['السياده','التاكيد','السياده والتاكيد','مركز السياده','نقطه الاهتمام','مركز الاهتمام'],['السيادة: عنصر يجذب النظر أولاً.','نصنعها بالاختلاف في اللون أو الحجم أو المكان.']]
+];
+ const mk=(arr,tag)=>arr.map(([cid,title,keys,facts])=>{const e={k:'con',id:'c:'+cid,cid,title,facts,design:tag};keys.forEach(k=>add(k,e));return {con:cid,label:title,e};});
+ const de=mk(DE,'el'),pr=mk(PR,'pr');
+ const g1={k:'grp',id:'g:design-el',title:'عناصر التصميم',design:'el',items:de.map(x=>({con:x.con,label:x.label})),facts:['عناصر التصميم هي المفردات التي نبني بها أي عمل فني.','النقطة، الخط، الشكل، اللون، الملمس، المساحة، القيمة الضوئية.']};
+ const g2={k:'grp',id:'g:design-pr',title:'أسس التصميم',design:'pr',items:pr.map(x=>({con:x.con,label:x.label})),facts:['أسس التصميم هي القواعد التي ننظّم بها العناصر في العمل الفني.','التوازن، التباين، الإيقاع، الوحدة، التناسب، الحركة، السيادة.']};
+ ['عناصر التصميم','عناصر الفن','عناصر العمل الفني','العناصر الفنيه','عناصر فنيه','العناصر','عناصر التكوين'].forEach(k=>add(k,g1));
+ ['اسس التصميم','اساسيات التصميم','مبادئ التصميم','اسس الفن','مبادئ الفن','اسس العمل الفني','الاسس'].forEach(k=>add(k,g2));
+ window.__DE=[g1,g2];}
 // 2ب) العمارة الإسلامية: المقرنصات والأقواس وزخرفة الجدران
 {const mk=(cid,keys,title,facts)=>{const e={k:'con',id:'c:'+cid,cid,title,facts,arch:true};keys.forEach(k=>add(k,e));return e;};
  mk('muq',['المقرنصات','مقرنصات','المقرنص','مقرنص','مقرنصه','المقرنصه','مقرنسات','المقرنسات'],'المقرنصات',['زخرفة معمارية تشبه خلايا النحل: حنايا صغيرة متراصّة في صفوف فوق بعضها.','نراها تحت القباب، وفوق المداخل والمحاريب، وتحت شرفات المآذن.','تنقل البناء من المربّع إلى الدائرة تحت القبة، وتصنع لعبة جميلة من الظل والنور.']);
@@ -375,6 +400,24 @@ function conceptSvg(id){
     [130,250,370].forEach((cx,i)=>{const cy=200,r=44,R=62;s+=P(`M${cx-r} ${cy-r}H${cx+r}V${cy+r}H${cx-r}Z`,M,6,1.5+i*.4)+P(`M${cx} ${cy-R}L${cx+R} ${cy}L${cx} ${cy+R}L${cx-R} ${cy}Z`,T,6,1.7+i*.4)+`<circle class="f" cx="${cx}" cy="${cy}" r="13" fill="${G}" style="--o:1;--fd:${2.4+i*.3}s"/>`;});
     let d='';for(let x=70;x<=430;x+=45)d+=`M${x} 318L${x+16} 335L${x} 352L${x-16} 335Z`;s+=P(d,M,4,3);
   }
+  const F=(tag,attr,i,o=1)=>`<${tag} class="f" ${attr} style="--o:${o};--fd:${(i*.25).toFixed(2)}s"/>`;
+  if(id==='dot'){let k=0;for(let a=0;a<720;a+=28){const r=12+a/7.2,x=250+r*Math.cos(a*Math.PI/180),y=200+r*Math.sin(a*Math.PI/180)*.85;s+=F('circle',`cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(3+a/60).toFixed(1)}" fill="${[M,T,G][k%3]}"`,k*.35);k++;}}
+  if(id==='shape'){s=P('M60 180H180V60H60Z',M,8,0)+P('M290 180L350 60L410 180Z',T,8,1)+`<circle class="f" cx="120" cy="290" r="62" fill="none" stroke="${G}" stroke-width="8" style="--o:1;--fd:.6s"/>`+P('M290 330C250 270 300 220 345 245C380 200 450 240 420 290C440 340 360 360 330 330C315 350 285 350 290 330Z','#2a1414',7,2)+`<text x="120" y="390" text-anchor="middle" font-size="24" fill="${T}" font-weight="700">هندسي</text><text x="350" y="390" text-anchor="middle" font-size="24" fill="${M}" font-weight="700">عضوي</text>`;}
+  if(id==='colour'){['#d63a2f','#f08a24','#f4c430','#3a9d4a','#2468c9','#7d4cb8'].forEach((c,i)=>{const a=(i*60-90)*Math.PI/180;s+=F('circle',`cx="${(250+120*Math.cos(a)).toFixed(1)}" cy="${(200+120*Math.sin(a)).toFixed(1)}" r="52" fill="${c}"`,i);});}
+  if(id==='texture'){const B=(x,y,c,i)=>P(`M${x} ${y}h180v140h-180Z`,c,5,i);s=B(40,40,M,0)+B(280,40,T,0)+B(40,220,G,0)+B(280,220,'#2a1414',0);
+    let h='';for(let k=0;k<11;k++)h+=`M${50+k*15} 170L${68+k*15} 50`;s+=P(h,M,3,1);
+    for(let x=300;x<450;x+=22)for(let y=60;y<170;y+=22)s+=F('circle',`cx="${x}" cy="${y}" r="5" fill="${T}"`,2);
+    let w='';for(let y=240;y<350;y+=22){w+=`M50 ${y}`;for(let x=0;x<8;x++)w+='q10 -12 20 0t0 0';}s+=P(w,G,3,3);
+    let c='';for(let k=0;k<9;k++)c+=`M${290+k*20} 230V350M290 ${235+k*13}H450`;s+=P(c,'#2a1414',2,4);}
+  if(id==='space'){s=`<rect class="f" x="60" y="40" width="380" height="320" rx="10" fill="#f3e3c3" style="--o:1;--fd:0s"/>`+F('path',`d="M250 70C200 70 190 120 215 150C170 170 180 230 220 240L205 330H295L280 240C320 230 330 170 285 150C310 120 300 70 250 70Z" fill="${M}"`,1)+`<text x="250" y="205" text-anchor="middle" font-size="26" fill="#fff" font-weight="700">إيجابي</text><text x="115" y="345" text-anchor="middle" font-size="24" fill="${T}" font-weight="700">فراغ</text><text x="390" y="90" text-anchor="middle" font-size="24" fill="${T}" font-weight="700">فراغ</text>`;}
+  if(id==='value'){for(let i=0;i<7;i++){const v=Math.round(255-i*38);s+=F('rect',`x="${32+i*63}" y="140" width="58" height="120" rx="6" fill="rgb(${v},${v},${v})" stroke="#2a1414" stroke-width="2"`,i);}s+=`<text x="60" y="300" text-anchor="middle" font-size="24" fill="#2a1414" font-weight="700">فاتح</text><text x="440" y="300" text-anchor="middle" font-size="24" fill="#2a1414" font-weight="700">داكن</text>`;}
+  if(id==='balance'){s=P('M250 300L215 360H285Z',G,7,0)+P('M60 300H440','#2a1414',8,1)+F('rect',`x="85" y="200" width="100" height="100" rx="8" fill="${M}"`,2)+F('rect',`x="315" y="200" width="100" height="100" rx="8" fill="${M}"`,2)+P('M250 30V280',T,3,3);}
+  if(id==='contrast'){s=`<rect class="f" x="40" y="60" width="210" height="280" fill="#1c1414" style="--o:1;--fd:0s"/><rect class="f" x="250" y="60" width="210" height="280" fill="#fff" stroke="#1c1414" stroke-width="4" style="--o:1;--fd:0s"/>`+F('circle',`cx="145" cy="200" r="70" fill="#fff"`,1)+F('circle',`cx="355" cy="200" r="22" fill="#1c1414"`,2)+F('circle',`cx="355" cy="200" r="0" fill="#d63a2f"`,3);}
+  if(id==='rhythm'){[0,1,2,3,4,5,6].forEach(i=>{const big=i%2===0,r=big?34:16,x=50+i*67;s+=F('circle',`cx="${x}" cy="200" r="${r}" fill="${big?M:T}"`,i*.6);});s+=P('M30 270Q80 240 130 270T230 270T330 270T430 270T480 270',G,5,3);}
+  if(id==='unity'){for(let r=0;r<3;r++)for(let c=0;c<4;c++)s+=F('rect',`x="${70+c*95}" y="${60+r*95}" width="70" height="70" rx="35" fill="${(r+c)%2?T:'#2f8a93'}"`,(r*4+c)*.3);s+=P('M50 40H450V350H50Z',G,5,4);}
+  if(id==='proportion'){const V=(x,y,k,c,i)=>P(`M${x} ${y}c${-30*k} ${-10*k} ${-45*k} ${-60*k} ${-20*k} ${-95*k}h${-10*k}v${-25*k}h${60*k}v${25*k}h${-10*k}c${25*k} ${35*k} ${10*k} ${85*k} ${-20*k} ${95*k}Z`,c,6,i);s=P('M40 340H460',G,4,0)+V(150,340,2.2,M,1)+V(350,340,1.1,T,2);}
+  if(id==='movement'){s=P('M40 300C120 120 200 380 280 200S420 80 460 120',M,9,0)+P('M440 100L462 120L432 132',M,9,1)+P('M40 360C150 300 260 380 460 330',T,6,1.5)+P('M440 318L462 330L440 345',T,6,2);[[100,90],[170,70],[240,60]].forEach(([x,y],i)=>{s+=F('circle',`cx="${x}" cy="${y}" r="${12+i*6}" fill="${G}"`,2+i*.4,.4+i*.3);});}
+  if(id==='emphasis'){for(let r=0;r<4;r++)for(let c=0;c<5;c++){if(r===1&&c===2)continue;s+=F('circle',`cx="${70+c*90}" cy="${60+r*90}" r="22" fill="#b9b0a6"`,(r*5+c)*.1);}s+=F('circle',`cx="250" cy="150" r="48" fill="#d63a2f"`,3);}
   if(/^arc/.test(id)){
     s=P('M70 380H430',G,5,0);
     if(id==='arc1')s+=P('M130 380V220A120 120 0 0 1 370 220V380',M,9,.5);
@@ -803,6 +846,9 @@ QB.push({name:'الألوان',i:0,re:[],qs:[['ما الألوان الأساس�
 {const b=QB.find(x=>x.name==='العمارة الإسلامية');if(b)[['ما المقرنصات؟','زخرفة معمارية تشبه خلايا النحل'],['اذكر نوعين من الأقواس في العمارة الإسلامية.','المدبّب وحدوة الفرس'],['بماذا زُيّنت جدران المساجد؟','بالزخارف الهندسية والنباتية والكتابية'],['أين نرى المقرنصات؟','تحت القباب وفوق المداخل والمحاريب']].forEach(q=>b.qs.push(q));}
 /* كل موضوع لوحده: إذا ذُكر الموضوع في الطلب فالأسئلة منه فقط */
 const TOPICQ=[[/الوان|لون|مزج/,'الألوان'],[/سدو/,'السدو'],[/زخارف|زخرف/,'الزخارف الإسلامية'],[/عماره|مساجد|قباب|ماذن|مقرنص|اقواس|جدران|جداري/,'العمارة الإسلامية'],[/خط عربي|الخط العربي|خطاط/,'الخط العربي'],[/فنان/,'الفنانون القطريون'],[/العاب/,'الألعاب الشعبية القطرية'],[/تراث/,'التراث القطري'],[/محمل|محامل|سفن|سفينه/,'المحامل التقليدية'],[/عناصر|منظور|ظل|نور/,'عناصر الفن'],[/وحده|بنك/,'بنك أسئلة الوحدة']];
+{QB.push({name:'عناصر التصميم',i:0,re:[],qs:[['ما أصغر عنصر في التصميم؟','النقطة'],['ماذا تصنع النقطة إذا تحرّكت؟','خطاً'],['اذكر ثلاثة أنواع من الخطوط.','مستقيم ومنحنٍ ومتعرّج'],['ما الفرق بين الشكل الهندسي والشكل العضوي؟','الهندسي منتظم كالمربع، والعضوي من الطبيعة كالورقة'],['ما الملمس؟','إحساس السطح: ناعم أو خشن'],['ما الفراغ (المساحة السلبية)؟','المساحة حول الشكل'],['ما القيمة الضوئية؟','درجة فتاحة اللون أو قتامته'],['عدّد عناصر التصميم.','النقطة، الخط، الشكل، اللون، الملمس، المساحة، القيمة']]});
+ QB.push({name:'أسس التصميم',i:0,re:[],qs:[['ما التوازن؟','توزيع العناصر حتى لا يثقل جانب على آخر'],['ما الفرق بين التوازن المتماثل وغير المتماثل؟','المتماثل جانباه متشابهان، وغير المتماثل مختلفان لكن متعادلان'],['ما التباين؟ أعط مثالاً.','وضع عناصر مختلفة معاً، مثل الفاتح والداكن'],['كيف نصنع الإيقاع؟','بتكرار العناصر بانتظام'],['ما السيادة في العمل الفني؟','عنصر يجذب النظر أولاً'],['كيف نوحي بالحركة؟','بالخطوط المنحنية والمائلة'],['ما الوحدة في التصميم؟','أن تبدو الأجزاء كعائلة واحدة'],['عدّد أسس التصميم.','التوازن، التباين، الإيقاع، الوحدة، التناسب، الحركة، السيادة']]});
+ TOPICQ.unshift([/اسس (ال)?(تصميم|فن)|مبادئ (ال)?تصميم|توازن|تباين|ايقاع|سياده|تناسب/,'أسس التصميم'],[/عناصر (ال)?(تصميم|فن)|(ال)?نقطه|(ال)?ملمس|(ال)?فراغ|قيمه ضوئيه/,'عناصر التصميم']);}
 function topicBank(t){for(const [re,name] of TOPICQ)if(re.test(t)){const b=QB.find(x=>norm(x.name)===norm(name));if(b)return b;}return null;}
 let qr=0,muteUntil=0;
 /* أسئلة عن موضوع الرسمة نفسها */
@@ -844,6 +890,7 @@ function targetBank(toks,t){
   if(!e&&cur&&cur.k==='mix')return topicBank('الوان');
   if(!e&&cur&&cur.cal)return topicBank('خط عربي');
   if(cur&&cur.arch&&!e)return topicBank('عماره');
+  if(cur&&cur.design&&!e)return topicBank(cur.design==='pr'?'اسس التصميم':'عناصر التصميم');
   if(!e)return null;
   if(e.k==='x')return itemBank('x:towers',e.title);
   if(e.k==='grp')return e.id==='g:mosques'?itemBank('مسجد','المساجد'):(e.items[0].col?topicBank('الوان'):(QB.find(b=>norm(b.name)===norm(e.title))||(e.items[0].st?itemBank(e.items[0].st,e.title):null)));
@@ -955,6 +1002,18 @@ function scan(toks,from,final,fn){
   }
   return i;
 }
+const TALKV=/^[وف]?(تكلم\S*|نتكلم|سنتكلم|راح نتكلم|تحدث\S*|نتحدث|سنتحدث|حدثني|حدثنا|حدثهم|كلمني|كلمنا|كلمهم|اشرح\S*|نشرح|سنشرح|ارسم\S*|نرسم|سنرسم|عرف\S*|نتعرف|سنتعرف|نتعلم|سنتعلم|خلينا|لنتكلم|لنتعرف)$/;
+let talked='';
+function talkSay(toks,final){
+  let v=-1;for(let i=toks.length-1;i>=0;i--)if(TALKV.test(toks[i])){v=i;break;}
+  if(v<0)return false;
+  if(painting&&/رسم/.test(toks[v]))return false;
+  let hit=null,at=-1;scan(toks,v+1,final,(r,i)=>{if(!hit&&i<=v+4){hit=r.e;at=i;}});
+  if(!hit)return false;
+  const key=v+':'+at+':'+hit.id;if(talked===key)return true;talked=key;
+  if(hit===cur)return true;
+  painting=false;les=null;cur=null;show(hit);sayHide(600);return true;
+}
 let done=0,fired=new Set(),hot=new Set(),sayT=0,quietUntil=0,waitT=0,uHits=0;
 const SHOWV=/(^| )[وف]?(اعرض\S*|ارني|ورني|ورينا|ورنا|اظهر\S*|بدل\S*|غير\S*|انتقل\S*|اريد|نريد|ابي|نبي|ابغي|ابغا|نبغي|بدي|بدنا|اعطني|اعطينا|عطني|عطنا|طلع\S*|شوف\S*|نشوف|نشاهد|افتح\S*|جيب\S*)( |$)/;
 const SIZE=/(^| )[وف]?(كبر\S*|اكبر|تكبير|صغر\S*|اصغر|تصغير)( |$)/,SKYW=/(^| )(ال)?(ليل|سماء|سما|غروب|نهار|ظلام)( |$)|مظلم/;
@@ -977,17 +1036,33 @@ function calHtml(e){
   if(e.list.length===1)return `<div class="calp one"><span class="calx ${CAL[e.list[0]].f}" style="font-size:min(17vh,${(165/n).toFixed(2)}vw)">${esc(e.text)}</span></div>`;
   return `<div class="calp">${e.list.map((k,i)=>`<div class="calr" style="animation-delay:${i*.5}s"><b>${esc(CAL[k].name)}</b><span class="calx ${CAL[k].f}" style="font-size:min(${e.list.length>2?9:12}vh,${(125/n).toFixed(2)}vw);animation-delay:${i*.5}s">${esc(e.text)}</span></div>`).join('')}</div>`;
 }
+/* يتّسع السطر للاسم كاملاً: نصغّر الخط حتى يدخل كله */
+function calFit(){document.querySelectorAll('#hero .calx').forEach(el=>{const box=el.parentNode,cs=getComputedStyle(box),W=box.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-6;if(W<=0)return;let fs=parseFloat(getComputedStyle(el).fontSize),k=0;while(el.getBoundingClientRect().width>W&&fs>12&&k++<40){fs*=.92;el.style.fontSize=fs+'px';}});}
+new MutationObserver(()=>{if(document.querySelector('#hero .calx')){calFit();setTimeout(calFit,350);}}).observe($('hero'),{childList:true,subtree:false});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(calFit);
+if(document.fonts)document.fonts.addEventListener&&document.fonts.addEventListener('loadingdone',calFit);
+window.addEventListener('resize',()=>{document.querySelectorAll('#hero .calx').forEach(el=>el.style.fontSize='');calFit();});
+let calWait=0,calApp=0;
+const CALCLEAN=/^(لي|لنا|جمله|الجمله|كلمه|الكلمه|عباره|العباره|هذه|هذا|التاليه|مثال|مثالا|بالخطوط|الثلاثه|العربيه|اسم|اسمي|الاسم|اسمه|اسمك|باسم)$/;
+function calCont(t,toks,raw){
+  if(!(cur&&cur.cal)||toks.length>5||uHits||CARDW.test(t)||SHOWV.test(t)||CALV.test(t)||calScripts(t).length||/(^| )(امسح|مسح|احذف|موقت)( |$)/.test(t))return false;
+  const now=Date.now();let ws=String(raw).trim().split(/\s+/),named=false;while(ws.length&&CALCLEAN.test(norm(ws[0]))){ws.shift();named=true;}if(!ws.length)return false;
+  if(calWait>now||named)calText=ws.join(' ').slice(0,80);
+  else if(calApp>now)calText=(calText+' '+ws.join(' ')).slice(0,80);
+  else return false;
+  calWait=0;calApp=now+3500;const l=cur.list;cur=null;show(calView(l));return true;
+}
 function calCmd(t,raw){
-  const sc=calScripts(t),w=CALV.test(t),inCal=!!(cur&&cur.cal);
-  if(!(CALT.test(t)||(sc.length&&(/خط/.test(t)||w||inCal))||(w&&(inCal||/(^| )(جمله|كلمه|عباره)( |$)/.test(t)))))return false;
+  const sc=calScripts(t),inCal=!!(cur&&cur.cal),w=CALV.test(t)||(inCal&&/^(ال)?(اسم|اسمي|كلمه|جمله|عباره)$/.test(t.split(' ')[0]));
+  if(!(CALT.test(t)||(/(^| )[وف]?(اكتب|اكتبي|اكتبلي|اكتبها|نكتب)( |$)/.test(t)&&t.split(' ').length<=7)||(CALV.test(t)&&t.split(' ').length<=3&&t.split(' ').slice(1).every(x=>CALCLEAN.test(x)))||(sc.length&&(/خط/.test(t)||w||inCal))||(w&&(inCal||/(^| )(جمله|كلمه|عباره)( |$)/.test(t)))))return false;
   if(w){
     // الجملة = ما بعد «اكتب» ما عدا اسم الخط
-    const ws=String(raw).trim().split(/\s+/),nw=ws.map(x=>norm(x));let v=nw.findIndex(x=>CALV.test(x));
+    const ws=String(raw).trim().split(/\s+/),nw=ws.map(x=>norm(x));let v=nw.findIndex(x=>CALV.test(x));if(v<0)v=-1;
     const drop=new Set();nw.forEach((x,i)=>{if(i>v&&/كوف|نسخ|رقع/.test(x)){drop.add(i);let j=i-1;while(j>v&&(/^(و|او|ام|ثم)$/.test(nw[j])||/^[بلو]?(ال)?خط(وط)?$/.test(nw[j]))){drop.add(j);j--;}}});
     let out=ws.filter((_,i)=>i>v&&!drop.has(i));
-    while(out.length&&/^(لي|لنا|جمله|الجمله|كلمه|الكلمه|عباره|العباره|هذه|هذا|التاليه|مثال|مثالا|بالخطوط|الثلاثه|العربيه)$/.test(norm(out[0])))out.shift();
+    while(out.length&&CALCLEAN.test(norm(out[0])))out.shift();
     while(out.length&&/^(بالخطوط|الثلاثه|العربيه)$/.test(norm(out[out.length-1])))out.pop();
-    if(out.length)calText=out.join(' ').slice(0,80);
+    if(out.length){calText=out.join(' ').slice(0,80);calWait=0;calApp=Date.now()+3500;}else{calWait=Date.now()+8000;calApp=0;}
   }
   const list=sc.length?sc:(inCal&&w&&!CALT.test(t)?cur.list:CALORD);
   painting=false;les=null;cur=null;show(calView(list));return true;
@@ -1017,6 +1092,7 @@ function hear(raw,final,alts){
   CMD=cmd||painting||!!cur;
   const from=Math.max(0,done-1);
   const next=scan(toks,from,!!final,(r,i)=>{const id=r.e.id+'@'+i;if(fired.has(id))return;fired.add(id);uHits++;for(let k=i;k<i+r.n;k++)hot.add(k);if(!painting&&!cmd&&!cards.length&&!cur){show(r.e);drew=true;}});
+  if(!cards.length&&talkSay(toks,!!final))drew=true;
   const shown=done;done=next;
   if(!final&&next<toks.length)waitT=setTimeout(()=>hear(raw,'flush'),900);
   // الكلام في وسط الصفحة بخط كبير وملوّن، ويختفي عند ظهور الرسمة
@@ -1028,7 +1104,9 @@ function hear(raw,final,alts){
   if(isFinal){
     CMD=true;
     const base=cur&&(cur.k==='st'||cur.k==='x'||cur.k==='grp')?cur:null,n0=pEls.length,was=painting;
-    if(!common(t,toks,raw)){
+    if(talked){}
+    else if(calCont(t,toks,raw)){}
+    else if(!common(t,toks,raw)){
       let out=null;if(painting&&SHOWV.test(t))scan(toks,0,true,r=>{if(!out&&r.e.k!=='st'&&r.e.k!=='x')out=r.e;});
       if(out){showX(out);drew=true;}
       else if(painting)paintFinal(t,toks);
@@ -1046,12 +1124,12 @@ function hear(raw,final,alts){
     }
     if(pEls.length>n0||(!was&&painting)){quietUntil=Date.now()+2000;sayHide(500);}
     else if(cur||painting)sayHide(700);
-    done=0;fired.clear();hot.clear();uHits=0;
+    done=0;fired.clear();hot.clear();uHits=0;talked='';
   }
 }
 
 /* ================= الاستماع ================= */
-let want=false,dict=null,rec=null,running=false,lastEvt=0;
+let want=false,dict=null,rec=null,running=false,lastEvt=0,lastFin=Date.now();
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 function msg(t){const m=$('msg');m.textContent=t||'';m.classList.toggle('show',!!t);}
@@ -1061,21 +1139,24 @@ function startRec(){
   if(!rec){
     rec=new SR();rec.lang='ar-SA';rec.interimResults=true;rec.continuous=!MOBILE;rec.maxAlternatives=3;
     rec.onstart=()=>{running=true;lastEvt=Date.now();msg('');dotUI();};
-    rec.onresult=e=>{lastEvt=Date.now();if(Date.now()<muteUntil)return;let interim='';
-      for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal){const al=[];for(let k=1;k<r.length;k++)al.push(r[k].transcript);hear(r[0].transcript,true,al);}else interim+=r[0].transcript+' ';}
-      if(interim.trim())hear(interim,false);};
+    rec.onresult=e=>{lastEvt=Date.now();if(Date.now()<muteUntil)return;let interim='',fin=false;
+      for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal){const al=[];for(let k=1;k<r.length;k++)al.push(r[k].transcript);hear(r[0].transcript,true,al);fin=true;}else interim+=r[0].transcript+' ';}
+      if(fin)lastFin=Date.now();
+      if(interim.trim()){hear(interim,false);
+        // كلام طويل بلا توقف: نُنهي المقطع ليُعالج ويبدأ الاستماع من جديد فوراً
+        if(!MOBILE&&Date.now()-lastFin>12000&&interim.trim().split(/\s+/).length>22){lastFin=Date.now();try{rec.stop();}catch(_){}}}};
     rec.onerror=e=>{
       if(e.error==='not-allowed'||e.error==='service-not-allowed'){want=false;msg('الميكروفون غير مسموح. اسمح به من إعدادات الموقع في المتصفح ثم اضغط زر الميكروفون.');showTyping();}
       else if(e.error==='network')msg('الاستماع يحتاج اتصالاً بالإنترنت.');
       else if(e.error==='audio-capture'){want=false;msg('لم أجد ميكروفوناً في هذا الجهاز.');showTyping();}
       else if(e.error==='language-not-supported'){rec.lang='ar';}
     };
-    rec.onend=()=>{running=false;dotUI();if(want)setTimeout(()=>{if(want&&!running)try{rec.start();}catch(_){}} ,MOBILE?120:250);};
+    rec.onend=()=>{running=false;dotUI();if(want)setTimeout(()=>{if(want&&!running)try{rec.start();}catch(_){}} ,MOBILE?60:60);};
   }
   try{rec.start();}catch(_){}
 }
 /* حارس: إذا توقف الاستماع بصمت نعيد تشغيله */
-setInterval(()=>{if(want&&rec&&!running&&Date.now()-lastEvt>3000){try{rec.start();}catch(_){}}},3000);
+setInterval(()=>{if(want&&rec&&!running&&Date.now()-lastEvt>1500){try{rec.start();}catch(_){}}},1500);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want&&rec&&!running){try{rec.start();}catch(_){}}});
 function listen(on){
   want=on;
@@ -1092,7 +1173,7 @@ if(window.claude&&typeof window.claude.use==='function'){
 }
 $('go').addEventListener('click',()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();}catch(_){}$('start').classList.add('hide');listen(true);});
 $('dot').addEventListener('click',()=>listen(!want));
-$('hero').addEventListener('click',ev=>{const c=ev.target.closest('.cell');if(!c||!cur||cur.k!=='grp')return;const it=cur.items[[...c.parentNode.children].indexOf(c)];if(!it||!it.txt)return;let hit=null;scan(norm(it.txt).split(' ').filter(Boolean),0,true,r=>{if(!hit)hit=r.e;});if(hit&&hit!==cur){cur=null;show(hit);}});
+$('hero').addEventListener('click',ev=>{const c=ev.target.closest('.cell');if(!c||!cur||cur.k!=='grp')return;const it=cur.items[[...c.parentNode.children].indexOf(c)];if(it&&it.con){const h=ENTBYID('c:'+it.con);if(h&&h!==cur){cur=null;show(h);}return;}if(!it||!it.txt)return;let hit=null;scan(norm(it.txt).split(' ').filter(Boolean),0,true,r=>{if(!hit)hit=r.e;});if(hit&&hit!==cur){cur=null;show(hit);}});
 $('cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(b)reveal(+b.dataset.i);});
 if('speechSynthesis' in window)speechSynthesis.getVoices();
 $('kb').addEventListener('click',()=>{$('form').classList.toggle('show');if($('form').classList.contains('show'))$('typed').focus();});
