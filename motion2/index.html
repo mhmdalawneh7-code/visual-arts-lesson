@@ -757,6 +757,36 @@ const DECO=/زخرف\S*|زخارف|زين\S*|نقوش|نقش/;
 const DECOV=/(^| )[وف]?(ارسم\S*|نرسم|ضع\S*|اضف\S*|زين\S*|نزين|زخرف\S*|اعمل\S*|حط\S*|زيد\S*|اجعل\S*|اعطها)( |$)/;
 function decoTypes(t){const r=[];if(/هندس/.test(t))r.push('geo');if(/نبات/.test(t))r.push('veg');if(/كتاب|خطي|حروف/.test(t))r.push('cal');return r;}
 function isDeco(t){return DECO.test(t)&&!P_ERASE.test(t)&&(DECOV.test(t)||/(^| )(علي|فوق)( |$)/.test(t))&&(decoTypes(t).length||/(^| )(علي|فوق|ب)( |$)/.test(t));}
+/* ارسم بحر / صحراء: مشهد فارغ يمكن أن نضيف إليه ما نشاء */
+const SEAW=/(^| )(ال)?(بحر|شاطي|شاطئ|ساحل|كورنيش)( |$)/,DESW=/(^| )(ال)?(صحراء|صحرا|رمال|رمل|كثبان|بر)( |$)/,SCV=/(^| )[وف]?(ارسم\S*|نرسم|اعرض\S*|ورني|اظهر\S*|ضع\S*|اضف\S*|اريد|اعمل\S*|حط\S*|اعطني|هات)( |$)/;
+function sceneWant(t,toks){
+  if(painting||cards.length)return false;
+  const sea=SEAW.test(t),des=DESW.test(t);if(!sea&&!des)return false;
+  if(!(SCV.test(t)||toks.length<=2))return false;
+  let obj=false;scan(toks,0,true,r=>{if(r.e.k==='st'||r.e.k==='x'||r.e.k==='cal'||r.e.k==='txt'||r.e.k==='grp')obj=true;});
+  return !obj;
+}
+function sceneCmd(t,toks){
+  if(!sceneWant(t,toks))return false;
+  const sea=SEAW.test(t),des=DESW.test(t),useSea=sea&&(!des||t.search(SEAW)<=t.search(DESW));
+  cur=null;les=null;pEls=[];pid=pg=ps=pw=0;pSpot=0;pSky='day';pGround=useSea?'sea':'sand';painting=true;$('trail').innerHTML='';
+  renderPainting(0);return true;
+}
+/* «أضف عنصر داخل اللوحة»: بلا تسمية نختار عنصراً مناسباً للمشهد، ومع التسمية نضيف المسمّى */
+const elemWant=t=>P_ADD.test(t)&&!P_ERASE.test(t)&&(/(^| )(ال)?عنصر\S*( |$)/.test(t)||/لوحه/.test(t));
+const CAND={sea:['المحمل','سمكة','شمس','طائر','غوص اللؤلؤ','انسان'],sand:['جمل','النخلة','بيت الشعر','حصان','شمس','طائر','الصقر','الدلة']};
+function elemCmd(t,toks){
+  if(!elemWant(t))return false;
+  let named=false;scan(toks,0,true,r=>{if(r.e.k==='st'||r.e.k==='x'||r.e.k==='grp')named=true;});
+  if(!painting){
+    if(cur&&(cur.k==='st'||cur.k==='x'))startPaintingWith(cur);
+    else{cur=null;les=null;pEls=[];pid=pg=ps=pw=0;pSpot=0;pSky='day';pGround='sand';painting=true;$('trail').innerHTML='';renderPainting(0);}
+  }
+  if(named){paintFinal(t,toks);return true;}
+  if(!/(^| )(ال)?عنصر\S*( |$)/.test(t))return !!document.querySelector('.canvas');
+  const list=(pGround==='sea'?CAND.sea:CAND.sand).filter(k=>ST[k]),used=new Set(pEls.map(e=>e.key));
+  const k=list.find(x=>!used.has(x))||list[0];const id=pAdd({key:k});renderPainting(id||0);if(SE[k])pFact(SE[k]);return true;
+}
 let heroDeco=[];
 function decoHero(types){
   const hp=document.querySelector('#hero .paper');if(!hp)return false;
@@ -826,6 +856,7 @@ function placeCmd(t,toks,es){
   pLast=el.id;renderPainting(newId);return true;
 }
 function paintFinal(t,toks){
+  if(painting&&elemWant(t)&&/(^| )(ال)?عنصر\S*( |$)/.test(t)&&!(()=>{let o=false;scan(toks,0,true,r=>{if(r.e.k==='st'||r.e.k==='x'||r.e.k==='grp')o=true;});return o;})()&&elemCmd(t,toks))return;
   const found=new Map();scan(toks,0,true,r=>{found.set(r.e.id.replace(/^s3:/,'s:'),r.e.n?r.e:(found.get(r.e.id)||r.e));});
   const es=[...found.values()],n=numIn(toks);
   if(/(^| )(اغلق|اخرج|ارجع|اقفل)\S*( |$)/.test(t)){painting=false;cur=null;$('hero').innerHTML='';return;}
@@ -1297,7 +1328,7 @@ function hear(raw,final,alts){
   CMD=cmd||painting||!!cur;
   const from=Math.max(0,done-1);
   const next=scan(toks,from,!!final,(r,i)=>{const id=r.e.id+'@'+i;if(fired.has(id))return;fired.add(id);uHits++;for(let k=i;k<i+r.n;k++)hot.add(k);if(!painting&&!cmd&&!cards.length&&!cur){show(r.e);drew=true;}});
-  if(!cards.length&&!((cur||painting)&&isDeco(t))&&talkSay(toks,!!final))drew=true;
+  if(!cards.length&&!((cur||painting)&&isDeco(t))&&!sceneWant(t,toks)&&!elemWant(t)&&talkSay(toks,!!final))drew=true;
   const shown=done;done=next;
   if(!final&&next<toks.length)waitT=setTimeout(()=>hear(raw,'flush'),900);
   // الكلام في وسط الصفحة بخط كبير وملوّن، ويختفي عند ظهور الرسمة
@@ -1311,6 +1342,8 @@ function hear(raw,final,alts){
     const base=cur&&(cur.k==='st'||cur.k==='x'||cur.k==='grp')?cur:null,n0=pEls.length,was=painting;
     if(talked){}
     else if(decoShown(t)){drew=true;}
+    else if(sceneCmd(t,toks)){drew=true;}
+    else if(!painting&&elemCmd(t,toks)){drew=true;}
     else if(personCmd(t,toks)){drew=true;}
     else if(calCont(t,toks,raw)){}
     else if(!common(t,toks,raw)){
