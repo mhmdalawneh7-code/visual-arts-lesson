@@ -1730,7 +1730,7 @@ function styleMarks(key){
   const sk=st.s.map(x=>`<path d="${x[0]}" fill="none" stroke="${x[1]}" stroke-width="${Math.max(1.2,x[2]*.5)}" stroke-opacity=".45" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
   return `<g filter="url(#real)">${fl}${sk}</g>`;}
 const STYW=[['cubism',/تكعيب|كيوبي|كوبيزم/],['abstract',/تجريد/],['real',/واقعي|واقعيه|حقيقي/]];
-const STYV=/(^| )(بطريقه|بالطريقه|طريقه|بطريقة|اسلوب|بأسلوب|باسلوب|بالاسلوب|مدرسه|بمدرسه|بالمدرسه|حول\S*|اجعل\S*|خل\S*|غير\S*|حوّل\S*)( |$)/;
+const STYV=/(^| )(بطريقه|بالطريقه|طريقه|اسلوب|باسلوب|بالاسلوب|مدرسه|بمدرسه|بالمدرسه)( |$)|(^| )(حول|غير|اجعل|خلي?)\S* (ال)?(رسم|لوحه|رسمه|الرسم|الرسمه|اللوحه)\S* (الي|الى|ل|ب)/;
 function styleCmd(t,toks){
   let off=/(^| )(الغ|الغي|ازل|ارجع|رجع|بدون|اوقف)\S* (ال)?(اسلوب|طريقه|مدرسه)|اسلوب عادي|الاسلوب الاصلي|قلم الحبر/.test(t);
   let sty=null;for(const [k,re] of STYW)if(re.test(t))sty=k;
@@ -1839,6 +1839,7 @@ function hear(raw,final,alts){
   if(/(^| )(اختبر|فحص|افحص|اظهر|اعرض)\S* (ال)?(مايك|ميكروفون|المايك|الميكروفون)( |$)/.test(t)){try{localStorage.setItem('micmeter',meterOn()?'0':'1');}catch(_){}if(meterOn()){micPro(true);msg('شريط مستوى الصوت يعمل. إذا لم يتحرك فالميكروفون لا يصل إليه صوت.');}else{micPro(false);msg('تم إيقاف شريط مستوى الصوت.');}return;}
   if(isFinal&&paintTextCmd(t,toks,raw))return;
   if(isFinal&&logoCmd(t,toks,raw))return;
+  if(isFinal&&ART_STYLE&&!STYW.some(([,re])=>re.test(t))&&(/(^| )(ارسم|ارسمي|لوحه جديده|من جديد|ابدا)\S*( |$)/.test(t)||!painting&&!/(^| )(اضف|ضع|زد|ضيف|حط)\S*( |$)/.test(t))){ART_STYLE='';}
   if(isFinal&&styleCmd(t,toks))return;
   if(isFinal&&collageCmd(t,toks))return;
   if(isFinal&&xpCmd(t,toks,true))return;
