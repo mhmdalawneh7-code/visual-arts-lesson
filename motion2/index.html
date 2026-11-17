@@ -223,6 +223,7 @@ body.hascards #hero,body.hascards #trail{opacity:.18;transition:opacity .4s}
  <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/></filter>
  <filter id="pencilgray" x="-5%" y="-5%" width="110%" height="110%"><feColorMatrix type="saturate" values="0"/><feComponentTransfer result="g"><feFuncR type="linear" slope=".7" intercept=".12"/><feFuncG type="linear" slope=".7" intercept=".12"/><feFuncB type="linear" slope=".7" intercept=".12"/></feComponentTransfer><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="g" in2="n" scale="3.2"/></filter>
  <filter id="cutout" x="-8%" y="-8%" width="116%" height="116%"><feMorphology in="SourceAlpha" operator="dilate" radius="5" result="d"/><feFlood flood-color="#ffffff"/><feComposite in2="d" operator="in" result="o"/><feGaussianBlur in="SourceAlpha" stdDeviation="5" result="b"/><feOffset in="b" dx="6" dy="8" result="sh"/><feComponentTransfer in="sh" result="sh2"><feFuncA type="linear" slope=".42"/></feComponentTransfer><feMerge><feMergeNode in="sh2"/><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="real" x="-10%" y="-10%" width="125%" height="130%"><feGaussianBlur in="SourceAlpha" stdDeviation="6" result="b"/><feDiffuseLighting in="b" surfaceScale="6" diffuseConstant="1.1" lighting-color="#ffffff" result="d"><feDistantLight azimuth="235" elevation="52"/></feDiffuseLighting><feComposite in="d" in2="SourceAlpha" operator="in" result="dl"/><feBlend in="SourceGraphic" in2="dl" mode="multiply" result="lit"/><feGaussianBlur in="SourceAlpha" stdDeviation="7" result="sb"/><feOffset in="sb" dx="9" dy="12" result="so"/><feComponentTransfer in="so" result="sh"><feFuncA type="linear" slope=".45"/></feComponentTransfer><feMerge><feMergeNode in="sh"/><feMergeNode in="lit"/></feMerge></filter>
  <pattern id="inkhatch" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(40)"><line x1="0" y1="3" x2="9" y2="3" stroke="#2b3190" stroke-width="1.5" stroke-opacity=".8"/></pattern>
  <pattern id="inkhatch1" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(40)"><line x1="0" y1="2" x2="7" y2="2" stroke="#2b3190" stroke-width="1.5"/><line x1="2" y1="0" x2="2" y2="7" stroke="#2b3190" stroke-width="1.1" stroke-opacity=".7"/></pattern>
  <pattern id="inkhatch2" patternUnits="userSpaceOnUse" width="4.5" height="4.5" patternTransform="rotate(40)"><line x1="0" y1="1.4" x2="4.5" y2="1.4" stroke="#2b3190" stroke-width="1.7"/><line x1="1.4" y1="0" x2="1.4" y2="4.5" stroke="#2b3190" stroke-width="1.4"/></pattern>
@@ -575,7 +576,7 @@ const SKIPW=/^[وف]?(اعرض\S*|ارني|ورني|ورينا|اظهر\S*|بد�
 const BB={};
 function bbox(key){
   if(BB[key])return BB[key];
-  const m=$('measure');m.innerHTML=marks(key,false);let b;try{b=m.getBBox();}catch(_){b=null;}m.innerHTML='';
+  const m=$('measure');BBMEAS=true;m.innerHTML=marks(key,false);BBMEAS=false;let b;try{b=m.getBBox();}catch(_){b=null;}m.innerHTML='';
   return BB[key]=b&&b.width?{x:b.x-12,y:b.y-12,w:b.width+24,h:b.height+24}:{x:150,y:60,w:700,h:480};
 }
 function fillOf(s,i,col){if(col&&col!=='orig'){if(col.p&&col.p[i])return col.p[i];if(i===(s.main||0)&&col.m)return col.m;}return s.f[i][1];}
@@ -587,6 +588,7 @@ function penDef(c,k){const id=penId(c,k),a=k?-38:38;
   return `<pattern id="${id}" patternUnits="userSpaceOnUse" width="15" height="15" patternTransform="rotate(${a})"><rect width="15" height="15" fill="${c}" fill-opacity=".30"/><line x1="0" y1="4" x2="15" y2="4" stroke="${c}" stroke-width="7" stroke-opacity=".95" stroke-linecap="round"/><line x1="0" y1="11.5" x2="15" y2="11.5" stroke="${c}" stroke-width="3.6" stroke-opacity=".75"/></pattern>`;}
 let PAPER=false;
 function marks(key,anim,col){
+  if(ART_STYLE&&!BBMEAS&&!PAPER)return styleMarks(key);
   const s=ST[key],n=s.s.length,step=Math.min(40,1500/Math.max(n,1)),fd=Math.min(1.7,n*step/1000+.5),sk=!col;
   let defs='';const seen={};
   const fills=s.f.map((f,i)=>{
@@ -738,6 +740,7 @@ function mixOf(a,b){
 }
 function eqHtml(a,b,i){const r=mixOf(a,b);return `<div class="eq" style="animation-delay:${i*.35}s"><i style="background:${C[a][1]}"></i><span>${C[a][0]}</span><b>+</b><i style="background:${C[b][1]}"></i><span>${C[b][0]}</span><b>=</b><i class="res" style="background:${r.hex}"></i><span class="rn">${r.name}</span></div>`;}
 function heroBody(e){
+  if(e.k==='logo')return `<div class="paper big" id="hp">${logoSvg(LOGO)}</div>`;
   if(e.k==='st')return e.n?`<div class="row">${[0,1,2].map(i=>itemHtml({st:e.key},i)).join('')}</div>`:`<div class="paper big" id="hp">${stSvg(e.key,true,hero.col)}</div>`;
   if(e.k==='pic')return `<div class="paper big">${PICS[e.pic].svg}</div>`;
   if(e.k==='col')return `<div class="blob big" style="background:${e.hex}"></div>`;
@@ -1692,6 +1695,93 @@ function xpCmd(t,toks,final){
   if(!XP_V.test(t)&&!XP_TXT.test(t))return false;
   xpMode=XP_DRAW.test(t)&&XP_TXT.test(t)?'both':XP_DRAW.test(t)?'draw':XP_TXT.test(t)?'text':'both';
   return xpRender();}
+
+/* ===== المدارس الفنية في الرسم: تكعيبية، تجريدية، واقعية ===== */
+let ART_STYLE='',BBMEAS=false,STUID=0;
+const STY_P={cubism:['#c9a66b','#8a7a5a','#6e8fa8','#b5523b','#d9c9a8','#5c6b73','#e0b84a','#7d5a3c'],abstract:['#d63a2f','#f4c430','#2468c9','#111111','#ffffff','#2f9e55','#ee6f9a']};
+const hashK=k=>{let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))%100003;return h;};
+const abBox={};
+function styleMarks(key){
+  const st=ST[key],b=bbox(key),u=++STUID,H=hashK(key);let r=H;const rnd=()=>{r=(r*73+19)%1009;return r/1009;};
+  PAPER=true;const base=(()=>{BBMEAS=true;const m=marks(key,false,'orig');BBMEAS=false;return m;})();PAPER=false;
+  if(ART_STYLE==='cubism'){
+    const C=3,R=3,W=b.w/C,Hh=b.h/R,P=[];
+    for(let j=0;j<=R;j++){P[j]=[];for(let i=0;i<=C;i++)P[j][i]=[b.x+i*W+((i&&i<C)?(rnd()-.5)*W*.6:0),b.y+j*Hh+((j&&j<R)?(rnd()-.5)*Hh*.6:0)];}
+    let defs=`<g id="cb${u}">${base}</g>`,body='';let n=0;const lw=Math.max(b.w,b.h)/110;
+    const tri=(a,c,d)=>{const id=`cc${u}_${n}`,pts=[a,c,d].map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ');defs+=`<clipPath id="${id}"><polygon points="${pts}"/></clipPath>`;
+      const dx=(rnd()-.5)*W*.14,dy=(rnd()-.5)*Hh*.14,rot=(rnd()-.5)*12,cx=(a[0]+c[0]+d[0])/3,cy=(a[1]+c[1]+d[1])/3,tint=STY_P.cubism[(n*3+H)%8];
+      body+=`<g clip-path="url(#${id})"><g transform="translate(${dx.toFixed(1)} ${dy.toFixed(1)}) rotate(${rot.toFixed(1)} ${cx.toFixed(0)} ${cy.toFixed(0)})"><use href="#cb${u}"/></g><polygon points="${pts}" fill="${tint}" fill-opacity=".42" style="mix-blend-mode:multiply"/></g><polygon points="${pts}" fill="none" stroke="#1a1a1a" stroke-width="${lw.toFixed(1)}" stroke-linejoin="round"/>`;n++;};
+    for(let j=0;j<R;j++)for(let i=0;i<C;i++){const a=P[j][i],c=P[j][i+1],d=P[j+1][i+1],e=P[j+1][i];if((i+j)%2){tri(a,c,e);tri(c,d,e);}else{tri(a,c,d);tri(a,d,e);}}
+    return `<defs>${defs}</defs>${body}`;}
+  if(ART_STYLE==='abstract'){
+    const pal=STY_P.abstract;let o='',cs=[];const bw=Math.max(b.w,b.h);
+    st.f.forEach((f,i)=>{const k=key+'#'+i;let bb=abBox[k];if(!bb){const q=pathBox(f[0]);bb=abBox[k]=q?{x:q.x,y:q.y,w:q.width,h:q.height}:{x:b.x,y:b.y,w:b.w/3,h:b.h/3};}
+      if(bb.w*bb.h<bw*bw*.002)return;
+      const cx=bb.x+bb.w/2,cy=bb.y+bb.h/2,c=pal[(i+H)%pal.length],t=(i+H)%3;cs.push([cx,cy]);
+      if(t===0)o+=`<rect x="${bb.x.toFixed(0)}" y="${bb.y.toFixed(0)}" width="${bb.w.toFixed(0)}" height="${bb.h.toFixed(0)}" fill="${c}" stroke="#111" stroke-width="${(bw/120).toFixed(1)}"/>`;
+      else if(t===1)o+=`<ellipse cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" rx="${(bb.w/2).toFixed(0)}" ry="${(bb.h/2).toFixed(0)}" fill="${c}" stroke="#111" stroke-width="${(bw/120).toFixed(1)}"/>`;
+      else o+=`<polygon points="${cx.toFixed(0)},${bb.y.toFixed(0)} ${(bb.x+bb.w).toFixed(0)},${(bb.y+bb.h).toFixed(0)} ${bb.x.toFixed(0)},${(bb.y+bb.h).toFixed(0)}" fill="${c}" stroke="#111" stroke-width="${(bw/120).toFixed(1)}"/>`;});
+    let ln='';for(let i=1;i<cs.length;i+=1)ln+=`<line x1="${cs[i-1][0].toFixed(0)}" y1="${cs[i-1][1].toFixed(0)}" x2="${cs[i][0].toFixed(0)}" y2="${cs[i][1].toFixed(0)}" stroke="#111" stroke-width="${(bw/150).toFixed(1)}"/>`;
+    return ln+o+cs.slice(0,3).map(q=>`<circle cx="${q[0].toFixed(0)}" cy="${q[1].toFixed(0)}" r="${(bw/45).toFixed(0)}" fill="#111"/>`).join('');}
+  // واقعية: ألوان ناعمة وإضاءة وظل
+  const fl=st.f.map((f,i)=>`<path d="${f[0]}" fill="${fillOf(st,i,'orig')}" opacity="${f[2]}"/>`).join('');
+  const sk=st.s.map(x=>`<path d="${x[0]}" fill="none" stroke="${x[1]}" stroke-width="${Math.max(1.2,x[2]*.5)}" stroke-opacity=".45" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  return `<g filter="url(#real)">${fl}${sk}</g>`;}
+const STYW=[['cubism',/تكعيب|كيوبي|كوبيزم/],['abstract',/تجريد/],['real',/واقعي|واقعيه|حقيقي/]];
+const STYV=/(^| )(بطريقه|بالطريقه|طريقه|بطريقة|اسلوب|بأسلوب|باسلوب|بالاسلوب|مدرسه|بمدرسه|بالمدرسه|حول\S*|اجعل\S*|خل\S*|غير\S*|حوّل\S*)( |$)/;
+function styleCmd(t,toks){
+  let off=/(^| )(الغ|الغي|ازل|ارجع|رجع|بدون|اوقف)\S* (ال)?(اسلوب|طريقه|مدرسه)|اسلوب عادي|الاسلوب الاصلي|قلم الحبر/.test(t);
+  let sty=null;for(const [k,re] of STYW)if(re.test(t))sty=k;
+  if(!off&&!(sty&&STYV.test(t)))return false;
+  if(off)ART_STYLE='';else ART_STYLE=sty;
+  let named=false;scan(toks,0,true,r=>{if(r.e.k==='st')named=true;});
+  if(painting)renderPainting(0);else if(cur&&cur.k==='st'&&$('hp')){renderHero();}
+  return !named||off;}
+/* ===== شعار باسم أشخاص ===== */
+const LOGO_PAL=[['#7a1230','#f4c430'],['#1f3a44','#f4c430'],['#2468c9','#ffffff'],['#2f7d3a','#f6d98a'],['#3b2a4f','#f6d98a'],['#8a1538','#ffffff']];
+const LOGO_FONTS=[['CalKufi','كوفي'],['CalNaskh','نسخ'],['CalRuqaa','رقعة'],['CalThuluth','ثلث'],['CalDiwani','ديواني'],['CalIjaza','إجازة'],['CalFarsi','فارسي']];
+let LOGO={names:[],shape:0,pal:0,font:0};
+const NAMEW=new Set(['وليد','وائل','وسام','وضاح','وفيق','وجدي','وحيد','وسيم','وعد','ولاء','وفاء','وديع','وجيه','وصفي','ورد','وردة','وضحى','وداد']);
+function logoNames(raw){
+  let m=/(?:باسم|بإسم|بأسماء|باسماء|لاسم|لإسم|لاسماء|اسم|اسماء|أسماء)\s+(.+)$/.exec(raw)||/(?:لوجو|لوغو|شعار|شعارا|logo)\s+(?:ل\S*\s+)?(.+)$/i.exec(raw);
+  if(!m)return [];
+  let tx=m[1].replace(/\s*(بالخط|بخط|بطريقه|بلون|بشكل|بتصميم)\s+.*$/,'').replace(/[\.,!؟?]/g,' ').trim();
+  const out=[];let cur=[];
+  const KW=/^(بلون|ازرق|احمر|اخضر|بنفسجي|عنابي|ذهبي|دائري|دائره|درع|مربع|نجمه|كوفي|نسخ|رقعه|ثلث|ديواني|فارسي|اجازه|الاجازه|بخط|بالخط|بشكل|بتصميم|الكوفي|النسخ|الرقعه|الثلث|الديواني|الفارسي|بالكوفي|بالنسخ|بالرقعه|بالثلث|بالديواني|بالفارسي|ازرق|الازرق|الاحمر|الاخضر|الدائري|الدرع|المربع|النجمه)$/;
+  let ws=tx.split(/\s+/);while(ws.length&&KW.test(norm(ws[ws.length-1])))ws.pop();
+  ws.forEach(w=>{ if(w==='و'||w==='،'){if(cur.length){out.push(cur.join(' '));cur=[];}return;}
+    if(cur.length&&w.length>3&&w[0]==='و'&&!NAMEW.has(w)){out.push(cur.join(' '));cur=[w.slice(1)];return;}
+    cur.push(w);});
+  if(cur.length)out.push(cur.join(' '));
+  return out.filter(Boolean).slice(0,4);}
+function logoSvg(L){
+  const [bg,fg]=LOGO_PAL[L.pal%LOGO_PAL.length],ff=LOGO_FONTS[L.font%LOGO_FONTS.length][0],n=L.names.length,fs=n===1?150:n===2?100:n===3?78:64;
+  let shape='';
+  const sh=L.shape%4,st8=(x,y,r,f)=>`<path d="${star8(x,y,r)}" fill="${f}"/>`;
+  if(sh===0)shape=`<circle cx="400" cy="300" r="262" fill="${fg}"/><circle cx="400" cy="300" r="244" fill="${bg}"/><circle cx="400" cy="300" r="222" fill="none" stroke="${fg}" stroke-width="3" stroke-dasharray="4 10" stroke-linecap="round"/>`+[...Array(8).keys()].map(i=>st8(400+262*Math.cos(i*Math.PI/4),300+262*Math.sin(i*Math.PI/4),16,fg)).join('');
+  else if(sh===1)shape=`<path d="M400 34L690 118V330C690 452 546 534 400 574C254 534 110 452 110 330V118Z" fill="${fg}"/><path d="M400 56L668 134V328C668 438 536 512 400 548C264 512 132 438 132 328V134Z" fill="${bg}"/>`+st8(400,78,22,fg);
+  else if(sh===2)shape=`<rect x="110" y="100" width="580" height="400" rx="70" fill="${fg}"/><rect x="128" y="118" width="544" height="364" rx="56" fill="${bg}"/>`+[[110,100],[690,100],[110,500],[690,500]].map(q=>st8(q[0],q[1],26,fg)).join('');
+  else shape=`<path d="${star8(400,300,285)}" fill="${fg}"/><path d="${star8(400,300,262)}" fill="${bg}"/><circle cx="400" cy="300" r="190" fill="none" stroke="${fg}" stroke-width="3"/>`;
+  const gap=fs*1.12,y0=300-(n-1)*gap/2+fs*.28;
+  const tx=L.names.map((nm,i)=>`<text class="lg" x="400" y="${(y0+i*gap).toFixed(0)}" font-size="${fs}" text-anchor="middle" fill="${fg}" style="font-family:${ff},'Reem Kufi',sans-serif;font-weight:700">${esc(nm)}</text>`).join('');
+  const orn=`<path d="M300 ${(y0+(n-1)*gap+fs*.32).toFixed(0)}H500" stroke="${fg}" stroke-width="4" stroke-linecap="round"/>`+st8(400,y0+(n-1)*gap+fs*.32,12,fg);
+  return `<svg viewBox="95 20 610 560" class="logosvg">${shape}${tx}${n===1?'':''}${orn}</svg>`;}
+function fitLogo(){document.querySelectorAll('#hero .logosvg text.lg').forEach(t=>{const lim=LOGO.shape%4===1?420:LOGO.shape%4===0?400:LOGO.shape%4===2?470:360;let k=0;while(k++<8){const w=t.getBBox().width;if(w<=lim)break;t.setAttribute('font-size',(parseFloat(t.getAttribute('font-size'))*lim/w*.98).toFixed(1));}});}
+let logoN=0;
+function logoShow(){const e={k:'logo',id:'logo:'+(++logoN),title:'شعار: '+LOGO.names.join(' و '),facts:['الشعار رمز بسيط يُعرّف باسم أو فكرة.','هنا الاسم داخل إطار هندسي بخط عربي: '+LOGO_FONTS[LOGO.font%LOGO_FONTS.length][1]+'.','قل «غيّر الشكل» أو «غيّر اللون» أو «غيّر الخط» لتجرّب تصميماً آخر.'],logo:true};
+  painting=false;show(e);setTimeout(fitLogo,60);setTimeout(fitLogo,400);}
+const LOGOW=/(لوجو|لوغو|شعار|logo)/i;
+function logoCmd(t,toks,raw){
+  if(cur&&cur.k==='logo'&&/(^| )غير\S*|(^| )بدل\S*|(^| )جرب\S*/.test(t)&&!LOGOW.test(t)){
+    if(/شكل|اطار|تصميم/.test(t))LOGO.shape++;else if(/لون|الوان/.test(t))LOGO.pal++;else if(/خط/.test(t))LOGO.font++;else {LOGO.shape++;LOGO.pal++;}
+    logoShow();return true;}
+  if(!LOGOW.test(t))return false;
+  const names=logoNames(raw||t);if(!names.length)return false;
+  LOGO.names=names;LOGO.shape=0;LOGO.pal=0;LOGO.font=0;
+  for(let i=0;i<LOGO_FONTS.length;i++)if(t.includes(norm(LOGO_FONTS[i][1]))||(i===5&&/اجاز/.test(t)))LOGO.font=i;
+  if(/ازرق/.test(t))LOGO.pal=2;else if(/اخضر/.test(t))LOGO.pal=3;else if(/بنفسج/.test(t))LOGO.pal=4;else if(/احمر|عنابي/.test(t))LOGO.pal=0;else if(/ازرق غامق|كحلي/.test(t))LOGO.pal=1;
+  if(/دائر|دائري/.test(t))LOGO.shape=0;else if(/درع/.test(t))LOGO.shape=1;else if(/مربع|بطاقه/.test(t))LOGO.shape=2;else if(/نجمه/.test(t))LOGO.shape=3;
+  logoShow();return true;}
 const COLW=/كولاج/;
 function collageCmd(t,toks){
   if(!COLW.test(t))return false;
@@ -1708,6 +1798,8 @@ function hear(raw,final,alts){
   clearTimeout(waitT);
   const t=toks.join(' ');
   if(/(^| )(اختبر|فحص|افحص|اظهر|اعرض)\S* (ال)?(مايك|ميكروفون|المايك|الميكروفون)( |$)/.test(t)){try{localStorage.setItem('micmeter',meterOn()?'0':'1');}catch(_){}if(meterOn()){micPro(true);msg('شريط مستوى الصوت يعمل. إذا لم يتحرك فالميكروفون لا يصل إليه صوت.');}else{micPro(false);msg('تم إيقاف شريط مستوى الصوت.');}return;}
+  if(isFinal&&logoCmd(t,toks,raw))return;
+  if(isFinal&&styleCmd(t,toks))return;
   if(isFinal&&collageCmd(t,toks))return;
   if(isFinal&&xpCmd(t,toks,true))return;
   if(isFinal&&document.getElementById('xp')&&!XP_V.test(t)&&!XP_PARTS.test(t)&&!XP_HOW.test(t))xpClose();
