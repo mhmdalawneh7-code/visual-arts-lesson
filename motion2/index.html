@@ -218,6 +218,63 @@ ST['حصان']={t:'الحصان العربي',size:.5,sky:0,main:2,f:[
  ['M731 198a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z','#1d1a1c',1]],
  s:[['M360 330C360 280 430 262 520 268C600 270 650 290 655 335','#3d2412',5,0],['M606 306C622 244 650 202 690 172C706 160 722 166 730 180L772 216C782 226 776 242 762 242L726 238C702 252 682 292 660 344','#3d2412',5,0],
     ['M395 380L388 470L392 520H412L410 470L426 390','#3d2412',4,0],['M620 386L632 460L628 520H648L652 460L648 380','#3d2412',4,0],['M362 320C318 332 308 402 330 472','#3d2412',4,0],['M750 226l12 4','#3d2412',3,0]]};
+/* أشخاص: ولد بثوب وغترة يحمل علماً، شخص ينظر إلى البحر، أطفال يلعبون بالكرة */
+const SKIN='#e6b98c',THOB='#fbfaf4',OUT='#56313a',MAR='#8a1538';
+const TF=(d,x,y,k,kx)=>{kx=kx||k;let out='';for(const m of d.matchAll(/([MLHVCQZmlhvcqz])([^MLHVCQZmlhvcqz]*)/g)){const c=m[1],n=(m[2].match(/-?\d*\.?\d+/g)||[]).map(Number);
+  if(c==='Z'||c==='z'){out+='Z';continue;}
+  if(c==='H')out+='H'+n.map(a=>(x+a*kx).toFixed(1)).join(' ');
+  else if(c==='V')out+='V'+n.map(a=>(y+a*k).toFixed(1)).join(' ');
+  else if(c==='h')out+=c+n.map(a=>(a*kx).toFixed(1)).join(' ');else if(c==='v')out+=c+n.map(a=>(a*k).toFixed(1)).join(' ');
+  else{const q=[];for(let i=0;i<n.length;i+=2)q.push((x+n[i]*kx).toFixed(1)+' '+(y+n[i+1]*k).toFixed(1));out+=c+q.join(' ');}}
+  return out;};
+const circP=(cx,cy,r)=>{const c=.5523*r;return `M${cx+r} ${cy}C${cx+r} ${cy+c} ${cx+c} ${cy+r} ${cx} ${cy+r}C${cx-c} ${cy+r} ${cx-r} ${cy+c} ${cx-r} ${cy}C${cx-r} ${cy-c} ${cx-c} ${cy-r} ${cx} ${cy-r}C${cx+c} ${cy-r} ${cx+r} ${cy-c} ${cx+r} ${cy}Z`;};
+const FLAGP='M100 -482H206V-398H122L134 -407L122 -416L134 -425L122 -434L134 -443L122 -452L134 -461L122 -470L134 -479L122 -482Z';
+function person(x,y,k,o,F,S){
+  const kx=k*(o.w||1.3),A=(d,c,op=1)=>F.push([TF(d,x,y,k,kx),c,op]),L=(d,w=6)=>S.push([TF(d,x,y,k,kx),OUT,w,0]);
+  const back=!!o.back,pose=o.pose||'stand';
+  // الساقان/الحذاء
+  const kick=pose==='kick',jump=pose==='jump';
+  A(kick?'M-40 -170L-34 -20L-44 0L-4 0L2 -170Z':'M-40 -170L-36 0L-4 0L-2 -170Z','#f1ece0');
+  A(kick?'M10 -170L74 -90L100 -112L116 -90L72 -60L2 -150Z':'M4 -170L36 0L4 0L2 -170Z','#f1ece0');
+  A('M-48 0H-2V12H-52ZM'+(kick?'96 -108L122 -122L134 -102L106 -90Z':'2 0H48L52 12H-2Z'),'#6f4a38');
+  // الثوب
+  A('M-48 -300Q0 -322 48 -300L56 -246L52 -170L-52 -170L-56 -246Z','#fbfaf4');
+  A('M-52 -170L-46 -96L-42 -2H42L46 -96L52 -170Z','#fbfaf4');
+  A('M0 -318L18 -170L0 -168Z','#d9d2c0',.5);
+  // الذراعان
+  if(o.flag){A('M38 -296L88 -386L108 -374L62 -278Z','#fbfaf4');A(circP(98,-382,14),SKIN);A('M-40 -296L-60 -200L-44 -190L-28 -280Z','#fbfaf4');}
+  else if(o.brow){A('M38 -296L74 -352L52 -372L30 -340L46 -300Z','#fbfaf4');A('M-40 -296L-62 -200L-46 -190L-28 -280Z','#fbfaf4');}
+  else if(jump){A('M38 -296L92 -392L110 -380L60 -278Z','#fbfaf4');A('M-38 -296L-92 -392L-110 -380L-60 -278Z','#fbfaf4');}
+  else {A('M38 -296L66 -200L50 -192L28 -280Z','#fbfaf4');A('M-38 -296L-66 -200L-50 -192L-28 -280Z','#fbfaf4');}
+  // الرأس والغترة
+  A('M-34 -352Q-36 -408 0 -410Q36 -408 34 -352L48 -306L10 -318L16 -346Q0 -372 -16 -346L-10 -318L-48 -306Z','#ffffff');
+  if(back)A('M-32 -352Q-34 -404 0 -406Q34 -404 32 -352L36 -304Q0 -296 -36 -304Z','#ffffff');
+  else A('M-16 -346Q0 -372 16 -346Q18 -320 0 -314Q-18 -320 -16 -346Z',SKIN);
+  A('M-35 -386Q0 -402 35 -386L35 -378Q0 -394 -35 -378Z','#2a1414');
+  if(!back){A(circP(-7,-342,2.4),'#1d1a1c');A(circP(7,-342,2.4),'#1d1a1c');}
+  // خطوط القلم
+  L('M-48 -300Q0 -322 48 -300L56 -246L52 -170L46 -96L42 -2H-42L-46 -96L-52 -170L-56 -246Z');
+  L('M-34 -352Q-36 -408 0 -410Q36 -408 34 -352L48 -306L10 -318L16 -346Q0 -372 -16 -346L-10 -318L-48 -306Z');
+  if(o.flag){L('M38 -296L88 -386L108 -374L62 -278',5);L('M-40 -296L-60 -200L-44 -190L-28 -280',5);}
+  else if(o.brow){L('M38 -296L74 -352L52 -372L30 -340L46 -300',5);L('M-40 -296L-62 -200L-46 -190L-28 -280',5);}
+  else if(jump){L('M38 -296L92 -392L110 -380L60 -278',5);L('M-38 -296L-92 -392L-110 -380L-60 -278',5);}
+  else{L('M38 -296L66 -200L50 -192L28 -280',5);L('M-38 -296L-66 -200L-50 -192L-28 -280',5);}
+  if(kick)L('M10 -170L74 -90L100 -112L116 -90',5);
+}
+function mkPerson(t,size,build){
+  const F=[],S=[];build(F,S);return {t,size,sky:0,main:0,f:F,s:S};
+}
+ST['ولد يحمل علم']=mkPerson('ولد يحمل علم قطر',.55,(F,S)=>{
+  person(500,520,1,{flag:true},F,S);
+  F.push([TF('M98 -486H104V-340H98Z',500,520,1),'#a87551',1]);
+  F.push([TF(FLAGP,500,520,1),MAR,1]);F.push([TF('M100 -482H122V-398H100Z',500,520,1),'#ffffff',1]);
+  S.push([TF('M100 -482H206V-398H100Z',500,520,1),OUT,5,0]);S.push([TF('M100 -486V-340',500,520,1),OUT,5,0]);
+});
+ST['ولد ينظر للبحر']=mkPerson('شخص ينظر إلى البحر',.5,(F,S)=>{person(500,520,1,{back:true,brow:true},F,S);});
+ST['اطفال يلعبون']=mkPerson('أطفال يلعبون بالكرة',.4,(F,S)=>{
+  person(330,520,.82,{pose:'kick',w:1.7},F,S);person(690,520,.7,{pose:'jump',w:1.7},F,S);
+  F.push([circP(498,490,26),'#ffffff',1]);F.push([circP(498,490,10),'#2a1414',1]);S.push([circP(498,490,26),OUT,5,0]);
+});
 const topicOf={};D.topics.forEach(t=>{if(t.scene)topicOf[t.scene]=t;});
 const C={red:['أحمر','#d63a2f'],yellow:['أصفر','#f4c430'],blue:['أزرق','#2468c9'],orange:['برتقالي','#ef7d22'],green:['أخضر','#2f9e55'],purple:['بنفسجي','#7b45b5'],
   brown:['بني','#8a5a3a'],black:['أسود','#1d1a1c'],white:['أبيض','#ffffff'],pink:['وردي','#ee6f9a'],maroon:['عنابي','#8a1538'],gold:['ذهبي','#d9a441'],turq:['فيروزي','#22b3a6'],grey:['رمادي','#8e8e93']};
@@ -354,6 +411,16 @@ Object.keys(ST).forEach(k=>{add(k,SE[k]);add(ST[k].t,SE[k]);});
 D.topics.forEach(t=>{if(t.scene&&ST[t.scene])[t.t].concat(t.keys).forEach(k=>add(k,SE[t.scene]));});
 Object.entries(D.alias).forEach(([a,k])=>{if(ST[k])add(a,SE[k]);});
 Object.entries(D.plural).forEach(([a,k])=>{if(ST[k])add(a,Object.assign({},SE[k],{n:3,id:'s3:'+k}));});
+/* أشخاص: أسماء وأوامر */
+Object.assign(PARTS,{'ولد يحمل علم':{'ثوب':0,'قميص':0,'علم':7,'العلم':7},'ولد ينظر للبحر':{'ثوب':0,'قميص':0},'اطفال يلعبون':{'كره':8,'الكره':8,'ثوب':0}});
+Object.assign(EXTRA,{'ولد يحمل علم':['يحمل علم قطر العنابي الأبيض بكل فخر.','العلم له تسع رؤوس بيضاء مسننة.','نرسم الذراع المرفوعة بخط مائل يوحي بالحركة.'],'ولد ينظر للبحر':['نراه من الخلف فلا نرسم الوجه، ونوحي بالنظر برفع اليد فوق العينين.','رسم الشخص من الخلف يجعل المشاهد ينظر معه إلى البحر.'],'اطفال يلعبون':['طفلان يلعبان بالكرة: واحد يركلها وآخر يقفز فرحاً.','الحركة تظهر في الأذرع المرفوعة والساق الممدودة.','اختلاف حجم الطفلين يعطي إحساساً بالعمق.']});
+Object.keys(ST).forEach(k=>{if(/^(ولد يحمل علم|ولد ينظر للبحر|اطفال يلعبون)$/.test(k)){SE[k]=stEnt(k);}});
+{const put=(ws,key,n)=>ws.forEach(w=>{const c=canon(w);if(c)ENT.set(c,n?Object.assign({},SE[key],{n,id:'s3:'+key}):SE[key]);});
+ const FL=['شخص يحمل علم','شخص يحمل العلم','ولد يحمل علم','ولد يحمل العلم','رجل يحمل علم','طفل يحمل علم','شخص حامل علم','شخص يرفع علم','شخص يرفع العلم','شخص ماسك علم','شخص يمسك علم','شخص وعلم','حامل العلم'];
+ put(FL,'ولد يحمل علم');
+ put(['شخص ينظر الى البحر','شخص ينظر للبحر','شخص يتامل البحر','رجل ينظر الى البحر','ولد ينظر الى البحر','طفل ينظر الى البحر','شخص ينظر من الخلف','شخص يشاهد البحر','شخص يطل على البحر'],'ولد ينظر للبحر');
+ put(['اشخاص ينظرون الى البحر','اشخاص ينظرون للبحر','ناس ينظرون الى البحر','اشخاص يتاملون البحر','رجال ينظرون الى البحر','اولاد ينظرون الى البحر','اطفال ينظرون الى البحر','اشخاص يشاهدون البحر','ناس تنظر الى البحر','عدة اشخاص ينظرون الى البحر'],'ولد ينظر للبحر',3);
+ put(['اطفال يلعبون','اطفال يلعبون بالكره','اولاد يلعبون','اولاد يلعبون بالكره','طفلان يلعبان','طفلين يلعبان','طفل يلعب','طفل يلعب بالكره','اطفال يلعبون على الشاطئ','اطفال يلعبون في الشاطئ','العاب اطفال','اطفال يلعبون في البحر','اطفال يلعبون على البحر','اطفال'],'اطفال يلعبون');}
 // 8) اللوحات الجاهزة
 D.pics.forEach(p=>{const e={k:'pic',id:'p:'+p.id,pic:p.id,title:p.title,facts:p.note?[p.note]:[]};p.keys.forEach(k=>add(k,e));});
 /* فهم أوسع للكلام: تطابق صوتي (ص=س، ط=ت، ض=د…) ثم تطابق تقريبي بفرق حرف واحد */
@@ -597,6 +664,7 @@ function remember(e){
 }
 function pAdd(spec){
   if(pEls.length>=30)return 0;const el={id:++pid};
+  if(spec.key==='ولد ينظر للبحر'&&pGround!=='sea')pGround='sea';
   if(spec.x){if(pEls.some(e=>e.x))return 0;el.x=spec.x;pGround='sea';pEls.unshift(el);return el.id;}
   const s=ST[spec.key],b=bbox(spec.key);el.key=spec.key;
   let H=s.size*620,sc=H/b.h;if(b.w*sc>440){sc=440/b.w;H=b.h*sc;}
@@ -1020,6 +1088,17 @@ function spotlight(t,toks){
   const p=document.querySelector('#hero .paper,#hero .blob');if(p)p.classList.add('spot');
 }
 QB.push({name:'بنك أسئلة الوحدة',qs:UQ,i:0,re:['بنك','وحده']});
+const PERSONK=['انسان','انسان يمشي','ولد يحمل علم','ولد ينظر للبحر'];
+function personCmd(t,toks){
+  if(!/(^| )(يحمل|يحمله|يحملها|حامل|يرفع|يرفعه|يمسك|ماسك|ويحمل|وماسك)\S*( |$)/.test(t)||!/(^| )(ال)?علم( |$)|علم قطر/.test(t))return false;
+  const K='ولد يحمل علم';
+  if(painting){
+    let el=[...pEls].reverse().find(q=>PERSONK.includes(q.key)&&q.key!==K);
+    if(!el){const id=pAdd({key:K});el=pEls.find(q=>q.id===id);renderPainting(id);return true;}
+    const H=elH(el),base=el.cy+H/2,b=bbox(K);el.key=K;el.sc=H/b.h;pMove(el,el.cx,base-elH(el)/2);pLast=el.id;renderPainting(el.id);return true;
+  }
+  painting=false;les=null;cur=null;show(SE[K]);return true;
+}
 function common(t,toks,raw){
   if(timerCmd(t,toks))return true;
   if(!CARDW.test(t)&&calCmd(t,raw||t))return true;
@@ -1044,7 +1123,7 @@ function lev1(a,b){if(Math.abs(a.length-b.length)>1)return false;let i=0,j=0,d=0
 function lookupAt(toks,i){
   if(SKIPW.test(toks[i]))return null;
   const a=strip(toks[i]),b=stripW(toks[i]),firsts=a===b?[a]:[a,b];
-  for(let n=Math.min(3,toks.length-i);n>=1;n--){
+  for(let n=Math.min(4,toks.length-i);n>=1;n--){
     const rest=toks.slice(i+1,i+n).map(strip);
     for(const f of firsts){
       const ws=[f].concat(rest),k=ws.join(' ');
@@ -1146,7 +1225,7 @@ function artSay(toks){
 }
 /* تسمية العنصر مباشرة بجملة قصيرة تعرضه حتى لو كان على الشاشة شيء آخر؛ أما الشرح الطويل فلا يقلّب الشاشة */
 function nameSay(toks){
-  if(toks.length>3)return false;
+  if(toks.length>5)return false;
   let hit=null,n=0;scan(toks,0,true,r=>{if(!hit){hit=r.e;n=r.n;}});
   if(!hit||hit===cur||n<toks.length-1)return false;
   showX(hit);sayHide(700);return true;
@@ -1173,6 +1252,7 @@ function hear(raw,final,alts){
     CMD=true;
     const base=cur&&(cur.k==='st'||cur.k==='x'||cur.k==='grp')?cur:null,n0=pEls.length,was=painting;
     if(talked){}
+    else if(personCmd(t,toks)){drew=true;}
     else if(calCont(t,toks,raw)){}
     else if(!common(t,toks,raw)){
       let out=null;if(painting&&SHOWV.test(t))scan(toks,0,true,r=>{if(!out&&r.e.k!=='st'&&r.e.k!=='x')out=r.e;});
