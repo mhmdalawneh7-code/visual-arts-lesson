@@ -1206,7 +1206,8 @@ function showTyping(){$('form').classList.add('show');$('typed').focus();}
 function startRec(){
   if(!rec){
     rec=new SR();rec.lang='ar-SA';rec.interimResults=true;rec.continuous=!MOBILE;rec.maxAlternatives=3;
-    rec.onstart=()=>{running=true;lastEvt=Date.now();msg('');dotUI();};
+    rec.onstart=()=>{running=true;startFails=0;lastEvt=Date.now();msg('');dotUI();};
+    rec.onaudiostart=rec.onsoundstart=rec.onspeechstart=()=>{lastEvt=Date.now();};
     rec.onresult=e=>{lastEvt=Date.now();if(Date.now()<muteUntil)return;let interim='',fin=false;
       for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal){const al=[];for(let k=1;k<r.length;k++)al.push(r[k].transcript);hear(r[0].transcript,true,al);fin=true;}else interim+=r[0].transcript+' ';}
       if(fin)lastFin=Date.now();
@@ -1215,21 +1216,44 @@ function startRec(){
         if(!MOBILE&&Date.now()-lastFin>12000&&interim.trim().split(/\s+/).length>22){lastFin=Date.now();try{rec.stop();}catch(_){}}}};
     rec.onerror=e=>{
       if(e.error==='not-allowed'||e.error==='service-not-allowed'){want=false;msg('الميكروفون غير مسموح. اسمح به من إعدادات الموقع في المتصفح ثم اضغط زر الميكروفون.');showTyping();}
-      else if(e.error==='network')msg('الاستماع يحتاج اتصالاً بالإنترنت.');
+      else if(e.error==='network'){netErr=true;msg('الاتصال ضعيف… أحاول الاستماع من جديد.');setTimeout(()=>{if(running)msg('');},4000);}
       else if(e.error==='audio-capture'){want=false;msg('لم أجد ميكروفوناً في هذا الجهاز.');showTyping();}
       else if(e.error==='language-not-supported'){rec.lang='ar';}
     };
-    rec.onend=()=>{running=false;dotUI();if(want)setTimeout(()=>{if(want&&!running)try{rec.start();}catch(_){}} ,MOBILE?60:60);};
+    rec.onend=()=>{running=false;dotUI();if(want)setTimeout(recStart,netErr?900:60);netErr=false;};
   }
-  try{rec.start();}catch(_){}
+  recStart();
+}
+/* تشغيل الاستماع مع إعادة المحاولة، وإنشاء مستمع جديد إذا علق القديم */
+let startFails=0,netErr=false;
+function recStart(){
+  if(!want||running||!rec)return;
+  try{rec.start();}catch(err){
+    if(err&&err.name==='InvalidStateError')return;
+    if(++startFails>=3){startFails=0;try{rec.abort();}catch(_){}rec=null;startRec();}
+  }
+}
+/* إبقاء الشاشة مضاءة أثناء الاستماع: إطفاء الشاشة يوقف الميكروفون */
+let wakeLk=null;
+async function keepAwake(on){
+  try{if(on&&'wakeLock' in navigator&&!wakeLk&&!document.hidden){wakeLk=await navigator.wakeLock.request('screen');wakeLk.addEventListener('release',()=>{wakeLk=null;});}
+      else if(!on&&wakeLk){await wakeLk.release();wakeLk=null;}}catch(_){}
 }
 /* حارس: إذا توقف الاستماع بصمت نعيد تشغيله */
-setInterval(()=>{if(want&&rec&&!running&&Date.now()-lastEvt>1500){try{rec.start();}catch(_){}}},1500);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want&&rec&&!running){try{rec.start();}catch(_){}}});
+setInterval(()=>{
+  if(!want||!rec)return;
+  if(!running&&Date.now()-lastEvt>1500){lastEvt=Date.now();recStart();}
+  // جلسة عالقة: تعمل ولا يصل منها شيء لمدة طويلة، نعيد تشغيلها
+  else if(running&&Date.now()-lastEvt>15000){lastEvt=Date.now();try{rec.abort();}catch(_){}}
+  if(!wakeLk)keepAwake(true);
+},1500);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want){keepAwake(true);if(rec&&!running)recStart();}});
+window.addEventListener('focus',()=>{if(want&&rec&&!running)recStart();});
 function listen(on){
   want=on;
   if(dict){if(on)dict.start().catch(()=>{want=false;msg('لم يُسمح بالميكروفون.');showTyping();dotUI();});else dict.stop().catch(()=>{});dotUI();return;}
   if(!SR){want=false;msg('هذا المتصفح لا يدعم الاستماع. افتح الرابط في Chrome على أندرويد أو الكمبيوتر، أو في Safari على آيفون. يمكنك الكتابة الآن.');showTyping();dotUI();return;}
+  keepAwake(on);
   if(on)startRec();else{try{rec&&rec.stop();}catch(_){}}
   dotUI();
 }
