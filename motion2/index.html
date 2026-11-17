@@ -1501,6 +1501,59 @@ const XP_PARTS=/(^| )(ال)?(اجزاء|اجزاءه|اجزاءها|مكونات
       XP_HOW=/(^| )(كيف|طريقه|طريقة|خطوات|خطوه|علمني|علمنا|تعلم)( |$).*(رسم|ارسم|نرسم|اعمل|نعمل|رسمه)|(^| )(طريقه|خطوات|خطوه|مراحل) (ال)?(رسم|رسمه)|(^| )(كيف|علمني|علمنا) (ا|ن)?رسم/;
 const PNAME={'رايه':'راية','قبه':'قبة','مناره':'منارة','مئذنه':'مئذنة','لؤلؤه':'لؤلؤة','غتره':'غترة','شعله':'شعلة','بوابه':'بوابة','نافذه':'نافذة','اشعه':'أشعة','ارجل':'أرجل','ابراج':'أبراج','اوراق':'أوراق','ورق':'ورق','نوافذ':'نوافذ','زعانف':'زعانف','عجلات':'عجلات','اطارات':'إطارات','جدار':'جدار','جدران':'جدران','حائط':'حائط','سقف':'سقف','باب':'باب','قمه':'قمة','مركز':'مركز','وسط':'وسط','بتلات':'بتلات','شباك':'شباك','غطاء':'غطاء','مقبض':'مقبض','سرج':'سرج','ثوب':'ثوب','وجه':'وجه','حذاء':'حذاء','جذع':'جذع','سعف':'سعف','شراع':'شراع','علم':'علم','هيكل':'هيكل','جناح':'جناح','صدر':'صدر','منقار':'منقار','ذيل':'ذيل','وكر':'وكر','برج':'برج','زجاج':'زجاج','نار':'نار','ساق':'ساق','سيف':'سيف'};
 const PCOL=['#d63a2f','#2468c9','#f4c430','#2f9e55','#7b45b5','#ef7d22','#22b3a6','#ee6f9a'];
+
+/* ===== كيف أرسم لكل أنواع الموضوعات (أبراج، مفاهيم، مشاهد، خطوط، فنانون) ===== */
+const ART_STEPS={mondrian:['📄|افرد ورقة مربعة بيضاء.','➖|ارسم خطوطاً سوداء سميكة، رأسية وأفقية، تقطع الورقة.','🟥|لوّن بعض المربعات بالأحمر أو الأصفر أو الأزرق فقط.','⬜|اترك باقي المربعات بيضاء، وانظر إلى التوازن.'],
+ vangogh:['✏️|ارسم المشهد بخطوط خفيفة، مثل ليل أو حقل.','🎨|اختر ألواناً قوية متجاورة: أزرق وأصفر.','🌀|ارسم بضربات فرشاة قصيرة دوّامية.','⭐|أضف نقاط ضوء كبيرة للنجوم والشمس.'],
+ picasso:['👤|ارسم وجهاً أو آلة موسيقية بأشكال بسيطة.','🔷|قسّم الشكل إلى مثلثات ومربعات وأقواس.','👀|اعرض أكثر من جانب في الصورة الواحدة، كوجه من الأمام والجنب.','🎨|لوّن كل قطعة بلون مختلف.'],
+ monet:['🌅|اختر منظراً فيه ماء أو حديقة.','🖌️|ضع بقع لون صغيرة بدل الخطوط الدقيقة.','☀️|لوّن بلون الضوء في تلك اللحظة.','🔍|ابتعد عن اللوحة لترى الصورة تتكوّن.'],
+ matisse:['✂️|قصّ ورقاً ملوّناً بالمقص بأشكال حرّة.','🌿|اقصص أوراقاً وأمواجاً وأشكالاً عضوية.','🎨|رتّب القصاصات بألوان قوية ومتباينة.','📌|الصق القطع على ورقة بيضاء.'],
+ kandinsky:['🎵|استمع إلى موسيقى واختر إحساساً.','⚫|ارسم نقاطاً ودوائر وخطوطاً بدل الأشياء.','🎨|اختر لكل إحساس لوناً وشكلاً.','🧩|وازن بين الأشكال في الورقة.'],
+ davinci:['📐|ارسم الهيكل بخطوط خفيفة بنسب صحيحة.','🔍|راقب الأجزاء ونسبها بدقة.','🌓|درّج الظلال والنور بلطف.','👁️|أضف تفاصيل العينين والملامح.'],
+ dali:['💭|تخيّل حلماً غريباً.','🕰️|ارسم شيئاً مألوفاً، كساعة.','🫠|حوّله إلى شكل غير متوقع: يذوب أو يطير.','🏜️|ضعه في مكان واسع هادئ.']};
+const DEFAULT_ART=['📝|اختر موضوعاً تحبه.','✏️|ارسم الشكل العام بخط خفيف.','🎨|لوّن على طريقة الفنان.','✨|أضف التفاصيل والإضاءة.'];
+const CAL_STEPS=['📏|ارسم خطاً مرجعياً أفقياً خفيفاً.','✒️|ابدأ بالحرف الأول بقلم الخط المناسب.','🔗|صل الحروف بحسب قواعد الخط.','✨|أضف التشكيل والزخرفة، ثم راجع التوازن.'];
+function xpTargetSpec(toks){
+  const k=xpTargetKey(toks);if(k)return k;
+  let sp=null;scan(toks,0,true,r=>{if(!sp){const e=r.e;if(e.k==='x'||e.k==='con'||e.k==='pic'||e.k==='cal'||(e.k==='txt'&&e.loc))sp={e};}});
+  if(sp)return sp;
+  if(painting&&pEls.some(q=>q.x))return {e:TOWERS};
+  if(cur&&(cur.k==='x'||cur.k==='con'||cur.k==='pic'||cur.k==='cal'||(cur.k==='txt'&&cur.loc)))return {e:cur};
+  return null;}
+const xpIc=a=>a.map(x=>{const i=x.indexOf('|');return [x.slice(0,i),x.slice(i+1)];});
+function xpStepsCards(cards,title){
+  return `<section class="xpc"><h3>كيف أرسم: ${title}</h3><div class="xmap"><div class="xflag">🚩 ابدأ</div>${cards.map((c,i)=>`<div class="xst" style="animation-delay:${i*.35}s"><div class="xn">${i+1}</div><div class="xd">${c[0]}</div><h4>${c[1]}</h4><p>${c[2]||''}</p></div>${i<cards.length-1?'<i class="xar">◀</i>':''}`).join('')}<div class="xflag">🏁 انتهينا</div></div></section>`;}
+function xpHowSpec(sp){
+  const e=sp.e,T=e.title||'';
+  const gen=[['الشكل العام','قسّم الورقة بخطوط خفيفة وحدّد أماكن العناصر.'],['الأشكال الكبيرة','ارسم الأشكال الكبيرة بخط خفيف.'],['التفاصيل والظل','أضف التفاصيل والظلال.'],['التلوين','لوّن بالألوان المناسبة.']];
+  if(e.k==='x'){
+    const fr=[.28,.55,.82,1];
+    const cards=fr.map((f,i)=>{const id='xc'+i;return [`<svg viewBox="0 0 1200 600"><defs><clipPath id="${id}"><rect x="0" y="0" width="${(1200*f).toFixed(0)}" height="600"/></clipPath></defs><g clip-path="url(#${id})" ${i<3?'filter="url(#pencilgray)"':''} transform="translate(0 20)">${skyline(false)}</g></svg>`,['ارسم أول برج','أضف أبراجاً بارتفاعات مختلفة','أكمل الأبراج وأضف النوافذ','لوّن البحر والسماء'][i],['ابدأ بمستطيل طويل من جهة واحدة.','غيّر الأشكال: مقوّس ومائل ومتعرّج.','ارسم خطوطاً صغيرة للنوافذ.','أضف ماء الكورنيش وسماء.'][i]];});
+    return xpStepsCards(cards,T);}
+  if(e.k==='con'){
+    const d=document.createElement('div');d.innerHTML=conceptSvg(e.cid);const svg=d.firstChild;const ss=[...svg.querySelectorAll('path.s')],n=ss.length;
+    const K=Math.max(2,Math.min(4,n)),per=Math.ceil(n/K);
+    const cards=[...Array(K).keys()].map(i=>{const dd=document.createElement('div');dd.innerHTML=conceptSvg(e.cid);const sv=dd.firstChild;const ps=[...sv.querySelectorAll('path.s')];
+      ps.forEach((q,j)=>{if(j>=per*(i+1))q.remove();else{q.classList.remove('s');q.removeAttribute('pathLength');q.style.cssText='';if(j>=per*i&&i<K-1)q.setAttribute('stroke','#d63a2f');}});
+      if(i<K-1)sv.querySelectorAll('.f,circle,text,ellipse,rect').forEach(q=>{if(!q.closest('defs'))q.remove();});
+      sv.querySelectorAll('.f').forEach(q=>{q.classList.remove('f');q.style.cssText='';});sv.setAttribute('class','');
+      return [sv.outerHTML,['ابدأ بالخطوط الأساسية','أضف الأشكال التالية','أكمل التكرار والتفاصيل','لوّن وراجع'][i]||'خطوة',['ارسم بقلم رصاص خفيف.','كرّر الشكل بالتوازن نفسه.','دقّق في المسافات.','أضف الألوان.'][i]||''];});
+    return xpStepsCards(cards,T);}
+  if(e.k==='pic'){
+    const svg=PICS[e.pic].svg,g='<svg viewBox="0 0 300 200" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%"><path d="M100 0V200M200 0V200M0 67H300M0 133H300" stroke="#d63a2f" stroke-width="2" fill="none"/></svg>';
+    const mk=(st,ov)=>`<div style="position:relative"><div style="${st}">${svg}</div>${ov||''}</div>`;
+    const fl=['filter:grayscale(1) contrast(.4) brightness(1.7)','filter:grayscale(1) contrast(1.6)','filter:grayscale(1) sepia(.6) contrast(1.2)',''];
+    return xpStepsCards(fl.map((f,i)=>[mk(f,i===0?g:''),gen[i][0],gen[i][1]]),T);}
+  if(e.k==='cal')return xpStepsCards(xpIc(CAL_STEPS).map((c,i)=>[`<div class="xpbig">${c[0]}</div>`,['الخط المرجعي','ابدأ بالحرف','صل الحروف','التشكيل والزخرفة'][i],c[1]]),T||'الخط العربي');
+  // فنان
+  const arr=xpIc(ART_STEPS[e.loc]||DEFAULT_ART);
+  if(e.loc==='mondrian'){
+    const L=[ '', '<rect x="115" y="0" width="8" height="300"/><rect x="0" y="105" width="300" height="8"/>','<rect x="115" y="0" width="8" height="300"/><rect x="0" y="105" width="300" height="8"/><rect x="215" y="105" width="8" height="195"/><rect x="0" y="215" width="223" height="8"/>' ];
+    const bg='<rect width="300" height="300" fill="#f6f3ea" stroke="#999"/>';
+    const col='<rect width="115" height="105" fill="#d63a2f"/><rect x="223" y="215" width="77" height="85" fill="#2468c9"/><rect y="223" width="115" height="77" fill="#f4c430"/>';
+    const sv=(a,b)=>`<svg viewBox="0 0 300 300">${bg}${b?col:''}<g fill="#111">${a}</g></svg>`;
+    return xpStepsCards([[sv(L[0]),'ورقة مربعة',arr[0][1]],[sv(L[1]),'الخطوط السوداء',arr[1][1]],[sv(L[2],0),'شبكة أكبر','أضف خطوطاً بين المربعات.'],[sv(L[2],1),'الألوان الأساسية',arr[2][1]]],T);}
+  return xpStepsCards(arr.map((c,i)=>[`<div class="xpbig">${c[0]}</div>`,['الخطوة الأولى','ارسم الشكل','التلوين','التفاصيل'][i]||'خطوة',c[1]]),T);}
 function xpTargetKey(toks){
   let k=null;scan(toks,0,true,r=>{if(!k){if(r.e.k==='st')k=r.e.key;else if(r.e.k==='grp'){const it=(r.e.items||[]).find(i=>i.st&&ST[i.st]);if(it)k=it.st;}}});
   if(k)return k;
@@ -1535,9 +1588,9 @@ function xpHowHtml(key){
 function xpRender(){
   let ov=document.getElementById('xp');
   if(xpView!=='explain'){
-    if(!xpKey||!ST[xpKey]){if(ov)ov.remove();return false;}
+    const isObj=xpKey&&typeof xpKey==='object';if(!xpKey||(!isObj&&!ST[xpKey])){if(ov)ov.remove();return false;}
     if(!ov){ov=document.createElement('div');ov.id='xp';document.body.appendChild(ov);}
-    ov.innerHTML=xpBar()+`<div class="xpg">${xpView==='parts'?xpPartsHtml(xpKey):xpHowHtml(xpKey)}</div>`;
+    ov.innerHTML=xpBar()+`<div class="xpg">${isObj?xpHowSpec(xpKey):xpView==='parts'?xpPartsHtml(xpKey):xpHowHtml(xpKey)}</div>`;
     xpBind(ov);return true;}
   const items=xpItems();
   if(!items.length){if(ov)ov.remove();return false;}
@@ -1551,12 +1604,12 @@ function xpRender(){
 function xpBar(){const v=xpView,m=xpMode,B=(id,t,on)=>`<button class="xb ${on?'on':''}" data-m="${id}">${t}</button>`;
   return `<div class="xpbar">${B('both','🎨✍️ الكل',v==='explain'&&m==='both')}${B('draw','🎨 بالرسم',v==='explain'&&m==='draw')}${B('text','✍️ بالكتابة',v==='explain'&&m==='text')}${B('parts','🧩 الأجزاء',v==='parts')}${B('how','✏️ كيف أرسم',v==='how')}<button class="xb x" data-m="close">✕</button></div>`;}
 function xpBind(ov){ov.querySelectorAll('.xb').forEach(b=>b.onclick=()=>{const v=b.dataset.m;if(v==='close'){ov.remove();return;}
-  if(v==='parts'||v==='how'){if(!xpKey)xpKey=xpTargetKey([]);xpView=v;}else{xpView='explain';xpMode=v;}xpRender();});}
+  if(v==='parts'||v==='how'){if(!xpKey)xpKey=xpTargetSpec([]);xpView=v;}else{xpView='explain';xpMode=v;}xpRender();});}
 function xpClose(){const ov=document.getElementById('xp');if(ov)ov.remove();}
 function xpCmd(t,toks,final){
   if(XP_OFF.test(t)){xpClose();return true;}
   const hp=XP_PARTS.test(t)&&(XP_V.test(t)||/(^| )(ما|اعرض|اذكر|سم|اظهر|وين|ماهي|ماهى)\S*( |$)/.test(t)||toks.length<=3),hh=XP_HOW.test(t);
-  if(hp||hh){const k=xpTargetKey(toks);if(k){xpKey=k;xpView=hh&&!hp?'how':'parts';return xpRender();}}
+  if(hp||hh){const k=xpTargetSpec(toks);if(k){xpKey=k;xpView=(typeof k==='object'||(hh&&!hp))?'how':'parts';return xpRender();}}
   xpView='explain';
   if(!XP_V.test(t))return false;
   let named=false;scan(toks,0,true,r=>{named=true;});
@@ -1723,7 +1776,7 @@ $('form').addEventListener('submit',e=>{e.preventDefault();const v=$('typed').va
 // خلفية متحركة هادئة
 {const star=r=>{let p='';for(let k=0;k<16;k++){const a=k*22.5*Math.PI/180,R=k%2?r*.765:r;p+=(k?'L':'M')+(50+R*Math.cos(a)).toFixed(1)+' '+(50+R*Math.sin(a)).toFixed(1);}return p+'Z';};
  $('fx').innerHTML=[[4,8,90,0],[78,6,130,-5],[88,58,100,-9],[6,62,140,-3],[44,30,70,-7]].map(([x,y,s,d])=>`<svg viewBox="0 0 100 100" style="left:${x}%;top:${y}%;width:${s}px;animation-delay:${d}s"><path d="${star(46)}"/></svg>`).join('');}
-window.__t={hear,ENT,cards,get les(){return les&&(les.n+':'+lsec+':'+lstep);},get cur(){return cur;},get n(){return pEls.length;},get spot(){return pSpot;}};
+window.__t={xpTest:(k,v)=>{xpKey=k;xpView=v;return xpRender();},keys:()=>Object.keys(ST),hear,ENT,cards,get les(){return les&&(les.n+':'+lsec+':'+lstep);},get cur(){return cur;},get n(){return pEls.length;},get spot(){return pSpot;}};
 
 </script>
 </body>
