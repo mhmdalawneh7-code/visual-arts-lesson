@@ -1374,7 +1374,9 @@ function hear(raw,final,alts){
   const isFinal=final===true;
   if(toks.length<done)done=0;
   clearTimeout(waitT);
-  const t=toks.join(' '),cmd=CALV.test(t)||CALT.test(t)||calScripts(t).length>0||CARDW.test(t)||SPOT.test(t)||SHOWV.test(t)||COLORV.test(t)||/موقت|مزج|امزج|اخلط|منظور/.test(t)||P_ADD.test(t)||P_ERASE.test(t)||SIZE.test(t)||SKYW.test(t);let drew=false;
+  const t=toks.join(' ');
+  if(/(^| )(اختبر|فحص|افحص|اظهر|اعرض)\S* (ال)?(مايك|ميكروفون|المايك|الميكروفون)( |$)/.test(t)){try{localStorage.setItem('micmeter',meterOn()?'0':'1');}catch(_){}if(meterOn()){micPro(true);msg('شريط مستوى الصوت يعمل. إذا لم يتحرك فالميكروفون لا يصل إليه صوت.');}else{micPro(false);msg('تم إيقاف شريط مستوى الصوت.');}return;}
+  const cmd=CALV.test(t)||CALT.test(t)||calScripts(t).length>0||CARDW.test(t)||SPOT.test(t)||SHOWV.test(t)||COLORV.test(t)||/موقت|مزج|امزج|اخلط|منظور/.test(t)||P_ADD.test(t)||P_ERASE.test(t)||SIZE.test(t)||SKYW.test(t);let drew=false;
   CMD=cmd||painting||!!cur;
   const from=Math.max(0,done-1);
   const next=scan(toks,from,!!final,(r,i)=>{const id=r.e.id+'@'+i;if(fired.has(id))return;fired.add(id);uHits++;for(let k=i;k<i+r.n;k++)hot.add(k);if(!painting&&!cmd&&!cards.length&&!cur){show(r.e);drew=true;}});
@@ -1460,6 +1462,7 @@ function recStart(){
 }
 /* ميكروفون احترافي (الكمبيوتر): إلغاء الصدى والضجيج وضبط التضخيم + مؤشر مستوى الصوت */
 let mstream=null,mctx=null,mbar=null,mraf=0,mlow=0;
+const meterOn=()=>{try{return localStorage.getItem('micmeter')==='1';}catch(_){return false;}};
 async function micPro(on){
   if(MOBILE||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return;
   if(!on){cancelAnimationFrame(mraf);if(mstream){mstream.getTracks().forEach(t=>t.stop());mstream=null;}if(mctx){try{mctx.close();}catch(_){}mctx=null;}if(mbar)mbar.style.display='none';return;}
@@ -1498,7 +1501,7 @@ function listen(on){
   want=on;
   if(dict){if(on)dict.start().catch(()=>{want=false;msg('لم يُسمح بالميكروفون.');showTyping();dotUI();});else dict.stop().catch(()=>{});dotUI();return;}
   if(!SR){want=false;msg('هذا المتصفح لا يدعم الاستماع. افتح الرابط في Chrome على أندرويد أو الكمبيوتر، أو في Safari على آيفون. يمكنك الكتابة الآن.');showTyping();dotUI();return;}
-  keepAwake(on);micPro(on);
+  keepAwake(on);if(!on||meterOn())micPro(on);
   if(on)startRec();else{try{rec&&rec.stop();}catch(_){}}
   dotUI();
 }
