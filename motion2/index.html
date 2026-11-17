@@ -1443,6 +1443,26 @@ function recStart(){
     if(++startFails>=3){startFails=0;try{rec.abort();}catch(_){}rec=null;startRec();}
   }
 }
+/* ميكروفون احترافي (الكمبيوتر): إلغاء الصدى والضجيج وضبط التضخيم + مؤشر مستوى الصوت */
+let mstream=null,mctx=null,mbar=null,mraf=0,mlow=0;
+async function micPro(on){
+  if(MOBILE||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return;
+  if(!on){cancelAnimationFrame(mraf);if(mstream){mstream.getTracks().forEach(t=>t.stop());mstream=null;}if(mctx){try{mctx.close();}catch(_){}mctx=null;}if(mbar)mbar.style.display='none';return;}
+  if(mstream)return;
+  try{
+    mstream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}});
+    const tr=mstream.getAudioTracks()[0];
+    tr.addEventListener('ended',()=>{mstream=null;mst('انقطع الميكروفون، أعد توصيله',true);});
+    mctx=new (window.AudioContext||window.webkitAudioContext)();const an=mctx.createAnalyser();an.fftSize=512;mctx.createMediaStreamSource(mstream).connect(an);
+    if(!mbar){mbar=document.createElement('span');mbar.title='مستوى صوت الميكروفون';mbar.style.cssText='display:inline-block;width:70px;height:10px;border-radius:6px;background:#0007;overflow:hidden;vertical-align:middle;margin:0 6px';mbar.innerHTML='<i style="display:block;height:100%;width:0;background:#7fe08a;transition:width .08s"></i>';document.querySelector('.ctl').prepend(mbar);}
+    mbar.style.display='';mbar.title='الميكروفون: '+(tr.label||'الافتراضي')+' — لتغييره اجعل الميكروفون المطلوب هو الافتراضي في إعدادات Chrome أو النظام';
+    const buf=new Uint8Array(an.fftSize),bi=mbar.firstChild;let quiet=0;
+    const tick=()=>{an.getByteTimeDomainData(buf);let m=0;for(const v of buf)m=Math.max(m,Math.abs(v-128));const lv=Math.min(1,m/64);
+      bi.style.width=Math.round(lv*100)+'%';bi.style.background=lv>.9?'#ff6b6b':lv>.08?'#7fe08a':'#f6d98a';
+      if(lv<.03){if(++quiet>600&&!mlow){mlow=1;mst('الصوت ضعيف جداً: قرّب الميكروفون أو افحص كتم الصوت',true);}}else{quiet=0;if(mlow){mlow=0;mst('');}}
+      mraf=requestAnimationFrame(tick);};tick();
+  }catch(err){mstream=null;}
+}
 /* إبقاء الشاشة مضاءة أثناء الاستماع: إطفاء الشاشة يوقف الميكروفون */
 let wakeLk=null;
 async function keepAwake(on){
@@ -1463,7 +1483,7 @@ function listen(on){
   want=on;
   if(dict){if(on)dict.start().catch(()=>{want=false;msg('لم يُسمح بالميكروفون.');showTyping();dotUI();});else dict.stop().catch(()=>{});dotUI();return;}
   if(!SR){want=false;msg('هذا المتصفح لا يدعم الاستماع. افتح الرابط في Chrome على أندرويد أو الكمبيوتر، أو في Safari على آيفون. يمكنك الكتابة الآن.');showTyping();dotUI();return;}
-  keepAwake(on);
+  keepAwake(on);micPro(on);
   if(on)startRec();else{try{rec&&rec.stop();}catch(_){}}
   dotUI();
 }
