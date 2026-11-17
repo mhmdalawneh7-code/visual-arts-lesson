@@ -91,6 +91,15 @@ button{cursor:pointer}
 @font-face{font-family:CalNaskh;src:url(fonts/amiri-arabic-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
 @font-face{font-family:CalRuqaa;src:url(fonts/aref-ruqaa-arabic-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:CalRuqaa;src:url(fonts/aref-ruqaa-arabic-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:CalThuluth;src:url(fonts/katibeh-arabic-400-normal.woff2) format('woff2');font-display:swap}
+@font-face{font-family:CalDiwani;src:url(fonts/rakkas-arabic-400-normal.woff2) format('woff2');font-display:swap}
+@font-face{font-family:CalFarsi;src:url(fonts/noto-nastaliq-urdu-arabic-400-normal.woff2) format('woff2');font-display:swap}
+@font-face{font-family:CalIjaza;src:url(fonts/mirza-arabic-400-normal.woff2) format('woff2');font-display:swap}
+.fth{font-family:CalThuluth,'Katibeh',serif;font-weight:400}
+.fd{font-family:CalDiwani,'Rakkas',serif;font-weight:400}
+.ff{font-family:CalFarsi,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:2.1!important}
+.fi{font-family:CalIjaza,'Mirza',serif;font-weight:400}
+.calp.two{grid-template-columns:1fr 1fr;column-gap:clamp(10px,2vw,30px)}.calp:not(.one) .calx{line-height:1.45!important}.calp.two .calr+.calr{border-top:0}.paper{position:relative}.decov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;animation:pop .5s ease}
 .fk{font-family:CalKufi,'Reem Kufi',sans-serif;font-weight:700;word-spacing:.32em}
 .fn{font-family:CalNaskh,'Amiri','Noto Naskh Arabic','Traditional Arabic',serif;font-weight:400}
 .fr{font-family:CalRuqaa,'Aref Ruqaa',serif;font-weight:400}
@@ -603,6 +612,7 @@ function showX(e){
   cur=null;show(e);
 }
 function show(e){
+  heroDeco=[];
   const now=Date.now();if(cur&&cur.id===e.id&&now-(lastAt[e.id]||0)<5000)return;lastAt[e.id]=now;
   if(e.k==='col')colSel=[e.id.slice(4)];else if(e.cols)colSel=e.cols.slice();else if(e.k!=='mix')colSel=[];
   if(cur&&cur!==e&&now-curAt>1500){const t=thumbOf(cur),tr=$('trail');if(t&&!(tr.firstElementChild&&tr.firstElementChild.outerHTML===t)){tr.insertAdjacentHTML('afterbegin',t);while(tr.children.length>6)tr.lastElementChild.remove();}}
@@ -615,7 +625,7 @@ function show(e){
 }
 function artFix(){const figs=[...document.querySelectorAll('#hero .art figure')],box=document.querySelector('#hero .art');if(!box)return;box.style.display=figs.length?'':'none';if(!figs.length&&cur&&cur.loc&&$('fact')){FX.list=[];$('fact').innerHTML=`<ul class="afacts">${cur.facts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`;}if(figs.length&&!figs.some(f=>f.classList.contains('on')))figs[0].classList.add('on');box.dataset.n=figs.length>1?(figs.findIndex(f=>f.classList.contains('on'))+1)+' / '+figs.length:'';}
 function artStep(d){const figs=[...document.querySelectorAll('#hero .art figure')];if(figs.length<2)return false;const i=figs.findIndex(f=>f.classList.contains('on'));figs.forEach(f=>f.classList.remove('on'));figs[(i+d+figs.length)%figs.length].classList.add('on');artFix();return true;}
-function renderHero(){const hp=$('hp');if(!hp||!cur||!hero)return;hp.innerHTML=cur.k==='x'?skylineSvg(hero.col):stSvg(cur.key,false,hero.col);}
+function renderHero(){const hp=$('hp');if(!hp||!cur||!hero)return;hp.innerHTML=cur.k==='x'?skylineSvg(hero.col):stSvg(cur.key,false,hero.col);if(heroDeco.length)decoHero(heroDeco);}
 /* اسم اللون بالعربية من قيمته */
 function nameOf(hex){
   const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,sat=d===0?0:d/(1-Math.abs(2*l-1));
@@ -691,7 +701,7 @@ function renderPainting(newId){
   let back='',front='';
   pEls.forEach(e=>{
     const on=e.id===pSpot,op=pSpot&&!on?' opacity=".22"':'';let g,glow='';
-    if(e.x){const k=e.k||1;g=`<g class="${e.id===newId?'pnew':''}"${op} transform="translate(${800-600*k} ${540-600*k}) scale(${1.5*k})"><g${e.col?'':' filter="url(#pencilgray)"'}>${skyline(false)}</g></g>`;if(on)glow=`<ellipse cx="800" cy="290" rx="700" ry="330" fill="url(#pglow)"/>`;}
+    if(e.x){const k=e.k||1;g=`<g class="${e.id===newId?'pnew':''}"${op} transform="translate(${800-600*k} ${540-600*k}) scale(${1.5*k})"><g${e.col?'':' filter="url(#pencilgray)"'}>${skyline(false)}</g></g>`;if(on)glow=`<ellipse cx="800" cy="290" rx="700" ry="330" fill="url(#pglow)"/>`;if(e.deco)g+=decoSvg(e);}
     else{const b=bbox(e.key);g=`<g class="${e.id===newId?'draw':''}"${op} transform="translate(${e.cx} ${e.cy.toFixed(1)}) scale(${e.sc.toFixed(3)}) translate(${-(b.x+b.w/2)} ${-(b.y+b.h/2)})">${marks(e.key,e.id===newId,e.col)}</g>`;
       if(on)glow=`<circle cx="${e.cx}" cy="${e.cy.toFixed(1)}" r="${(Math.max(b.w,b.h)*e.sc*.85).toFixed(0)}" fill="url(#pglow)"/>`;
       if(e.deco)g+=decoSvg(e);}
@@ -711,23 +721,65 @@ function numIn(toks){const m=[['ثلاث',3],['اربع',4],['خمس',5],['اث�
 let pLast=0;
 /* زخرفة على العنصر: شريط بنجوم ثمانية وخط متعرّج */
 function star8(x,y,r){let d='';for(let i=0;i<16;i++){const a=i*Math.PI/8,rr=i%2?r*.55:r;d+=(i?'L':'M')+(x+rr*Math.cos(a)).toFixed(1)+' '+(y+rr*Math.sin(a)).toFixed(1);}return d+'Z';}
+/* ثلاثة أنواع: هندسية (نجوم)، نباتية (فرع وأوراق وزهور)، كتابية (كلمة بالخط الكوفي) */
+function bandSvg(type,x0,y0,bw,bh,anim){
+  const n=Math.max(3,Math.round(bw/(bh*1.4)));let o='';
+  if(type==='geo'){
+    o+=`<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${(bh*.3).toFixed(1)}" fill="#8a1538" opacity=".92"/>`;
+    for(let i=0;i<n;i++){const x=x0+bw*(i+.5)/n;o+=`<path d="${star8(x,y0+bh/2,bh*.38)}" fill="${i%2?'#f4c430':'#fff'}"/>`;}
+    let zz=`M${x0.toFixed(1)} ${(y0+bh+3).toFixed(1)}`;for(let i=0;i<n*2;i++)zz+=`L${(x0+bw*(i+.5)/(n*2)).toFixed(1)} ${(y0+bh+3+(i%2?0:bh*.3)).toFixed(1)}`;
+    o+=`<path d="${zz}" fill="none" stroke="#1f6f78" stroke-width="${Math.max(2,bh*.1).toFixed(1)}" stroke-linejoin="round"/>`;
+  }else if(type==='veg'){
+    o+=`<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${(bh*.3).toFixed(1)}" fill="#f3e3c3" stroke="#3a9d4a" stroke-width="${Math.max(1.5,bh*.06).toFixed(1)}" opacity=".95"/>`;
+    const m=y0+bh/2;let d=`M${x0.toFixed(1)} ${m.toFixed(1)}`;const seg=bw/n;
+    for(let i=0;i<n;i++)d+=`Q${(x0+seg*(i+.5)).toFixed(1)} ${(m+(i%2?-1:1)*bh*.38).toFixed(1)} ${(x0+seg*(i+1)).toFixed(1)} ${m.toFixed(1)}`;
+    o+=`<path d="${d}" fill="none" stroke="#2f7d3a" stroke-width="${Math.max(2,bh*.08).toFixed(1)}" stroke-linecap="round"/>`;
+    for(let i=0;i<n;i++){const x=x0+seg*(i+.5),up=i%2?1:-1,ly=m-up*bh*.19;
+      o+=`<path d="M${x.toFixed(1)} ${ly.toFixed(1)}q${(seg*.22).toFixed(1)} ${(-up*bh*.3).toFixed(1)} ${(seg*.42).toFixed(1)} ${(-up*bh*.04).toFixed(1)}q${(-seg*.22).toFixed(1)} ${(up*bh*.26).toFixed(1)} ${(-seg*.42).toFixed(1)} ${(up*bh*.04).toFixed(1)}Z" fill="#3a9d4a"/>`;
+      o+=`<circle cx="${(x0+seg*i).toFixed(1)}" cy="${m.toFixed(1)}" r="${(bh*.11).toFixed(1)}" fill="#d63a2f"/>`;}
+  }else{
+    o+=`<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${(bh*.3).toFixed(1)}" fill="#1f3a44" opacity=".95"/>`;
+    const k=Math.max(2,Math.round(bw/(bh*3)));
+    for(let i=0;i<k;i++)o+=`<text x="${(x0+bw*(i+.5)/k).toFixed(1)}" y="${(y0+bh*.74).toFixed(1)}" font-size="${(bh*.78).toFixed(1)}" text-anchor="middle" fill="#f4c430" style="font-family:CalKufi,'Reem Kufi',sans-serif;font-weight:700">${i%2?'بلادي':'قطر'}</text>`;
+  }
+  return o;
+}
 function decoSvg(e){
-  const w=elW(e),h=elH(e),boat=e.key==='المحمل',bw=w*(boat?.62:.72),bh=Math.max(14,h*(boat?.1:.16)),x0=e.cx-bw/2,y0=e.cy+h*(boat?.24:.08)-bh/2;
-  const n=Math.max(3,Math.round(bw/(bh*1.4)));let st='',zz=`M${x0} ${y0+bh+3}`;
-  for(let i=0;i<n;i++){const x=x0+bw*(i+.5)/n;st+=`<path d="${star8(x,y0+bh/2,bh*.38)}" fill="${i%2?'#f4c430':'#fff'}"/>`;}
-  for(let i=0;i<n*2;i++)zz+=`L${(x0+bw*(i+.5)/(n*2)).toFixed(1)} ${(y0+bh+3+(i%2?0:bh*.35)).toFixed(1)}`;
-  return `<g class="pnew"><rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${(bh*.3).toFixed(1)}" fill="#8a1538" opacity=".92"/>${st}<path d="${zz}" fill="none" stroke="#1f6f78" stroke-width="${Math.max(2,bh*.12).toFixed(1)}" stroke-linejoin="round"/></g>`;
+  const types=e.deco&&e.deco.length?e.deco:['geo'];let o='';
+  if(e.x){const k=e.k||1,bw=760*k,bh=Math.max(26,46*k),x0=800-bw/2;
+    types.forEach((t,i)=>{o+=bandSvg(t,x0,300*k+60+i*(bh+10),bw,bh);});}
+  else{
+    const w=elW(e),h=elH(e),boat=e.key==='المحمل',bw=w*(boat?.62:.72),bh=Math.max(14,h*(boat?.1:.16)*(types.length>1?.8:1)),x0=e.cx-bw/2;
+    types.forEach((t,i)=>{o+=bandSvg(t,x0,e.cy+h*(boat?.24:.08)-bh/2+i*(bh*1.5),bw,bh);});}
+  return `<g class="pnew">${o}</g>`;
 }
 const DECO=/زخرف\S*|زخارف|زين\S*|نقوش|نقش/;
+const DECOV=/(^| )[وف]?(ارسم\S*|نرسم|ضع\S*|اضف\S*|زين\S*|نزين|زخرف\S*|اعمل\S*|حط\S*|زيد\S*|اجعل\S*|اعطها)( |$)/;
+function decoTypes(t){const r=[];if(/هندس/.test(t))r.push('geo');if(/نبات/.test(t))r.push('veg');if(/كتاب|خطي|حروف/.test(t))r.push('cal');return r;}
+function isDeco(t){return DECO.test(t)&&!P_ERASE.test(t)&&(DECOV.test(t)||/(^| )(علي|فوق)( |$)/.test(t))&&(decoTypes(t).length||/(^| )(علي|فوق|ب)( |$)/.test(t));}
+let heroDeco=[];
+function decoHero(types){
+  const hp=document.querySelector('#hero .paper');if(!hp)return false;
+  heroDeco=types;hp.querySelectorAll('.decov').forEach(x=>x.remove());
+  const bh=44,gap=14,H=types.length*(bh+gap),y0=Math.max(30,400-H-70);let g='';
+  types.forEach((ty,i)=>{g+=bandSvg(ty,90,y0+i*(bh+gap),820,bh);});
+  hp.insertAdjacentHTML('beforeend',`<svg class="decov" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">${g}</svg>`);return true;
+}
 function decoCmd(t,toks,es){
-  if(!DECO.test(t)||!/(^| )(علي|فوق|في|ب)( |$)|^زخرف|^زين/.test(t))return false;
-  const sts=es.filter(e=>e.k==='st');
+  if(!isDeco(t))return false;
+  const types=decoTypes(t);if(!types.length)types.push('geo');
+  const sts=es.filter(e=>e.k==='st'),tw=es.some(e=>e.k==='x');
   const find=key=>[...pEls].reverse().find(q=>q.key===key);
-  let el=sts.length?find(sts[0].key):null;
+  let el=tw?pEls.find(q=>q.x):sts.length?find(sts[0].key):null;
   if(!el&&sts.length){const id=pAdd({key:sts[0].key});el=pEls.find(q=>q.id===id);}
-  if(!el)el=pEls.find(q=>q.id===pSpot)||pEls.find(q=>q.id===pLast)||[...pEls].reverse().find(q=>!q.x);
-  if(!el||el.x)return false;
-  el.deco=!P_ERASE.test(t);pLast=el.id;renderPainting(0);return true;
+  if(!el)el=pEls.find(q=>q.id===pSpot)||pEls.find(q=>q.id===pLast)||[...pEls].reverse().find(q=>true);
+  if(!el)return false;
+  el.deco=types;pLast=el.id;renderPainting(0);return true;
+}
+function decoShown(t){
+  if(painting||!cur||!isDeco(t)||!['st','x','pic','con'].includes(cur.k))return false;
+  const types=decoTypes(t);if(!types.length)types.push('geo');
+  return decoHero(types);
 }
 const PL_R=/(^| )(ال)?(يمين|اليمين|يمينا|لليمين|باليمين)( |$)/,PL_L=/(^| )(ال)?(يسار|اليسار|يسارا|لليسار|باليسار|شمال|الشمال|للشمال|بالشمال)( |$)/,
  PL_C=/(^| )(بال|في ال|ال|لل)?(نص|نصف|منتصف|وسط)( |$)|بالنص|بالنصف|بالوسط|بالمنتصف|في النص/,PL_SEA=/(في|داخل|بداخل|علي|فوق|وسط) (ال)?(بحر|ماء|مي|مويه)|بالبحر|بحر/,
@@ -1169,10 +1221,15 @@ function sayHide(ms){clearTimeout(sayT);sayT=setTimeout(()=>$('say').classList.a
 const CAL={kufi:{name:'الخط الكوفي',f:'fk',facts:['من أقدم الخطوط العربية، ويُنسب إلى مدينة الكوفة.','حروفه مستقيمة وزواياه حادّة، كأنه أشكال هندسية.','كُتبت به المصاحف الأولى، وزُيّنت به جدران المساجد.']},
  naskh:{name:'خط النسخ',f:'fn',facts:['خط واضح سهل القراءة، حروفه ليّنة ومستديرة.','سُمّي بالنسخ لأن النُّسّاخ كانوا ينسخون به الكتب.','تُكتب به المصاحف وأغلب الكتب المطبوعة اليوم.']},
  ruqaa:{name:'خط الرقعة',f:'fr',facts:['خط سريع وبسيط، حروفه قصيرة وقليلة التشكيل.','نستعمله في الكتابة اليومية باليد.','أغلب حروفه تُكتب فوق السطر.']}};
-const CALORD=['kufi','naskh','ruqaa'];
+CAL.thuluth={name:'خط الثلث',f:'fth',tag:'زخرفي وجميل',facts:['زخرفي وجميل.','حروفه كبيرة ومنحنية، ويُكتب به على المساجد والمحاريب وعناوين الكتب.','يُعدّ من أصعب الخطوط وأجملها.']};
+CAL.diwani={name:'الخط الديواني',f:'fd',tag:'متداخل ومنحني',facts:['متداخل ومنحنٍ.','حروفه متصلة ومتراكبة وتميل إلى الأعلى.','كان يُكتب به في دواوين الدولة العثمانية.']};
+CAL.farsi={name:'الخط الفارسي',f:'ff',tag:'انسيابي ومائل',facts:['انسيابي ومائل.','يُعرف أيضاً بالنستعليق، ونشأ في بلاد فارس.','يُستعمل في الشعر والفنون الجميلة.']};
+CAL.ijaza={name:'خط الإجازة',f:'fi',tag:'يجمع النسخ والثلث',facts:['يجمع بين النسخ والثلث.','كان الخطاطون يكتبون به إجازاتهم لتلاميذهم.','أبسط من الثلث وأجمل من النسخ.']};
+CAL.kufi.tag='هندسي وزاوي';CAL.naskh.tag='واضح ومقروء';CAL.ruqaa.tag='بسيط وسريع';
+const CALORD=['naskh','ruqaa','thuluth','diwani','kufi','farsi','ijaza'];
 let calText='الخط العربي فن جميل';
 const CALV=/(^| )[وف]?(اكتب\S*|نكتب|كتابه)( |$)/,CALT=/خطوط (ال)?عربيه|خط (ال)?عربي|خطوط (ال)?ثلاث|انواع (ال)?خط(وط)? (ال)?عربي/;
-const calScripts=t=>CALORD.filter(k=>({kufi:/كوف/,naskh:/نسخ/,ruqaa:/رقع/})[k].test(t));
+const calScripts=t=>CALORD.filter(k=>({kufi:/كوف/,naskh:/نسخ/,ruqaa:/رقع/,thuluth:/ثلث/,diwani:/ديوان/,farsi:/فارس|نستعليق/,ijaza:/اجاز/})[k].test(t));
 function calView(list){
   const one=list.length===1?CAL[list[0]]:null;
   return {k:'cal',cal:true,id:'cal:'+list.join('+')+':'+calText,list,text:calText,title:one?one.name:'الخطوط العربية',
@@ -1181,7 +1238,8 @@ function calView(list){
 function calHtml(e){
   const n=Math.max(6,[...e.text].length);
   if(e.list.length===1)return `<div class="calp one"><span class="calx ${CAL[e.list[0]].f}" style="font-size:min(17vh,${(165/n).toFixed(2)}vw)">${esc(e.text)}</span></div>`;
-  return `<div class="calp">${e.list.map((k,i)=>`<div class="calr" style="animation-delay:${i*.5}s"><b>${esc(CAL[k].name)}</b><span class="calx ${CAL[k].f}" style="font-size:min(${e.list.length>2?9:12}vh,${(125/n).toFixed(2)}vw);animation-delay:${i*.5}s">${esc(e.text)}</span></div>`).join('')}</div>`;
+  const cols=e.list.length>4?2:1,rows=Math.ceil(e.list.length/cols);
+  return `<div class="calp${cols>1?' two':''}">${e.list.map((k,i)=>`<div class="calr" style="animation-delay:${(i*(e.list.length>4?.22:.5)).toFixed(2)}s"><b>${esc(CAL[k].name)}${CAL[k].tag?' · '+esc(CAL[k].tag):''}</b><span class="calx ${CAL[k].f}" style="font-size:min(${(Math.min(12,40/rows)).toFixed(1)}vh,${(125/cols/n).toFixed(2)}vw);animation-delay:${(i*(e.list.length>4?.22:.5)).toFixed(2)}s">${esc(e.text)}</span></div>`).join('')}</div>`;
 }
 /* يتّسع السطر للاسم كاملاً: نصغّر الخط حتى يدخل كله */
 function calFit(){document.querySelectorAll('#hero .calx').forEach(el=>{const box=el.parentNode,cs=getComputedStyle(box),W=box.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-6;if(W<=0)return;let fs=parseFloat(getComputedStyle(el).fontSize),k=0;while(el.getBoundingClientRect().width>W&&fs>12&&k++<40){fs*=.92;el.style.fontSize=fs+'px';}});}
@@ -1205,7 +1263,7 @@ function calCmd(t,raw){
   if(w){
     // الجملة = ما بعد «اكتب» ما عدا اسم الخط
     const ws=String(raw).trim().split(/\s+/),nw=ws.map(x=>norm(x));let v=nw.findIndex(x=>CALV.test(x));if(v<0)v=-1;
-    const drop=new Set();nw.forEach((x,i)=>{if(i>v&&/كوف|نسخ|رقع/.test(x)){drop.add(i);let j=i-1;while(j>v&&(/^(و|او|ام|ثم)$/.test(nw[j])||/^[بلو]?(ال)?خط(وط)?$/.test(nw[j]))){drop.add(j);j--;}}});
+    const drop=new Set();nw.forEach((x,i)=>{if(i>v&&/كوف|نسخ|رقع|ثلث|ديوان|فارس|نستعليق|اجاز/.test(x)){drop.add(i);let j=i-1;while(j>v&&(/^(و|او|ام|ثم)$/.test(nw[j])||/^[بلو]?(ال)?خط(وط)?$/.test(nw[j]))){drop.add(j);j--;}}});
     let out=ws.filter((_,i)=>i>v&&!drop.has(i));
     while(out.length&&CALCLEAN.test(norm(out[0])))out.shift();
     while(out.length&&/^(بالخطوط|الثلاثه|العربيه)$/.test(norm(out[out.length-1])))out.pop();
@@ -1239,7 +1297,7 @@ function hear(raw,final,alts){
   CMD=cmd||painting||!!cur;
   const from=Math.max(0,done-1);
   const next=scan(toks,from,!!final,(r,i)=>{const id=r.e.id+'@'+i;if(fired.has(id))return;fired.add(id);uHits++;for(let k=i;k<i+r.n;k++)hot.add(k);if(!painting&&!cmd&&!cards.length&&!cur){show(r.e);drew=true;}});
-  if(!cards.length&&talkSay(toks,!!final))drew=true;
+  if(!cards.length&&!((cur||painting)&&isDeco(t))&&talkSay(toks,!!final))drew=true;
   const shown=done;done=next;
   if(!final&&next<toks.length)waitT=setTimeout(()=>hear(raw,'flush'),900);
   // الكلام في وسط الصفحة بخط كبير وملوّن، ويختفي عند ظهور الرسمة
@@ -1252,6 +1310,7 @@ function hear(raw,final,alts){
     CMD=true;
     const base=cur&&(cur.k==='st'||cur.k==='x'||cur.k==='grp')?cur:null,n0=pEls.length,was=painting;
     if(talked){}
+    else if(decoShown(t)){drew=true;}
     else if(personCmd(t,toks)){drew=true;}
     else if(calCont(t,toks,raw)){}
     else if(!common(t,toks,raw)){
