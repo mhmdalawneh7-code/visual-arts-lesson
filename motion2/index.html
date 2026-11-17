@@ -760,13 +760,36 @@ function renderPainting(newId){
   pEls.forEach(e=>{
     const on=e.id===pSpot,op=pSpot&&!on?' opacity=".22"':'';let g,glow='';
     if(e.x){const k=e.k||1;g=`<g class="${e.id===newId?'pnew':''}"${op} transform="translate(${800-600*k} ${540-600*k}) scale(${1.5*k})"><g${e.col?'':' filter="url(#pencilgray)"'}>${skyline(false)}</g></g>`;if(on)glow=`<ellipse cx="800" cy="290" rx="700" ry="330" fill="url(#pglow)"/>`;if(e.deco)g+=decoSvg(e);}
-    else{const b=bbox(e.key);g=`<g class="${e.id===newId?'draw':''}"${op} transform="translate(${e.cx} ${e.cy.toFixed(1)}) scale(${e.sc.toFixed(3)}) translate(${-(b.x+b.w/2)} ${-(b.y+b.h/2)})">${marks(e.key,e.id===newId,e.col)}</g>`;
+    else{const b=bbox(e.key);g=`<g class="${e.id===newId?'draw':''}"${op} transform="translate(${e.cx} ${e.cy.toFixed(1)}) scale(${e.sc.toFixed(3)}) translate(${-(b.x+b.w/2)} ${-(b.y+b.h/2)})"><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent"/>${marks(e.key,e.id===newId,e.col)}</g>`;
       if(on)glow=`<circle cx="${e.cx}" cy="${e.cy.toFixed(1)}" r="${(Math.max(b.w,b.h)*e.sc*.85).toFixed(0)}" fill="url(#pglow)"/>`;
       if(e.deco)g+=decoSvg(e);}
+    g=`<g data-pid="${e.id}"${e.x?'':' style="cursor:grab"'}>${g}</g>`;
     if(on)front=glow+g;else back+=g;});
   const els=back+(pSpot?`<rect width="1600" height="900" fill="#000" opacity=".45"/>`:'')+front;
   const old=$('fact')?$('fact').innerHTML:'';
-  $('hero').innerHTML=`<div class="canvas"><svg viewBox="0 0 1600 900">${pBgSvg()}${els}</svg></div><div id="fact">${old}</div>`;
+  $('hero').innerHTML=`<div class="canvas"><svg viewBox="0 0 1600 900" style="touch-action:none">${pBgSvg()}${els}</svg></div><div id="fact">${old}</div>`;
+  attachDrag();
+}
+/* سحب العناصر بالماوس أو باللمس */
+function attachDrag(){
+  const svg=document.querySelector('#hero .canvas svg');if(!svg)return;
+  let dr=null;
+  const pt=ev=>{const m=svg.getScreenCTM();if(!m)return {x:0,y:0};const q=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(m.inverse());return {x:q.x,y:q.y};};
+  const grp=id=>[...svg.querySelectorAll('g[data-pid]')].filter(g=>{const q=+g.getAttribute('data-pid');return q===id||(pEls.find(e=>e.id===q)||{}).on===id;});
+  svg.addEventListener('pointerdown',ev=>{
+    const g=ev.target.closest&&ev.target.closest('g[data-pid]');if(!g)return;
+    const el=pEls.find(e=>e.id===+g.getAttribute('data-pid'));if(!el||el.x)return;
+    const p=pt(ev);dr={el,x0:p.x,y0:p.y,dx:0,dy:0,gs:grp(el.id)};
+    try{svg.setPointerCapture(ev.pointerId);}catch(_){}
+    dr.gs.forEach(q=>q.style.cursor='grabbing');ev.preventDefault();});
+  svg.addEventListener('pointermove',ev=>{
+    if(!dr)return;const p=pt(ev);const b=bbox(dr.el.key),hw=b.w*dr.el.sc/2,hh=b.h*dr.el.sc/2;
+    dr.dx=Math.max(hw-dr.el.cx,Math.min(1600-hw-dr.el.cx,p.x-dr.x0));dr.dy=Math.max(hh-dr.el.cy,Math.min(900-hh-dr.el.cy,p.y-dr.y0));
+    dr.gs.forEach(q=>q.setAttribute('transform','translate('+dr.dx.toFixed(1)+' '+dr.dy.toFixed(1)+')'));});
+  const end=()=>{if(!dr)return;const d=dr;dr=null;
+    if(Math.abs(d.dx)+Math.abs(d.dy)<4){d.gs.forEach(q=>{q.removeAttribute('transform');q.style.cursor='grab';});return;}
+    pMove(d.el,d.el.cx+d.dx,d.el.cy+d.dy);pLast=d.el.id;renderPainting(0);};
+  svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
 }
 function pFact(e){const fs=e.facts||[];if(!$('fact')||!fs.length)return;FX.list=fs;FX.i=0;FX.title=e.title;putFact();}
 function startPaintingWith(e){pEls=[];pid=pg=ps=pw=0;pSpot=0;pSky='day';pGround='sand';
@@ -878,6 +901,18 @@ function placeCmd(t,toks,es){
   const r=PL_R.test(t),l=PL_L.test(t),c=PL_C.test(t)&&!/نص (ال)?(ساعه|دقيقه)/.test(t),sea=PL_SEA.test(t)&&/(في|داخل|بداخل|علي|فوق|وسط|ب) ?(ال)?بحر|ماء/.test(t),on=PL_ON.test(t);
   const sts=es.filter(e=>e.k==='st');
   const fr=/(^| )(امام|قدام|بامام|قبال)( |$)/.test(t),bk=/(^| )(خلف|وراء|ورا|بخلف|ورى)( |$)/.test(t);
+  const its=es.filter(e=>e.k==='st'||e.k==='x');
+  if((fr||bk)&&its.length>=2&&its[0].id.replace(/^s3:/,'s:')!==its[1].id.replace(/^s3:/,'s:')&&(its[0].k==='x'||its[1].k==='x')){
+    const got=e=>e.k==='x'?(pEls.find(q=>q.x)||pEls.find(q=>q.id===pAdd({x:'towers'}))):([...pEls].reverse().find(q=>q.key===e.key)||pEls.find(q=>q.id===pAdd({key:e.key})));
+    const el=got(its[0]),a=got(its[1]);if(!el||!a||el===a)return false;
+    if(!el.x){
+      if(a.x){ if(fr){pMove(el,Math.max(300,Math.min(1300,el.cx)),705-elH(el)/2);} else{el.sc*=.85;pMove(el,Math.max(300,Math.min(1300,el.cx)),515-elH(el)/2);} }
+      else{const ab=a.cy+elH(a)/2;if(fr)pMove(el,a.cx+elW(a)*.3,Math.min(880,ab+28)-elH(el)/2);else{el.sc*=.85;pMove(el,a.cx-elW(a)*.3,ab-46-elH(el)/2);}}
+    }
+    pEls.splice(pEls.indexOf(el),1);
+    if(fr)pEls.splice(pEls.indexOf(a)+1,0,el);else pEls.splice(pEls.indexOf(a),0,el);
+    pLast=el.id;renderPainting(0);return true;
+  }
   if((fr||bk)&&sts.length>=2&&sts[0].key!==sts[1].key){
     const find=key=>[...pEls].reverse().find(q=>q.key===key),get=k=>find(k)||pEls.find(q=>q.id===pAdd({key:k}));
     const el=get(sts[0].key),a=get(sts[1].key);if(!el||!a)return false;
