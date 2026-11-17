@@ -189,6 +189,14 @@ body.hascards #hero,body.hascards #trail{opacity:.18;transition:opacity .4s}
 .xpc li b{font-size:1.3em;line-height:1}
 .xpc.small h3{font-size:clamp(17px,2.4vw,24px)}.xpc.small li{font-size:clamp(13px,1.7vw,17px)}
 @keyframes xpin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.xmap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 6px}
+.xst{position:relative;width:clamp(130px,17vw,190px);background:#fffdf6;border:2px solid #d8c7a4;border-radius:16px;padding:22px 8px 10px;text-align:center;opacity:0;animation:xpin .5s ease forwards}
+.xn{position:absolute;top:-14px;right:50%;transform:translateX(50%);width:30px;height:30px;border-radius:50%;background:#7a1230;color:#fff;font:800 17px system-ui;display:grid;place-items:center;box-shadow:0 2px 6px #0004}
+.xd svg{width:100%;height:clamp(80px,14vh,140px)}.xst h4{margin:4px 0 2px;color:#7a1230;font:800 clamp(13px,1.7vw,17px) system-ui}.xst p{margin:0;font:600 clamp(11px,1.4vw,14px)/1.4 system-ui;color:#5a4a3a}
+.xar{color:#c9a24b;font-size:22px;font-style:normal}
+.xflag{font:800 clamp(13px,1.8vw,18px) system-ui;color:#2f7d3a;background:#e4f3e4;border-radius:14px;padding:8px 12px}
+.xpc li b[style]{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#fff;font:800 16px system-ui;flex:none}
 </style>
 </head>
 <body>
@@ -1486,20 +1494,70 @@ function xpThumb(it){
   if(it.x)return `<svg viewBox="0 0 1200 600"><g filter="url(#pencilgray)" transform="translate(0 20)">${skyline(false)}</g></svg>`;
   if(it.img)return `<img src="${it.img}" alt="" onerror="this.style.display='none'">`;
   return '<div class="xpbig">🎨</div>';}
+
+/* ===== أجزاء الرسمة + كيف أرسمها (خريطة خطوات انفوجرافيك) ===== */
+let xpView='explain',xpKey=null;
+const XP_PARTS=/(^| )(ال)?(اجزاء|اجزاءه|اجزاءها|مكونات|اقسام|اجزا)( |$)/,
+      XP_HOW=/(^| )(كيف|طريقه|طريقة|خطوات|خطوه|علمني|علمنا|تعلم)( |$).*(رسم|ارسم|نرسم|اعمل|نعمل|رسمه)|(^| )(طريقه|خطوات|خطوه|مراحل) (ال)?(رسم|رسمه)|(^| )(كيف|علمني|علمنا) (ا|ن)?رسم/;
+const PNAME={'رايه':'راية','قبه':'قبة','مناره':'منارة','مئذنه':'مئذنة','لؤلؤه':'لؤلؤة','غتره':'غترة','شعله':'شعلة','بوابه':'بوابة','نافذه':'نافذة','اشعه':'أشعة','ارجل':'أرجل','ابراج':'أبراج','اوراق':'أوراق','ورق':'ورق','نوافذ':'نوافذ','زعانف':'زعانف','عجلات':'عجلات','اطارات':'إطارات','جدار':'جدار','جدران':'جدران','حائط':'حائط','سقف':'سقف','باب':'باب','قمه':'قمة','مركز':'مركز','وسط':'وسط','بتلات':'بتلات','شباك':'شباك','غطاء':'غطاء','مقبض':'مقبض','سرج':'سرج','ثوب':'ثوب','وجه':'وجه','حذاء':'حذاء','جذع':'جذع','سعف':'سعف','شراع':'شراع','علم':'علم','هيكل':'هيكل','جناح':'جناح','صدر':'صدر','منقار':'منقار','ذيل':'ذيل','وكر':'وكر','برج':'برج','زجاج':'زجاج','نار':'نار','ساق':'ساق','سيف':'سيف'};
+const PCOL=['#d63a2f','#2468c9','#f4c430','#2f9e55','#7b45b5','#ef7d22','#22b3a6','#ee6f9a'];
+function xpTargetKey(toks){
+  let k=null;scan(toks,0,true,r=>{if(!k){if(r.e.k==='st')k=r.e.key;else if(r.e.k==='grp'){const it=(r.e.items||[]).find(i=>i.st&&ST[i.st]);if(it)k=it.st;}}});
+  if(k)return k;
+  if(painting&&pEls.length){const e=pEls.find(q=>q.id===pSpot)||pEls.find(q=>q.id===pLast&&q.key)||[...pEls].reverse().find(q=>q.key);return e?e.key:null;}
+  if(cur&&cur.k==='st')return cur.key;
+  if(cur&&cur.thumb&&ST[cur.thumb])return cur.thumb;
+  return null;}
+function pathBox(d){const m=$('measure');m.innerHTML=`<path d="${d}"/>`;let b;try{b=m.firstChild.getBBox();}catch(_){b=null;}m.innerHTML='';return b;}
+function xpPartsHtml(key){
+  const st=ST[key],b=bbox(key),ps=PARTS[key]||{},idxName={};
+  Object.keys(ps).forEach(n=>{if(!(ps[n] in idxName))idxName[ps[n]]=PNAME[n]||n;});
+  let idxs=Object.keys(idxName).map(Number).filter(i=>st.f[i]);
+  if(!idxs.length){idxs=[st.main||0];idxName[idxs[0]]='الشكل الأساسي';if(st.f.length>1){const o=st.f.findIndex((f,i)=>i!==idxs[0]);idxs.push(o);idxName[o]='التفاصيل';}}
+  idxs.sort((a,c)=>a-c);
+  const fills=st.f.map((f,i)=>{const j=idxs.indexOf(i);return `<path d="${f[0]}" fill="${j>=0?PCOL[j%PCOL.length]:'#e6ddc9'}" opacity="${j>=0?.8:.55}"/>`;}).join('');
+  const strokes=st.s.map(x=>`<path d="${x[0]}" fill="none" stroke="#3b3936" stroke-width="${Math.max(2.5,x[2]*.8)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const R=Math.max(b.w,b.h)*.05;
+  const badges=idxs.map((i,j)=>{const bb=pathBox(st.f[i][0]);if(!bb)return '';const cx=bb.x+bb.width/2,cy=bb.y+bb.height/2;return `<g><circle cx="${cx}" cy="${cy}" r="${R}" fill="#fff" stroke="#3a2a1a" stroke-width="${R*.14}"/><text x="${cx}" y="${cy+R*.4}" font-size="${R*1.1}" text-anchor="middle" font-weight="800" fill="#3a2a1a" font-family="system-ui">${j+1}</text></g>`;}).join('');
+  const leg=idxs.map((i,j)=>`<li style="animation-delay:${.2+j*.3}s"><b style="background:${PCOL[j%PCOL.length]}">${j+1}</b><span>${idxName[i]}</span></li>`).join('');
+  return `<section class="xpc"><h3>أجزاء الرسمة: ${(stEnt(key)||{}).title||key}</h3><div class="xpb"><div class="xpd"><svg viewBox="${b.x-20} ${b.y-20} ${b.w+40} ${b.h+40}">${fills}${strokes}${badges}</svg></div><ol>${leg}</ol></div></section>`;}
+function xpHowHtml(key){
+  const st=ST[key],b=bbox(key),n=st.s.length;
+  const K=Math.max(3,Math.min(5,Math.ceil(n/3))),per=Math.ceil(n/Math.max(1,K-1));
+  const cap=[['الشكل العام','ارسم الشكل الأساسي بخط خفيف وبسيط.'],['الأجزاء الكبيرة','أضف الأجزاء الكبيرة بالتدريج.'],['التفاصيل','أضف التفاصيل الصغيرة بعناية.'],['تثبيت الخطوط','أعد الخطوط المهمة بقلم أغمق.'],['التلوين','لوّن بالألوان المناسبة.']];
+  const caps=K===5?cap:K===4?[cap[0],cap[1],cap[2],cap[4]]:[cap[0],cap[2],cap[4]];
+  const cards=caps.map((c,i)=>{
+    const last=i===K-1,upto=last?n:Math.min(n,per*(i+1)),from=per*i;
+    const strokes=st.s.slice(0,upto).map((x,j)=>{const cur=!last&&j>=from;return `<path d="${x[0]}" fill="none" stroke="${last?x[1]:cur?'#d63a2f':'#3b3936'}" stroke-width="${cur?Math.max(4,x[2]):Math.max(2.5,x[2]*.7)}" stroke-linecap="round" stroke-linejoin="round" opacity="${cur||last?1:.75}"/>`;}).join('');
+    const fills=last?st.f.map((f,j)=>`<path d="${f[0]}" fill="${f[1]}" opacity="${f[2]}"/>`).join(''):'';
+    return `<div class="xst" style="animation-delay:${i*.35}s"><div class="xn">${i+1}</div><div class="xd"><svg viewBox="${b.x-15} ${b.y-15} ${b.w+30} ${b.h+30}">${fills}${strokes}</svg></div><h4>${c[0]}</h4><p>${c[1]}</p></div>${i<K-1?'<i class="xar">◀</i>':''}`;}).join('');
+  return `<section class="xpc"><h3>كيف أرسم: ${(stEnt(key)||{}).title||key}</h3><div class="xmap"><div class="xflag">🚩 ابدأ</div>${cards}<div class="xflag">🏁 انتهينا</div></div></section>`;}
 function xpRender(){
-  let ov=document.getElementById('xp');const items=xpItems();
+  let ov=document.getElementById('xp');
+  if(xpView!=='explain'){
+    if(!xpKey||!ST[xpKey]){if(ov)ov.remove();return false;}
+    if(!ov){ov=document.createElement('div');ov.id='xp';document.body.appendChild(ov);}
+    ov.innerHTML=xpBar()+`<div class="xpg">${xpView==='parts'?xpPartsHtml(xpKey):xpHowHtml(xpKey)}</div>`;
+    xpBind(ov);return true;}
+  const items=xpItems();
   if(!items.length){if(ov)ov.remove();return false;}
   if(!ov){ov=document.createElement('div');ov.id='xp';document.body.appendChild(ov);}
   const m=xpMode,card=(it,k)=>{
     const th=m==='text'?'':`<div class="xpd">${xpThumb(it)}</div>`;
     const fl=m==='draw'?it.facts.slice(0,4).map((f,i)=>{const w=f.split(/[.،:؛]/)[0].trim().split(' ').slice(0,5).join(' ');return `<li style="animation-delay:${0}s"><b>${xpIcon(f,i)}</b><span>${w}</span></li>`;}):it.facts.map((f,i)=>`<li style="animation-delay:${.25+i*.35}s"><b>${xpIcon(f,i)}</b><span>${f}</span></li>`);
     return `<section class="xpc ${items.length>1?'small':''}"><h3>${it.title}</h3><div class="xpb">${th}<ol>${(Array.isArray(fl)?fl:[]).join('')}</ol></div></section>`;};
-  ov.innerHTML=`<div class="xpbar"><button class="xb ${m==='both'?'on':''}" data-m="both">🎨✍️ الكل</button><button class="xb ${m==='draw'?'on':''}" data-m="draw">🎨 بالرسم</button><button class="xb ${m==='text'?'on':''}" data-m="text">✍️ بالكتابة</button><button class="xb x" data-m="close">✕</button></div><div class="xpg ${items.length>1?'multi':''}">${items.map(card).join('')}</div>`;
-  ov.querySelectorAll('.xb').forEach(b=>b.onclick=()=>{const v=b.dataset.m;if(v==='close'){ov.remove();return;}xpMode=v;xpRender();});
-  return true;}
+  ov.innerHTML=xpBar()+`<div class="xpg ${items.length>1?'multi':''}">${items.map(card).join('')}</div>`;
+  xpBind(ov);return true;}
+function xpBar(){const v=xpView,m=xpMode,B=(id,t,on)=>`<button class="xb ${on?'on':''}" data-m="${id}">${t}</button>`;
+  return `<div class="xpbar">${B('both','🎨✍️ الكل',v==='explain'&&m==='both')}${B('draw','🎨 بالرسم',v==='explain'&&m==='draw')}${B('text','✍️ بالكتابة',v==='explain'&&m==='text')}${B('parts','🧩 الأجزاء',v==='parts')}${B('how','✏️ كيف أرسم',v==='how')}<button class="xb x" data-m="close">✕</button></div>`;}
+function xpBind(ov){ov.querySelectorAll('.xb').forEach(b=>b.onclick=()=>{const v=b.dataset.m;if(v==='close'){ov.remove();return;}
+  if(v==='parts'||v==='how'){if(!xpKey)xpKey=xpTargetKey([]);xpView=v;}else{xpView='explain';xpMode=v;}xpRender();});}
 function xpClose(){const ov=document.getElementById('xp');if(ov)ov.remove();}
 function xpCmd(t,toks,final){
   if(XP_OFF.test(t)){xpClose();return true;}
+  const hp=XP_PARTS.test(t)&&(XP_V.test(t)||/(^| )(ما|اعرض|اذكر|سم|اظهر|وين|ماهي|ماهى)\S*( |$)/.test(t)||toks.length<=3),hh=XP_HOW.test(t);
+  if(hp||hh){const k=xpTargetKey(toks);if(k){xpKey=k;xpView=hh&&!hp?'how':'parts';return xpRender();}}
+  xpView='explain';
   if(!XP_V.test(t))return false;
   let named=false;scan(toks,0,true,r=>{named=true;});
   if(named&&!XP_REF.test(t))return false;
@@ -1514,7 +1572,7 @@ function hear(raw,final,alts){
   const t=toks.join(' ');
   if(/(^| )(اختبر|فحص|افحص|اظهر|اعرض)\S* (ال)?(مايك|ميكروفون|المايك|الميكروفون)( |$)/.test(t)){try{localStorage.setItem('micmeter',meterOn()?'0':'1');}catch(_){}if(meterOn()){micPro(true);msg('شريط مستوى الصوت يعمل. إذا لم يتحرك فالميكروفون لا يصل إليه صوت.');}else{micPro(false);msg('تم إيقاف شريط مستوى الصوت.');}return;}
   if(isFinal&&xpCmd(t,toks,true))return;
-  if(isFinal&&document.getElementById('xp')&&!XP_V.test(t))xpClose();
+  if(isFinal&&document.getElementById('xp')&&!XP_V.test(t)&&!XP_PARTS.test(t)&&!XP_HOW.test(t))xpClose();
   const cmd=CALV.test(t)||CALT.test(t)||calScripts(t).length>0||CARDW.test(t)||SPOT.test(t)||SHOWV.test(t)||COLORV.test(t)||/موقت|مزج|امزج|اخلط|منظور/.test(t)||P_ADD.test(t)||P_ERASE.test(t)||SIZE.test(t)||SKYW.test(t);let drew=false;
   CMD=cmd||painting||!!cur;
   const from=Math.max(0,done-1);
