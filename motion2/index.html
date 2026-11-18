@@ -812,10 +812,32 @@ function skyline(water){
   s+=`<polygon points="490,400 490,130 550,92 550,400" fill="#6fa3b8" ${O}/>${win(490,150,60,250,12)}`;
   s+=`<rect x="580" y="170" width="36" height="230" fill="#88b7c9" ${O}/><rect x="624" y="200" width="36" height="200" fill="#9cc4d3" ${O}/>${win(580,170,36,230,10)}${win(624,200,36,200,9)}`;
   s+=`<path d="M690 400V250h16v-40h38v40h16V400Z" fill="#7a9db5" ${O}/>${win(690,250,70,150,7)}`;
+  if(ART_STYLE)s=skyStyle(s);
   if(water)s+=`<rect x="0" y="400" width="800" height="100" fill="#2f9fb0"/><path d="M0 430q25 -12 50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0" fill="none" stroke="#bfeaf0" stroke-width="3"/><path d="M0 465q25 -12 50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0" fill="none" stroke="#bfeaf0" stroke-width="3" opacity=".6"/>`;
   return s;
 }
-const skylineSvg=col=>`<svg viewBox="0 20 800 480"><g${col?'':' filter="url(#pencilgray)"'}>${skyline(true)}</g></svg>`;
+
+function skyStyle(base){
+  const BX=[[40,240,160,160],[220,180,60,220],[300,150,70,250],[400,40,60,360],[490,92,60,308],[580,170,36,230],[624,200,36,200],[690,210,70,190]];
+  if(ART_STYLE==='real')return `<g filter="url(#real)">${base}</g>`;
+  const u=++STUID;let r=11;const rnd=()=>{r=(r*73+19)%1009;return r/1009;};
+  if(ART_STYLE==='cubism'){
+    const b={x:40,y:40,w:720,h:360},C=5,R=3,W=b.w/C,Hh=b.h/R,P=[];
+    for(let j=0;j<=R;j++){P[j]=[];for(let i=0;i<=C;i++)P[j][i]=[b.x+i*W+((i&&i<C)?(rnd()-.5)*W*.5:0),b.y+j*Hh+((j&&j<R)?(rnd()-.5)*Hh*.5:0)];}
+    let defs=`<g id="cb${u}">${base}</g>`,body='',n=0;
+    const tri=(a,c,d)=>{const id=`cc${u}_${n}`,pts=[a,c,d].map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ');defs+=`<clipPath id="${id}"><polygon points="${pts}"/></clipPath>`;
+      const dx=(rnd()-.5)*W*.16,dy=(rnd()-.5)*Hh*.16,rot=(rnd()-.5)*10,cx=(a[0]+c[0]+d[0])/3,cy=(a[1]+c[1]+d[1])/3,tint=STY_P.cubism[(n*3+2)%8];
+      body+=`<g clip-path="url(#${id})"><g transform="translate(${dx.toFixed(1)} ${dy.toFixed(1)}) rotate(${rot.toFixed(1)} ${cx.toFixed(0)} ${cy.toFixed(0)})"><use href="#cb${u}"/></g><polygon points="${pts}" fill="${tint}" fill-opacity=".42" style="mix-blend-mode:multiply"/></g><polygon points="${pts}" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>`;n++;};
+    for(let j=0;j<R;j++)for(let i=0;i<C;i++){const a=P[j][i],c=P[j][i+1],d=P[j+1][i+1],e=P[j+1][i];if((i+j)%2){tri(a,c,e);tri(c,d,e);}else{tri(a,c,d);tri(a,d,e);}}
+    return `<defs>${defs}</defs>${body}`;}
+  const pal=STY_P.abstract;let o='',ln='',cs=[];
+  BX.forEach((q,i)=>{const cx=q[0]+q[2]/2,cy=q[1]+q[3]/2,c=pal[(i+1)%pal.length],t=i%3;cs.push([cx,cy]);
+    if(t===0)o+=`<rect x="${q[0]}" y="${q[1]}" width="${q[2]}" height="${q[3]}" fill="${c}" stroke="#111" stroke-width="4"/>`;
+    else if(t===1)o+=`<ellipse cx="${cx}" cy="${cy}" rx="${q[2]/2}" ry="${q[3]/2}" fill="${c}" stroke="#111" stroke-width="4"/>`;
+    else o+=`<polygon points="${cx},${q[1]} ${q[0]+q[2]},${q[1]+q[3]} ${q[0]},${q[1]+q[3]}" fill="${c}" stroke="#111" stroke-width="4"/>`;});
+  for(let i=1;i<cs.length;i++)ln+=`<line x1="${cs[i-1][0]}" y1="${cs[i-1][1]}" x2="${cs[i][0]}" y2="${cs[i][1]}" stroke="#111" stroke-width="3"/>`;
+  return ln+o+cs.slice(0,4).map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="12" fill="#111"/>`).join('');}
+const skylineSvg=col=>`<svg viewBox="0 20 800 480"><g${col||ART_STYLE?'':' filter="url(#pencilgray)"'}>${skyline(true)}</g></svg>`;
 
 /* ================= اللوحة الواحدة: ندمج العناصر ثم نضيف ونحذف ================= */
 const seen=[];let painting=false,pEls=[],pSky='day',pGround='sand',pid=0,pg=0,ps=0,pw=0;
@@ -858,7 +880,7 @@ function renderPainting(newId){
   let back='',front='';
   pEls.forEach(e=>{
     const on=e.id===pSpot,op=pSpot&&!on?' opacity=".22"':'';let g,glow='';
-    if(e.x){const k=e.k||1;g=`<g class="${e.id===newId?'pnew':''}"${op} transform="translate(${800-600*k} ${540-600*k}) scale(${1.5*k})"><g${e.col?'':' filter="url(#pencilgray)"'}>${skyline(false)}</g></g>`;if(on)glow=`<ellipse cx="800" cy="290" rx="700" ry="330" fill="url(#pglow)"/>`;if(e.deco)g+=decoSvg(e);}
+    if(e.x){const k=e.k||1;g=`<g class="${e.id===newId?'pnew':''}"${op} transform="translate(${800-600*k} ${540-600*k}) scale(${1.5*k})"><g${e.col||ART_STYLE?'':' filter="url(#pencilgray)"'}>${skyline(false)}</g></g>`;if(on)glow=`<ellipse cx="800" cy="290" rx="700" ry="330" fill="url(#pglow)"/>`;if(e.deco)g+=decoSvg(e);}
     else if(e.t==='text'){const w=e.w,h=e.fs;g=`<g${op} transform="translate(${e.cx.toFixed(0)} ${e.cy.toFixed(0)}) rotate(${e.rot||0})"><rect x="${(-w/2).toFixed(0)}" y="${(-h*.85).toFixed(0)}" width="${w.toFixed(0)}" height="${(h*1.3).toFixed(0)}" fill="transparent"/><text text-anchor="middle" font-size="${e.fs}" fill="${e.fill}" stroke="${e.stroke}" stroke-width="${Math.round(e.fs/14)}" paint-order="stroke" stroke-linejoin="round" style="font-family:${e.font},'Reem Kufi',sans-serif;font-weight:700">${esc(e.txt)}</text></g>`;}
     else{const b=bbox(e.key);g=`<g class="${e.id===newId?'draw':''}"${op} transform="translate(${e.cx} ${e.cy.toFixed(1)})${pCollage?' rotate('+((e.id*7)%13-6)+')':''} scale(${e.sc.toFixed(3)}) translate(${-(b.x+b.w/2)} ${-(b.y+b.h/2)})"><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent"/>${(()=>{PAPER=pCollage;const m=marks(e.key,e.id===newId,pCollage?(e.col||'orig'):e.col);PAPER=false;return m;})()}</g>`;
       if(on)glow=`<circle cx="${e.cx}" cy="${e.cy.toFixed(1)}" r="${(Math.max(b.w,b.h)*e.sc*.85).toFixed(0)}" fill="url(#pglow)"/>`;
@@ -1737,7 +1759,7 @@ function styleCmd(t,toks){
   if(!off&&!(sty&&STYV.test(t)))return false;
   if(off)ART_STYLE='';else ART_STYLE=sty;
   let named=false;scan(toks,0,true,r=>{if(r.e.k==='st')named=true;});
-  if(painting)renderPainting(0);else if(cur&&cur.k==='st'&&$('hp')){renderHero();}
+  if(painting)renderPainting(0);else if(cur&&(cur.k==='st'||cur.k==='x')&&$('hp')){renderHero();}
   return !named||off;}
 /* ===== شعار باسم أشخاص ===== */
 const LOGO_PAL=[['#7a1230','#f4c430'],['#1f3a44','#f4c430'],['#2468c9','#ffffff'],['#2f7d3a','#f6d98a'],['#3b2a4f','#f6d98a'],['#8a1538','#ffffff']];
